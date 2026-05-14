@@ -1,12 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createErrorResponse = exports.createSuccessResponse = void 0;
-const createSuccessResponse = (status, message, data) => {
+const createSuccessResponse = (status, message, data, meta) => {
     const response = {
         success: true,
         status,
         message,
+        timestamp: new Date().toISOString(),
     };
+    if (meta) {
+        response.meta = meta;
+    }
     if (Array.isArray(data)) {
         response.results = data;
     }
@@ -21,6 +25,7 @@ const createErrorResponse = (status, message, error) => {
         success: false,
         status,
         message,
+        timestamp: new Date().toISOString(),
         error,
     };
 };

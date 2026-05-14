@@ -94,7 +94,7 @@ export const getStreamId = async (req: Request, res: Response) => {
  */
 export const getArtist = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const result = await musicService.getArtistDetails(id);
     
     return res.status(HTTP_STATUS.OK).json(
@@ -112,7 +112,7 @@ export const getArtist = async (req: Request, res: Response) => {
  */
 export const getAlbum = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const result = await musicService.getAlbumDetails(id);
     
     return res.status(HTTP_STATUS.OK).json(

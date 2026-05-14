@@ -61,7 +61,7 @@ export default function HomePage() {
                 ) : trendingSongs.length > 0 ? (
                   <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                     {trendingSongs.slice(0, 10).map((song) => (
-                      <MusicCard key={song.id} song={song} />
+                      <MusicCard key={song.musicId} song={song} />
                     ))}
                   </div>
                 ) : (
@@ -100,8 +100,7 @@ export default function HomePage() {
               </section>
             </div>
           )}
-        </main>
-      </div>
+      </main>
     </div>
   );
 }

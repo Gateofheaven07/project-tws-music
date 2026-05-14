@@ -68,7 +68,7 @@ export const createPlaylist = async (req: Request, res: Response) => {
  */
 export const addSongToPlaylist = async (req: Request, res: Response) => {
   try {
-    const { playlistId } = req.params;
+    const playlistId = req.params.playlistId as string;
     const { songId, title, artist, album, thumbnail, duration } = req.body;
 
     // Pastiin lagunya ada di cache
@@ -107,7 +107,7 @@ export const addSongToPlaylist = async (req: Request, res: Response) => {
  */
 export const getPlaylistDetail = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     const playlist = await prisma.playlist.findUnique({
       where: { id },
@@ -141,7 +141,7 @@ export const getPlaylistDetail = async (req: Request, res: Response) => {
  */
 export const deletePlaylist = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const userId = (req as any).user.userId;
 
     // Pastiin playlist-nya punya user yang login

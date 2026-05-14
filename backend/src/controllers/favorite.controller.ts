@@ -39,12 +39,17 @@ export const getFavorites = async (req: Request, res: Response) => {
         }
       },
       duration: f.song.duration,
+      genres: [],
+      releaseDate: "",
       playback: {
         provider: "youtube",
         type: "iframe",
         videoId: f.song.youtubeUrl,
         embedUrl: f.song.youtubeUrl ? `https://www.youtube.com/embed/${f.song.youtubeUrl}` : null,
         youtubeUrl: f.song.youtubeUrl ? `https://www.youtube.com/watch?v=${f.song.youtubeUrl}` : null
+      },
+      statistics: {
+        popularity: 0
       }
     }));
 
@@ -121,7 +126,7 @@ export const addFavorite = async (req: Request, res: Response) => {
 export const removeFavorite = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
-    const { songId } = req.params;
+    const songId = req.params.songId as string;
 
     await prisma.favorite.delete({
       where: {

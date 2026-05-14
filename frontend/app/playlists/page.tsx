@@ -198,15 +198,8 @@ export default function PlaylistsPage() {
                   </button>
                 </div>
               )}
-            </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
-
-      {/* Player Bar */}
-      <div className="flex-shrink-0">
-        <PlayerBar />
-      </div>
-    </div>
-  );
-}
+    );
+  }

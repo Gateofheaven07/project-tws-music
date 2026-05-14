@@ -39,12 +39,17 @@ export const getHistory = async (req: Request, res: Response) => {
         }
       },
       duration: h.song.duration,
+      genres: [],
+      releaseDate: "",
       playback: {
         provider: "youtube",
         type: "iframe",
         videoId: h.song.youtubeUrl,
         embedUrl: h.song.youtubeUrl ? `https://www.youtube.com/embed/${h.song.youtubeUrl}` : null,
         youtubeUrl: h.song.youtubeUrl ? `https://www.youtube.com/watch?v=${h.song.youtubeUrl}` : null
+      },
+      statistics: {
+        popularity: 0
       }
     }));
 

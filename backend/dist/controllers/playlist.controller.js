@@ -56,7 +56,7 @@ exports.createPlaylist = createPlaylist;
  */
 const addSongToPlaylist = async (req, res) => {
     try {
-        const { playlistId } = req.params;
+        const playlistId = req.params.playlistId;
         const { songId, title, artist, album, thumbnail, duration } = req.body;
         // Pastiin lagunya ada di cache
         await prisma_1.prisma.song.upsert({
@@ -73,7 +73,7 @@ const addSongToPlaylist = async (req, res) => {
         });
         const playlistSong = await prisma_1.prisma.playlistSong.create({
             data: {
-                playlistId: playlistId,
+                playlistId,
                 songId,
             }
         });
@@ -89,9 +89,9 @@ exports.addSongToPlaylist = addSongToPlaylist;
  */
 const getPlaylistDetail = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
         const playlist = await prisma_1.prisma.playlist.findUnique({
-            where: { id: id },
+            where: { id },
             include: {
                 songs: {
                     include: {
@@ -115,17 +115,17 @@ exports.getPlaylistDetail = getPlaylistDetail;
  */
 const deletePlaylist = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
         const userId = req.user.userId;
         // Pastiin playlist-nya punya user yang login
         const playlist = await prisma_1.prisma.playlist.findFirst({
-            where: { id: id, userId }
+            where: { id, userId }
         });
         if (!playlist) {
             return res.status(constants_1.HTTP_STATUS.NOT_FOUND).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.NOT_FOUND, 'Playlist nggak ketemu atau kamu nggak punya akses.'));
         }
         await prisma_1.prisma.playlist.delete({
-            where: { id: id }
+            where: { id }
         });
         return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Playlist berhasil dihapus.'));
     }

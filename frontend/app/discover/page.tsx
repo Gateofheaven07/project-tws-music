@@ -39,7 +39,7 @@ export default function DiscoverPage() {
                   ) : searchResults.length > 0 ? (
                     <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                       {searchResults.map((song) => (
-                        <MusicCard key={song.id} song={song} />
+                        <MusicCard key={song.musicId} song={song} />
                       ))}
                     </div>
                   ) : (
@@ -64,7 +64,7 @@ export default function DiscoverPage() {
                   ) : trendingSongs.length > 0 ? (
                     <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                       {trendingSongs.map((song) => (
-                        <MusicCard key={song.id} song={song} />
+                        <MusicCard key={song.musicId} song={song} />
                       ))}
                     </div>
                   ) : (
@@ -74,15 +74,8 @@ export default function DiscoverPage() {
                   )}
                 </section>
               )}
-            </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
-
-      {/* Player Bar */}
-      <div className="flex-shrink-0">
-        <PlayerBar />
-      </div>
-    </div>
-  );
-}
+    );
+  }

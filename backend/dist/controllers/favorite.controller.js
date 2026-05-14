@@ -20,8 +20,44 @@ const getFavorites = async (req, res) => {
             },
         });
         // Kita mapping biar formatnya seragam sama hasil search
-        const results = favorites.map((f) => f.song);
-        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Daftar lagu favorit kamu.', results));
+        const results = favorites.map((f) => ({
+            musicId: f.song.id.startsWith('music_') ? f.song.id : `music_dz_${f.song.id}`,
+            title: f.song.title,
+            artist: {
+                id: `artist_unknown`,
+                name: f.song.artist
+            },
+            album: {
+                id: `album_unknown`,
+                name: f.song.album,
+                cover: {
+                    small: f.song.thumbnail,
+                    medium: f.song.thumbnail,
+                    big: f.song.thumbnail,
+                    xl: f.song.thumbnail
+                }
+            },
+            duration: f.song.duration,
+            genres: [],
+            releaseDate: "",
+            playback: {
+                provider: "youtube",
+                type: "iframe",
+                videoId: f.song.youtubeUrl,
+                embedUrl: f.song.youtubeUrl ? `https://www.youtube.com/embed/${f.song.youtubeUrl}` : null,
+                youtubeUrl: f.song.youtubeUrl ? `https://www.youtube.com/watch?v=${f.song.youtubeUrl}` : null
+            },
+            statistics: {
+                popularity: 0
+            }
+        }));
+        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Daftar lagu favorit kamu.', results, {
+            total: results.length,
+            provider: {
+                metadata: "database",
+                playback: "youtube"
+            }
+        }));
     }
     catch (error) {
         return res.status(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Gagal ngambil daftar favorit.'));
@@ -76,10 +112,10 @@ exports.addFavorite = addFavorite;
 const removeFavorite = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { songId } = req.params;
+        const songId = req.params.songId;
         await prisma_1.prisma.favorite.delete({
             where: {
-                userId_songId: { userId, songId: songId },
+                userId_songId: { userId, songId },
             },
         });
         return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Lagu dihapus dari favorit.'));

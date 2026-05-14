@@ -51,6 +51,7 @@ export const createErrorResponse = (
     success: false,
     status,
     message,
+    timestamp: new Date().toISOString(),
     error,
   };
 };

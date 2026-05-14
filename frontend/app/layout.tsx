@@ -3,8 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import QueryProvider from '@/providers/QueryProvider'
-import { PlayerBar } from '@/components/PlayerBar'
-import { Sidebar } from '@/components/Sidebar'
+import { LayoutContent } from '@/components/LayoutContent'
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -42,32 +41,3 @@ export default function RootLayout({
   )
 }
 
-import { usePathname } from 'next/navigation'
-
-function LayoutContent({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const isAuthPage = pathname?.startsWith('/auth')
-
-  if (isAuthPage) {
-    return <div className="flex-1 overflow-auto">{children}</div>
-  }
-
-  return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar Global */}
-        <div className="w-64 flex-shrink-0 hidden md:block">
-          <Sidebar />
-        </div>
-        
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-hidden flex flex-col">
-          {children}
-        </main>
-      </div>
-      
-      {/* Player Bar Global */}
-      <PlayerBar />
-    </div>
-  )
-}

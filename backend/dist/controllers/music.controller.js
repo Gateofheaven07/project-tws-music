@@ -47,7 +47,14 @@ const search = async (req, res) => {
             return res.status(constants_1.HTTP_STATUS.BAD_REQUEST).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.BAD_REQUEST, 'Mau nyari apa? Masukin keyword-nya dong.'));
         }
         const results = await musicService.searchSongs(q);
-        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, `Hasil pencarian buat "${q}"`, results));
+        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, `Search result for "${q}"`, results, {
+            query: q,
+            total: results.length,
+            provider: {
+                metadata: "deezer",
+                playback: "youtube"
+            }
+        }));
     }
     catch (error) {
         return res.status(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message));
@@ -60,7 +67,13 @@ exports.search = search;
 const trending = async (req, res) => {
     try {
         const results = await musicService.getTrendingSongs();
-        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Daftar lagu trending hari ini.', results));
+        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Daftar lagu trending hari ini.', results, {
+            total: results.length,
+            provider: {
+                metadata: "deezer",
+                playback: "youtube"
+            }
+        }));
     }
     catch (error) {
         return res.status(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message));
@@ -92,7 +105,7 @@ exports.getStreamId = getStreamId;
  */
 const getArtist = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
         const result = await musicService.getArtistDetails(id);
         return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Detail artis berhasil diambil.', result));
     }
@@ -106,7 +119,7 @@ exports.getArtist = getArtist;
  */
 const getAlbum = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
         const result = await musicService.getAlbumDetails(id);
         return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Detail album berhasil diambil.', result));
     }
