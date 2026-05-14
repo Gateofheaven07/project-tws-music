@@ -21,32 +21,23 @@ export const Header = ({ title = 'SoundWave' }: HeaderProps) => {
   };
 
   return (
-    <header className="h-16 bg-background/80 backdrop-blur-lg sticky top-0 z-40 px-6 flex items-center justify-between">
-      <div className="flex items-center gap-4 flex-1">
-        {/* Search Bar */}
-        <div className={cn(
-          'flex items-center gap-3 w-full max-w-[360px] rounded-full bg-surface-interactive px-4 py-2 transition-all group border border-transparent shadow-md',
-          isSearchFocused && 'border-foreground bg-surface-container'
-        )}>
-          <Search className={cn(
-            "h-5 w-5 transition-colors",
-            isSearchFocused ? "text-foreground" : "text-text-secondary"
-          )} />
-          <input
-            type="text"
-            placeholder="Apa yang ingin kamu dengarkan?"
-            value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            onFocus={() => setIsSearchFocused(true)}
-            onBlur={() => setIsSearchFocused(false)}
-            className="flex-1 bg-transparent outline-none text-[14px] text-foreground placeholder-text-secondary/50 font-medium"
-          />
-        </div>
+    <header className="sticky top-0 z-40 px-6 py-4 flex items-center justify-between w-full bg-background/80 backdrop-blur-md">
+      <div className="flex-1 max-w-xl relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-text-secondary" />
+        <input
+          type="text"
+          placeholder="Apa yang ingin kamu dengar?"
+          value={searchQuery}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          className="w-full bg-[#1F1F1F] text-foreground border-none rounded-full py-3 pl-[48px] pr-6 focus:ring-1 focus:ring-primary focus:bg-[#252525] transition-colors text-[16px] shadow-sm outline-none"
+        />
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6 ml-8">
         {/* Title for section could be here, but usually it's breadcrumbs or just empty in Spotify */}
-        <h1 className="text-xl font-bold text-foreground tracking-tight">{title}</h1>
+        {title !== 'Cari' && (
+          <h1 className="text-xl font-bold text-foreground tracking-tight">{title}</h1>
+        )}
       </div>
     </header>
   );

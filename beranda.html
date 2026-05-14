@@ -1,0 +1,390 @@
+<html class="dark" lang="id"><head></head><body class="bg-background text-text-primary font-body-reg min-h-screen flex flex-col md:flex-row antialiased">```html
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MusikKita - Beranda</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "status-negative": "#F3727F",
+                    "status-info": "#539DF5",
+                    "surface-variant": "#343535",
+                    "primary-fixed-dim": "#34e36a",
+                    "on-primary-fixed-variant": "#00531f",
+                    "on-tertiary": "#313030",
+                    "on-surface-variant": "#bbcbb8",
+                    "surface-container-lowest": "#0d0e0f",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-high": "#292a2a",
+                    "surface-container": "#1e2020",
+                    "primary-fixed": "#69ff89",
+                    "inverse-primary": "#006e2c",
+                    "on-surface": "#e3e2e2",
+                    "on-secondary-container": "#bab8b7",
+                    "surface-container-low": "#1a1c1c",
+                    "error": "#ffb4ab",
+                    "background": "#121414",
+                    "surface-elevated": "#252525",
+                    "on-error": "#690005",
+                    "surface-tint": "#34e36a",
+                    "tertiary-fixed-dim": "#c8c6c5",
+                    "on-background": "#e3e2e2",
+                    "on-secondary": "#313030",
+                    "tertiary-fixed": "#e5e2e1",
+                    "on-tertiary-fixed-variant": "#474746",
+                    "error-container": "#93000a",
+                    "secondary-fixed": "#e5e2e1",
+                    "surface-interactive": "#1F1F1F",
+                    "tertiary-container": "#bdbbba",
+                    "on-secondary-fixed-variant": "#474646",
+                    "border-default": "#4D4D4D",
+                    "secondary": "#c8c6c5",
+                    "on-tertiary-fixed": "#1c1b1b",
+                    "primary-container": "#1ed760",
+                    "surface-bright": "#38393a",
+                    "outline": "#859583",
+                    "surface-container-highest": "#343535",
+                    "inverse-surface": "#e3e2e2",
+                    "text-secondary": "#B3B3B3",
+                    "text-primary": "#FFFFFF",
+                    "on-primary": "#003913",
+                    "status-warning": "#FFA42B",
+                    "surface-dim": "#121414",
+                    "on-primary-container": "#005721",
+                    "surface": "#121414",
+                    "primary": "#4cf479",
+                    "on-primary-fixed": "#002108",
+                    "outline-variant": "#3c4a3c",
+                    "secondary-container": "#4a4949",
+                    "on-tertiary-container": "#4b4b4b",
+                    "tertiary": "#d9d7d6",
+                    "inverse-on-surface": "#2f3131",
+                    "secondary-fixed-dim": "#c8c6c5",
+                    "on-secondary-fixed": "#1c1b1b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "search-padding-left": "48px",
+                    "search-padding-right": "96px",
+                    "pill-padding-y": "8px",
+                    "lg": "24px",
+                    "sm": "12px",
+                    "xs": "4px",
+                    "pill-padding-x": "16px",
+                    "md": "16px",
+                    "base": "8px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "section-title": ["Hanken Grotesk"],
+                    "small-label": ["Hanken Grotesk"],
+                    "feature-heading": ["Hanken Grotesk"],
+                    "body-bold": ["Hanken Grotesk"],
+                    "button-nav": ["Hanken Grotesk"],
+                    "body-reg": ["Hanken Grotesk"],
+                    "micro": ["Hanken Grotesk"],
+                    "caption": ["Hanken Grotesk"],
+                    "button-upper": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "section-title": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "small-label": ["12px", {"lineHeight": "1.5", "letterSpacing": "normal", "fontWeight": "700"}],
+                    "feature-heading": ["18px", {"lineHeight": "1.3", "letterSpacing": "normal", "fontWeight": "700"}],
+                    "body-bold": ["16px", {"lineHeight": "1.5", "letterSpacing": "normal", "fontWeight": "700"}],
+                    "button-nav": ["14px", {"lineHeight": "normal", "letterSpacing": "0.14px", "fontWeight": "700"}],
+                    "body-reg": ["16px", {"lineHeight": "1.5", "letterSpacing": "normal", "fontWeight": "400"}],
+                    "micro": ["10px", {"lineHeight": "1.2", "letterSpacing": "normal", "fontWeight": "400"}],
+                    "caption": ["14px", {"lineHeight": "1.5", "letterSpacing": "normal", "fontWeight": "400"}],
+                    "button-upper": ["14px", {"lineHeight": "1.0", "letterSpacing": "1.8px", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Custom Utilities for styling */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .text-truncate-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style data-stitch-cursor=""></style><style data-stitch-scroll-lock=""></style>
+<!-- Desktop SideNavBar -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bottom-0 bg-surface-container-lowest z-50 p-lg gap-md border-r border-transparent">
+<div class="flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-section-title text-primary" style="font-variation-settings: 'FILL' 1;">graphic_eq</span>
+<div class="flex flex-col">
+<span class="font-feature-heading text-feature-heading text-primary">Soundwave</span>
+<span class="font-micro text-micro text-text-secondary uppercase">Premium Audio</span>
+</div>
+</div>
+<ul class="flex flex-col gap-sm">
+<li>
+<a class="flex items-center gap-4 text-text-primary font-body-bold hover:text-text-primary transition-colors duration-200 py-2" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>Beranda</a>
+</li>
+<li>
+<a class="flex items-center gap-4 text-text-secondary font-body-reg hover:text-text-primary transition-colors duration-200 py-2" href="#"><span class="material-symbols-outlined">search</span>Cari</a>
+</li>
+<li>
+<a class="flex items-center gap-4 text-text-secondary font-body-reg hover:text-text-primary transition-colors duration-200 py-2" href="#"><span class="material-symbols-outlined">library_music</span>Koleksi Kamu</a>
+</li>
+<li><a class="flex items-center gap-4 text-text-secondary font-body-reg hover:text-text-primary transition-colors duration-200 py-2" href="#"><span class="material-symbols-outlined">favorite</span>Lagu yang Disukai</a></li></ul>
+<button class="mt-md bg-surface-interactive text-text-primary font-button-upper text-button-upper py-pill-padding-y px-pill-padding-x rounded-full hover:bg-surface-elevated transition-colors text-left flex items-center gap-sm w-full shadow-sm"><span class="material-symbols-outlined text-primary">add</span>BUAT DAFTAR PUTAR</button>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 relative flex flex-col min-h-screen bg-gradient-to-b from-[#1F2937]/30 to-background pb-[154px] md:pb-[90px]">
+<!-- Sticky Top Header -->
+<header class="fixed top-0 left-0 md:left-64 right-0 z-30 flex justify-between items-center px-md md:px-xl py-lg bg-background/80 backdrop-blur-md shadow-sm">
+<div class="flex items-center gap-sm md:hidden">
+<span class="material-symbols-outlined text-section-title text-primary" style="font-variation-settings: 'FILL' 1;">graphic_eq</span>
+<span class="font-feature-heading text-feature-heading text-text-primary">Soundwave</span>
+</div>
+<h2 class="hidden md:block font-section-title text-section-title">Selamat Malam</h2>
+<div class="flex items-center gap-sm ml-auto md:ml-0">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-elevated flex items-center justify-center">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A close-up portrait of a young professional in a modern, dark-themed UI setting. The lighting is moody with subtle neon accents highlighting their face, fitting an immersive, premium digital audio application aesthetic. The mood is focused and serene, surrounded by deep blacks and cool grays." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDF8rrz4oS26EkUUchSlTVtsCR0sKAR9yBXsMyMINrzcqLFYSMhXxz9p-ZQVLVfaAEkxfABauLPs5rzd7YlLbJvLGcb5RCjPD6_MCVIIrWa_BFtaSsGKb2bRHI1AopmCYhsZoDYoKIxHRcCJafEsUybfve2U6H4m7DKUylBD231-O35d-FGE3eMD6TfXirxuBvNoSZc4FbSanCBqj1WhIkYsbbfVrdJJ0ppGTSjt8Ssz96ny9j-zvcZ7iTn_WlGjDC3iNLrEQFJRsM"/>
+</div>
+</div>
+</header>
+<div class="pt-24 px-md md:px-xl flex flex-col gap-xl">
+<h2 class="md:hidden font-section-title text-section-title mb-[-16px]">Selamat Malam</h2>
+<!-- Section: Baru diputar -->
+<section>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-sm md:gap-md">
+<!-- Item 1 -->
+<div class="group flex items-center bg-surface-container-high hover:bg-surface-elevated transition-colors duration-300 rounded-DEFAULT overflow-hidden cursor-pointer relative shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+<img class="w-14 h-14 md:w-20 md:h-20 object-cover" data-alt="A close up shot of a vintage vinyl record spinning on a modern turntable. The scene is illuminated by dramatic, moody low-key lighting with a subtle hint of neon green reflecting off the grooves. The aesthetic is tactile and premium, emphasizing the texture of the vinyl against a pure black background. This fits the content-first darkness theme of a modern music app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWeNthhFMQPKxBBnI_zhoK27JiUQzqriJZ9FcRYeCtosX6xz64e9vdneBcxAgm6xBLYdW8dXCWRjmK6nUbM8O2-2scgNpGZJnz4QUZDdAHmz9ifNT5vjxndCY2HjHF18DoUTDRUi8plii-xVfmK1GevLW5bTIFOk-l2GferA3WlGGHtYwUw23lwGs2RgEidTa7aSLj3ZDSIFrl7Wq_NYz4m6JYU1QNNCRuFkNzH3Uh_XBzUT0baJuXwEYKibxvmBp_CtiqKKsZI8Q"/>
+<span class="font-body-bold text-body-bold px-sm md:px-md truncate">Lofi Beats</span>
+<button class="absolute right-md w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg translate-y-2 group-hover:translate-y-0">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<!-- Item 2 -->
+<div class="group flex items-center bg-surface-container-high hover:bg-surface-elevated transition-colors duration-300 rounded-DEFAULT overflow-hidden cursor-pointer relative shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+<img class="w-14 h-14 md:w-20 md:h-20 object-cover" data-alt="An abstract electronic music visualizer featuring sharp, geometric wave forms in a dark digital space. The waves glow with an intense, functional green light against an infinite black void. The composition is dynamic and rhythmic, conveying a sense of deep bass and high energy suitable for an electronic dance music playlist cover. The style is minimalist yet highly immersive." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWKaI-z-6vfqEztduxvgOySr_4vU4ahgeZpYqC-C3FAVJuOhudS_bvF1h1lapShZTnWYevkgOVKAGXs74iPyJ7jKq2Sze0-UFXUuxKy3QmXVP8lCZchcHzgo3BiWeGDh1CaOQabqCV-pQEn3ClTX0z3AYwKnM7GXbSnTSduWDNveogXmvDCiPvaOlIpH39vEd6SpuRcPKaSyrxt-rJq0PpjnBgtUoPozxayQ_3i8oFibKGAOIRlQsKCGHdADcR5bfLZBSoE1t_dOk"/>
+<span class="font-body-bold text-body-bold px-sm md:px-md truncate">This Is Hindia</span>
+<button class="absolute right-md w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg translate-y-2 group-hover:translate-y-0">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<!-- Item 3 -->
+<div class="group flex items-center bg-surface-container-high hover:bg-surface-elevated transition-colors duration-300 rounded-DEFAULT overflow-hidden cursor-pointer relative shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+<img class="w-14 h-14 md:w-20 md:h-20 object-cover" data-alt="A sleek, professional studio microphone standing in a completely dark recording booth. A single, focused beam of stark white light illuminates the metallic mesh of the mic, creating a striking high-contrast image. The surrounding background is an absolute, noise-free black. The mood is intimate and focused, perfectly capturing the essence of acoustic or vocal-centric music production." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzflyggRy5rsCELAX14iFC_6mPsH7FsJ-U8Zmzb1ZamKMndM7h_U1x1L3xMA3LCq9IgSPXUWCNaoqfbjWNEwbsbs03TTrW4KTaBxmAB80lqjNVUjo-9YChMlPR0xS3uEc1fT5CROOIzapkBcN8coPehcG7EbM2Gezisb3lbyayUK_e2sIL4KELKYewft8xieTeKQV3RzT2OgfKjU6Ahs57NF014TQUfDD9a4hicQVgBGJSRVGCepg28_S7fPaiy-Omw70wb7757FQ"/>
+<span class="font-body-bold text-body-bold px-sm md:px-md truncate">Acoustic Hits</span>
+<button class="absolute right-md w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg translate-y-2 group-hover:translate-y-0">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<!-- Item 4 -->
+<div class="group flex items-center bg-surface-container-high hover:bg-surface-elevated transition-colors duration-300 rounded-DEFAULT overflow-hidden cursor-pointer relative shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+<img class="w-14 h-14 md:w-20 md:h-20 object-cover" data-alt="A stylized, low-angle shot of a classic electric guitar neck and fretboard resting in deep shadow. The only illumination is a thin rim light that highlights the silver strings and the edge of the wood, separating it from the pitch-black background. The aesthetic is raw and tactile, echoing the roots of rock and indie music in a modern, content-first dark UI context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEkS2gGQHzlD3_oJ-hI2io_V7Hia8Z2mbRSRYaPoWRjsUl0ApJp006trLpW9R03s7EfIJNv-Hpq8JA4lt43wkxhDKMjTMWBp4HHPEdfO4cjBzeCaQVRg2Ieeaj8MqN1EKvWRLzBQmTzO2AKy5Sdvy40zlM6uDzbyyTcVPrgMRNKD4KBaC91CPwndloU4Gs2DSIDpeQOa7ezG0FqNj05HBwzBS3rPKjPnhg6mPSvacXgvWufalttBdn3Esp7Rvwsf_zTSZ6n41dwQw"/>
+<span class="font-body-bold text-body-bold px-sm md:px-md truncate">Indie Lokal</span>
+<button class="absolute right-md w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg translate-y-2 group-hover:translate-y-0">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<!-- Item 5 -->
+<div class="hidden md:flex group items-center bg-surface-container-high hover:bg-surface-elevated transition-colors duration-300 rounded-DEFAULT overflow-hidden cursor-pointer relative shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+<img class="w-14 h-14 md:w-20 md:h-20 object-cover" data-alt="A pair of high-end, minimalist studio headphones resting on a dark grey slate surface. The lighting is incredibly soft and diffuse, ensuring no harsh highlights disrupt the monochromatic, achromatic palette. The image conveys a premium, immersive listening experience, aligning perfectly with a high-fidelity streaming service brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQO8EihuUNmhtDfQuFfa8qjzVXKEgmMN3evmWo-8OdyeuvZyGJIf1C6Uh-JmxDiC-Io50P9kPm_csm-RT0PntO9Ge2Szdo8cSiDsLamC2-3GeWXu2QqPAHxi4UxLLoM7LMaui0ro0uCIJglAPvpzB4nxslU5OdpLBZmuhO-AECCS7RxQs0ZLPdGNjvewsZGME1eq9w7sJlKL69XCEBALT8VNhERsLG20MFO7Tswxlm5U6QFXCWgmi6pKp_IYdQCrmHNV5E49FSMvQ"/>
+<span class="font-body-bold text-body-bold px-sm md:px-md truncate">Fokus Malam</span>
+<button class="absolute right-md w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg translate-y-2 group-hover:translate-y-0">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<!-- Item 6 -->
+<div class="hidden md:flex group items-center bg-surface-container-high hover:bg-surface-elevated transition-colors duration-300 rounded-DEFAULT overflow-hidden cursor-pointer relative shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+<img class="w-14 h-14 md:w-20 md:h-20 object-cover" data-alt="An energetic concert scene captured entirely in silhouette against a massive LED screen displaying abstract static. The crowd is merely a suggestion of shapes in the deep foreground blackness. The intense contrast and absence of color emphasize the pure energy and scale of a live music event, serving as a dramatic cover for a trending hits playlist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqtBpM4Py1ZmSsIcDFTLn-fO98aIEkFzZ4EsS8nXHJPNNQPdKLjZxslfQiwd_K29lqScjyVy7_5EFNxhBzAl8D06YQFmj1WgM-NErQoaHSOilu2R7iY3Aa6ZU1R1xjmV7tssSOwEOBTt2r3dIFfiC_k8DPArDTsfickP-zyvkCz_-MSx_FX_7_gfIXEAVU6GM5vx1qmsPMBwUW4bA2mU785KjlN8NJniAkelHRf1IxymCiOp8n6wVQKf5N4_RodUGUgFJr7NYxCF0"/>
+<span class="font-body-bold text-body-bold px-sm md:px-md truncate">Top 50 Indonesia</span>
+<button class="absolute right-md w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg translate-y-2 group-hover:translate-y-0">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Section: Dibuat untuk Kamu -->
+<section class="mt-md">
+<div class="flex items-end justify-between mb-md">
+<h3 class="font-section-title text-section-title hover:underline cursor-pointer">Dibuat untuk Kamu</h3>
+<a class="font-small-label text-small-label text-text-secondary hover:text-text-primary uppercase tracking-wider" href="#">Tampilkan semua</a>
+</div>
+<!-- Horizontal scroll on mobile, grid on desktop -->
+<div class="flex md:grid md:grid-cols-4 lg:grid-cols-5 gap-md overflow-x-auto no-scrollbar pb-sm snap-x">
+<!-- Card 1 -->
+<div class="group bg-surface-container hover:bg-surface-elevated p-md rounded-lg flex-shrink-0 w-[160px] md:w-auto transition-colors duration-300 cursor-pointer snap-start shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+<div class="relative mb-md shadow-[0_8px_24px_rgba(0,0,0,0.5)] rounded-DEFAULT overflow-hidden aspect-square">
+<img class="w-full h-full object-cover" data-alt="A portrait of a thoughtful musician composed entirely of typography and abstract monochrome textures. The face is barely visible, emerging from the deep black shadows, representing a highly personalized, algorithmic curation of music. The artistic style is modern, dark, and enigmatic, fitting for a 'Discover Weekly' algorithmic playlist cover." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBqmFfZjEUwljApGREyjtc5a7lohXeJ9NLjl5AjBPCuq29-vK8N3G2Gtm0ybRQuo2nqNXBSN-cEoA1efGFJiXfRTc0OCkuvwBIssdZntLOMnYCILlVT9cOxxLYEEswQca1Q6BydLyZSTHs_HcBtYaB_kuUjWBAT0DhWlj7nZxMZWX4mievHC8NWqtDLsqzctZtDCujBRUEs-mvZB8seYSRR5AumRPnxuottpHE6oFdSLx3sAG5Sks3LqlGdS6yMvQuZNQqqRLEnpA"/>
+<button class="absolute bottom-2 right-2 w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-xl translate-y-4 group-hover:translate-y-0 z-10 hover:scale-105 hover:bg-primary">
+<span class="material-symbols-outlined text-[28px]" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<h4 class="font-body-bold text-body-bold mb-xs truncate">Discover Weekly</h4>
+<p class="font-caption text-caption text-text-secondary text-truncate-2">Lagu baru dan lagu lama untuk kamu. Diperbarui setiap Senin.</p>
+</div>
+<!-- Card 2 -->
+<div class="group bg-surface-container hover:bg-surface-elevated p-md rounded-lg flex-shrink-0 w-[160px] md:w-auto transition-colors duration-300 cursor-pointer snap-start shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+<div class="relative mb-md shadow-[0_8px_24px_rgba(0,0,0,0.5)] rounded-DEFAULT overflow-hidden aspect-square">
+<img class="w-full h-full object-cover" data-alt="A geometric collage of various musical instruments—a piano key, a snare drum, a guitar string—all rendered in stark greyscale against a pitch-black background. A single, bold stroke of vibrant green slices through the composition. This represents a dynamic 'Daily Mix' playlist, combining different elements into a cohesive, high-energy package." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxWMwo9sB0OPgvUyAps3vbEJuVfoK_MdBNxpCp5BYkIUE2GZfSOVsgJbJMdm8qoTQTKU_mnWkY8nQ2GeebMk7fcYf_fU5WotxBtTwKK2DVT4axtEDO_cAJFHd-A2BZreaLHL7APr3oDTHHdgrZfcoei1cqw5nLd3MlVH1kqwrZFF4ScpgqkJsgDWIYzPzO5C1wV-zgS3-W_Jbd25kbCr-2nMZK2m94gvIbcSOaHho61fLcmzReDKtJ-eWV7Rha5x6uX8P291h9xS8"/>
+<button class="absolute bottom-2 right-2 w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-xl translate-y-4 group-hover:translate-y-0 z-10 hover:scale-105 hover:bg-primary">
+<span class="material-symbols-outlined text-[28px]" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<h4 class="font-body-bold text-body-bold mb-xs truncate">Daily Mix 1</h4>
+<p class="font-caption text-caption text-text-secondary text-truncate-2">Tulus, Raisa, Afgan, dan lainnya.</p>
+</div>
+<!-- Card 3 -->
+<div class="group bg-surface-container hover:bg-surface-elevated p-md rounded-lg flex-shrink-0 w-[160px] md:w-auto transition-colors duration-300 cursor-pointer snap-start shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+<div class="relative mb-md shadow-[0_8px_24px_rgba(0,0,0,0.5)] rounded-DEFAULT overflow-hidden aspect-square">
+<img class="w-full h-full object-cover" data-alt="A macro shot of a metallic audio jack resting on a dark, textured surface. The lighting is minimal, highlighting only the intricate details of the metal grooves. The background dissolves into a smooth, dark gradient. The mood is technical and focused, ideal for a 'Release Radar' playlist featuring fresh, high-quality audio drops." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBj8owI0sJL5a2COUB1XwlcOAHii7KmpVNuE6cXvrRMr2dGeWekJebY4cqgeDU3py9bQ9YRPPhqO_MzSY-QMaA9olpPX0JrFE0-gtl32rfYSHKWz76hPXe6wuWKjmOY-ydx4H8gDZwtPMCikmEGAIIgN43F3wuQrF9K6MDtj-f7kKmK_Mf2UjKwA9kg9iUIyjdqFSCCixRdF--SV5PpqEz7Zndjy-lHTfOH6eQjJjYYIMk2Dv40vfMNZYS_lROIrFD7PxemD-3mDC4"/>
+<button class="absolute bottom-2 right-2 w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-xl translate-y-4 group-hover:translate-y-0 z-10 hover:scale-105 hover:bg-primary">
+<span class="material-symbols-outlined text-[28px]" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<h4 class="font-body-bold text-body-bold mb-xs truncate">Release Radar</h4>
+<p class="font-caption text-caption text-text-secondary text-truncate-2">Dengarkan rilis terbaru dari artis yang kamu ikuti.</p>
+</div>
+<!-- Card 4 -->
+<div class="group bg-surface-container hover:bg-surface-elevated p-md rounded-lg flex-shrink-0 w-[160px] md:w-auto transition-colors duration-300 cursor-pointer snap-start shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+<div class="relative mb-md shadow-[0_8px_24px_rgba(0,0,0,0.5)] rounded-DEFAULT overflow-hidden aspect-square">
+<img class="w-full h-full object-cover" data-alt="A moody, atmospheric shot of rain droplets on a dark glass surface, blurring out blurred city lights in the distance. The overall tone is heavily desaturated, leaning almost entirely into pure blacks and deep grays, evoking a sense of introspection and melancholy. Perfect for a curated 'Sad Songs' or late-night listening playlist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZpDGIITC8iIhh2XG-cdeX5GewyQEH2GYjQMbi8bpc2QDaM9GDrRqonjvTVz-jA7OegKjS8havpBlMROc6_uvNGoViW3dwG76ZWenzlnC7W5ALW7XXZxLWEdzDEqg9lX8zmfcqZBUAeo63J3iI6QANzkvy3nbl7fTwqN42DhutfkhwYAEHDk-Pr2T7VgxKvjw8GVyAnJRPdfnat_ueWyE2UaukheqzE2RQ1KwcemPfrD18n511Z2Vud-OFO9dNd_eqln8aQUXrZBU"/>
+<button class="absolute bottom-2 right-2 w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-xl translate-y-4 group-hover:translate-y-0 z-10 hover:scale-105 hover:bg-primary">
+<span class="material-symbols-outlined text-[28px]" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<h4 class="font-body-bold text-body-bold mb-xs truncate">Daily Mix 2</h4>
+<p class="font-caption text-caption text-text-secondary text-truncate-2">Hindia, Pamungkas, Nadin Amizah.</p>
+</div>
+</div>
+</section>
+<!-- Section: Trending Musik Indonesia -->
+<section class="mt-md mb-xl">
+<div class="flex items-end justify-between mb-md">
+<h3 class="font-section-title text-section-title hover:underline cursor-pointer">Trending Musik Indonesia</h3>
+<a class="font-small-label text-small-label text-text-secondary hover:text-text-primary uppercase tracking-wider" href="#">Tampilkan semua</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+<!-- Track List Item 1 -->
+<div class="group flex items-center gap-md p-sm rounded-DEFAULT hover:bg-surface-elevated transition-colors duration-200 cursor-pointer">
+<div class="relative w-12 h-12 flex-shrink-0">
+<img class="w-full h-full object-cover rounded" data-alt="A tightly cropped, high-contrast black and white photograph of a cassette tape. The edges of the tape are sharp against the pure black background. A tiny, functional green play triangle is digitally overlaid in the center, hinting at a modern digital interface interpreting retro media. The style is strictly minimalist and tactile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDR539z5G_t5bWeRG2t-CWRiUKPQBJBXSFW0v9oLJlpNAs9nBS9dbNbcjwHe33jWqv1V32DAvKhhiASE2IL65XIB8Mw50ppr_FgT9UihfAEuCEA3Td-sQVgwmJIefaHCZKO5I6YSJKt1LEeB08Tn8u745Nsl5fSFYXDa5_qHKKHuvIR8R8V53OSYXananPIY2sLsAdb2l5n9ic7YTmTXR4ob-uF8ndqaiECNQSUuWHRDyRem-HK1D4zAdeXRyHWy-VOIihkNpfoJZ0"/>
+<div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-text-primary" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<h4 class="font-body-bold text-body-bold text-text-primary truncate">Sial</h4>
+<p class="font-caption text-caption text-text-secondary truncate">Mahalini</p>
+</div>
+<button class="text-text-secondary hover:text-text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+<!-- Track List Item 2 -->
+<div class="group flex items-center gap-md p-sm rounded-DEFAULT hover:bg-surface-elevated transition-colors duration-200 cursor-pointer">
+<div class="relative w-12 h-12 flex-shrink-0">
+<img class="w-full h-full object-cover rounded" data-alt="An abstract arrangement of sound dampening foam pyramids. The sharp, angular geometry is highlighted by dramatic top-down lighting, creating deep, impenetrable shadows in the valleys. The entire image is monochromatic, relying solely on structure and light to create depth. This embodies the premium, architectural aesthetic of the music platform's dark mode." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu2ri02Tzq0BJH_ICF4d7qZGr7gfDqYGcmrayLpMo0fHBSBcOrfNsazO0D_c7ZptRqPTx159p-PTJ4RsI0F778oRCl5ypDMhrlQkH-KXvGhKYxDG-Uh7UbT-5GRFav-kE447XveVm1eJXEXDZIDHD9n19tVhMsrNq7UxonGzcBy-w8lysGIZe2kwBPVot8hRlLm17OnYP9Ob4wVD7y7nLT6kXxCCcmbQSPzwdJvAsCahOkJ4U7ygDm7uiMhKqVWBv0xcdam1CtHOk"/>
+<div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-text-primary" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<h4 class="font-body-bold text-body-bold text-text-primary truncate">Komang</h4>
+<p class="font-caption text-caption text-text-secondary truncate">Raim Laode</p>
+</div>
+<button class="text-text-secondary hover:text-text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+<!-- Track List Item 3 -->
+<div class="group flex items-center gap-md p-sm rounded-DEFAULT hover:bg-surface-elevated transition-colors duration-200 cursor-pointer">
+<div class="relative w-12 h-12 flex-shrink-0">
+<img class="w-full h-full object-cover rounded" data-alt="A sleek, modern synthesizer keyboard photographed from a severe angle. Only a few white keys are visible catching the light, while the rest of the instrument and the background vanish into total darkness. The aesthetic is extremely clean, tactile, and professional, perfectly suited for a high-end music streaming UI component." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEInmzDy_3ULHJ03drOuNb5fzJ5lq_9HYJqeL8zfMsXqL2eXqM82dYDjfVHZtKyHOzZHVSyr1olRlt1pfoKUrrjtCFYLf6DnAfriEqF59zHn6Ulc6AoSdEVgOUAddtKaCAXEvQysO_2kRiFLudmc6EU9bpcmWPE1zkU24p2HG373BOZtaHJEY2w_1849PNA0PIE-qi6gK2C2iFjI-K1rEFRRPH9CxnpvvHDHtE6rs2MFfRRdfxVM6y6MoXF31ta5gegezqdxqTeuw"/>
+<div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-text-primary" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<h4 class="font-body-bold text-body-bold text-text-primary truncate">Runtuh</h4>
+<p class="font-caption text-caption text-text-secondary truncate">Feby Putri, Fiersa Besari</p>
+</div>
+<button class="text-text-secondary hover:text-text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Custom Desktop/Mobile "Now Playing" Bar -->
+<div class="fixed bottom-[64px] md:bottom-0 left-0 w-full md:w-[calc(100%-256px)] md:left-64 h-[90px] bg-surface-container-highest border-t border-border-default z-40 flex items-center px-md justify-between shadow-[0_-4px_24px_rgba(0,0,0,0.5)]">
+<!-- Left: Track Info -->
+<div class="flex items-center gap-sm w-[30%] min-w-[180px]">
+<img class="w-14 h-14 rounded shadow-md object-cover" data-alt="A tight crop of a spinning vinyl record under a very dim, focused light. The grooves of the record are sharply detailed against the pitch black label area. This image serves as the 'now playing' album art, emphasizing the tactile, immersive 'content-first darkness' brand philosophy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFT9QH-TaW_9aZLn8XBPbu-1g9DaYF32F9AE0LdQxzQ-p_puLpKAaDwuzKAlyCtXUZhBxg3tNAQFhfcq2Y3bSKZnUIIenlq_ytx5wKPskkuvjn_eg559uxDpHeJNc5araAPolK0AGs0gZripMS2U9wSAaQWhXPbogehVS5ymu3EwhQWqmfOdLVE8JtA0abN1N4bnwZMRMZHF8RNDm2YPifeql_Q-L3P3rzhtxeUkUakU4CTcJp2Jm53YfaCofdnVMvFRyW7nccTPM"/>
+<div class="flex flex-col truncate">
+<span class="font-body-bold text-body-bold text-text-primary truncate hover:underline cursor-pointer">Evaluasi</span>
+<span class="font-micro text-micro text-text-secondary truncate hover:underline cursor-pointer">Hindia</span>
+</div>
+<button class="ml-2 text-text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="favorite_border">favorite_border</span>
+</button>
+</div>
+<!-- Center: Controls -->
+<div class="flex flex-col items-center justify-center max-w-[40%] flex-1">
+<div class="flex items-center gap-md mb-xs">
+<button class="text-text-secondary hover:text-text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="shuffle">shuffle</span>
+</button>
+<button class="text-text-secondary hover:text-text-primary transition-colors">
+<span class="material-symbols-outlined text-[28px]" data-icon="skip_previous" style="font-variation-settings: 'FILL' 1;">skip_previous</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-text-primary text-background flex items-center justify-center hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<button class="text-text-secondary hover:text-text-primary transition-colors">
+<span class="material-symbols-outlined text-[28px]" data-icon="skip_next" style="font-variation-settings: 'FILL' 1;">skip_next</span>
+</button>
+<button class="text-text-secondary hover:text-text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="repeat">repeat</span>
+</button>
+</div>
+<div class="w-full flex items-center gap-sm">
+<span class="font-micro text-micro text-text-secondary w-8 text-right">1:23</span>
+<div class="flex-1 h-1 bg-surface-variant rounded-full overflow-hidden group cursor-pointer relative">
+<div class="h-full bg-text-primary group-hover:bg-primary rounded-full" style="width: 35%;"></div>
+<div class="absolute h-3 w-3 bg-text-primary rounded-full top-1/2 -translate-y-1/2 left-[35%] -translate-x-1/2 opacity-0 group-hover:opacity-100 shadow-md"></div>
+</div>
+<span class="font-micro text-micro text-text-secondary w-8">3:45</span>
+</div>
+</div>
+<!-- Right: Extra Controls (Hidden on small mobile) -->
+<div class="hidden md:flex items-center justify-end gap-sm w-[30%] min-w-[180px]">
+</div></div></body></html>
