@@ -21,10 +21,41 @@ export const getHistory = async (req: Request, res: Response) => {
       take: 50, // Ambil 50 lagu terakhir aja
     });
 
-    const results = history.map((h) => h.song);
+    const results = history.map((h) => ({
+      musicId: h.song.id.startsWith('music_') ? h.song.id : `music_dz_${h.song.id}`,
+      title: h.song.title,
+      artist: {
+        id: `artist_unknown`,
+        name: h.song.artist
+      },
+      album: {
+        id: `album_unknown`,
+        name: h.song.album,
+        cover: {
+          small: h.song.thumbnail,
+          medium: h.song.thumbnail,
+          big: h.song.thumbnail,
+          xl: h.song.thumbnail
+        }
+      },
+      duration: h.song.duration,
+      playback: {
+        provider: "youtube",
+        type: "iframe",
+        videoId: h.song.youtubeUrl,
+        embedUrl: h.song.youtubeUrl ? `https://www.youtube.com/embed/${h.song.youtubeUrl}` : null,
+        youtubeUrl: h.song.youtubeUrl ? `https://www.youtube.com/watch?v=${h.song.youtubeUrl}` : null
+      }
+    }));
 
     return res.status(HTTP_STATUS.OK).json(
-      createSuccessResponse(HTTP_STATUS.OK, 'Riwayat putar kamu.', results)
+      createSuccessResponse(HTTP_STATUS.OK, 'Riwayat putar kamu.', results, {
+        total: results.length,
+        provider: {
+          metadata: "database",
+          playback: "youtube"
+        }
+      })
     );
   } catch (error) {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(

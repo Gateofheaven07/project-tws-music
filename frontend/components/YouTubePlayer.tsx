@@ -97,13 +97,14 @@ export const YouTubePlayer = () => {
 
   // Ganti lagu pas currentSong berubah
   useEffect(() => {
-    if (!playerRef.current || !currentSong?.youtubeUrl) return;
+    const videoId = currentSong?.playback?.videoId;
+    if (!playerRef.current || !videoId) return;
 
-    playerRef.current.loadVideoById(currentSong.youtubeUrl);
+    playerRef.current.loadVideoById(videoId);
     if (!isPlaying) {
       playerRef.current.pauseVideo();
     }
-  }, [currentSong?.youtubeUrl]);
+  }, [currentSong?.playback?.videoId]);
 
   // Update Progress Bar
   useEffect(() => {

@@ -17,22 +17,45 @@ export const searchSongs = async (query: string) => {
     const tracks = response.data.data;
 
     // Mapping hasilnya dan tambahin field videoId (Aggregation)
-    // Kita bakal coba ambil videoId buat beberapa lagu pertama biar cepet
     const results = await Promise.all(
       tracks.slice(0, 10).map(async (track: any) => {
-        // Cek cache dulu biar nggak boros kuota YouTube
+        // Cek cache dulu
         const cache = await prisma.song.findUnique({
           where: { id: String(track.id) }
         });
 
+        const videoId = cache?.youtubeUrl || null;
+
         return {
-          id: String(track.id),
+          musicId: `music_dz_${track.id}`,
           title: track.title,
-          artist: track.artist.name,
-          album: track.album.title,
-          cover: track.album.cover_medium,
+          artist: {
+            id: `artist_dz_${track.artist.id}`,
+            name: track.artist.name
+          },
+          album: {
+            id: `album_dz_${track.album.id}`,
+            name: track.album.title,
+            cover: {
+              small: track.album.cover_small,
+              medium: track.album.cover_medium,
+              big: track.album.cover_big,
+              xl: track.album.cover_xl
+            }
+          },
           duration: track.duration,
-          videoId: cache?.youtubeUrl || null, // Nanti diisi pas mau diputer kalo masih null
+          genres: [], // Deezer search doesn't give genres directly, would need extra call
+          releaseDate: "", // Would need extra call
+          playback: {
+            provider: "youtube",
+            type: "iframe",
+            videoId: videoId,
+            embedUrl: videoId ? `https://www.youtube.com/embed/${videoId}` : null,
+            youtubeUrl: videoId ? `https://www.youtube.com/watch?v=${videoId}` : null
+          },
+          statistics: {
+            popularity: track.rank || 0
+          }
         };
       })
     );
@@ -58,14 +81,38 @@ export const getTrendingSongs = async () => {
           where: { id: String(track.id) }
         });
 
+        const videoId = cache?.youtubeUrl || null;
+
         return {
-          id: String(track.id),
+          musicId: `music_dz_${track.id}`,
           title: track.title,
-          artist: track.artist.name,
-          album: track.album.title,
-          cover: track.album.cover_medium,
+          artist: {
+            id: `artist_dz_${track.artist.id}`,
+            name: track.artist.name
+          },
+          album: {
+            id: `album_dz_${track.album.id}`,
+            name: track.album.title,
+            cover: {
+              small: track.album.cover_small,
+              medium: track.album.cover_medium,
+              big: track.album.cover_big,
+              xl: track.album.cover_xl
+            }
+          },
           duration: track.duration,
-          videoId: cache?.youtubeUrl || null,
+          genres: [],
+          releaseDate: "",
+          playback: {
+            provider: "youtube",
+            type: "iframe",
+            videoId: videoId,
+            embedUrl: videoId ? `https://www.youtube.com/embed/${videoId}` : null,
+            youtubeUrl: videoId ? `https://www.youtube.com/watch?v=${videoId}` : null
+          },
+          statistics: {
+            popularity: track.rank || 0
+          }
         };
       })
     );

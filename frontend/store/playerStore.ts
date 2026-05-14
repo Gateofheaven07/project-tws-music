@@ -1,14 +1,35 @@
 import { create } from 'zustand';
 
 export interface Song {
-  id: string;
+  musicId: string;
   title: string;
-  artist: string;
-  album?: string;
+  artist: {
+    id: string;
+    name: string;
+  };
+  album: {
+    id: string;
+    name: string;
+    cover: {
+      small: string;
+      medium: string;
+      big: string;
+      xl: string;
+    };
+  };
   duration: number;
-  thumbnail?: string;
-  youtubeUrl?: string;
-  deezerUrl?: string;
+  genres: string[];
+  releaseDate: string;
+  playback: {
+    provider: string;
+    type: string;
+    videoId: string | null;
+    embedUrl: string | null;
+    youtubeUrl: string | null;
+  };
+  statistics: {
+    popularity: number;
+  };
 }
 
 type RepeatMode = 'off' | 'all' | 'one';

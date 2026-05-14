@@ -18,11 +18,11 @@ export const Sidebar = () => {
   ];
 
   return (
-    <div className="flex h-screen flex-col gap-4 border-r border-border bg-sidebar p-6 text-sidebar-foreground">
+    <div className="flex h-screen w-64 flex-col gap-4 bg-black p-6 text-[#b3b3b3]">
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-primary">
-        <Music className="h-6 w-6" />
-        <span>SoundWave</span>
+      <Link href="/" className="flex items-center gap-2 mb-4 text-[#ffffff] hover:text-[#1ed760] transition-colors">
+        <Music className="h-8 w-8 text-[#1ed760]" />
+        <span className="text-xl font-bold tracking-tight">SoundWave</span>
       </Link>
 
       {/* Navigation */}
@@ -35,14 +35,17 @@ export const Sidebar = () => {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-4 py-2 transition-colors',
+                'flex items-center gap-4 py-2 transition-all duration-200 group',
                 isActive
-                  ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+                  ? 'text-[#ffffff] font-bold'
+                  : 'hover:text-[#ffffff]'
               )}
             >
-              <Icon className="h-5 w-5" />
-              <span className="font-medium">{item.label}</span>
+              <Icon className={cn(
+                "h-6 w-6 transition-colors",
+                isActive ? "text-[#ffffff]" : "group-hover:text-[#ffffff]"
+              )} />
+              <span className="text-[14px]">{item.label}</span>
             </Link>
           );
         })}
@@ -50,29 +53,29 @@ export const Sidebar = () => {
 
       {/* User Section */}
       {user ? (
-        <div className="border-t border-sidebar-border pt-4">
-          <div className="mb-4 flex items-center gap-3 rounded-lg bg-sidebar-accent/10 p-3">
-            <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-sidebar-accent-foreground font-bold">
+        <div className="border-t border-[#121212] pt-4">
+          <div className="mb-4 flex items-center gap-3 rounded-lg bg-[#121212] p-3 shadow-md">
+            <div className="h-10 w-10 rounded-full bg-[#1ed760] flex items-center justify-center text-black font-bold shadow-lg">
               {user.username[0].toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="truncate font-semibold text-sm">{user.username}</p>
-              <p className="truncate text-xs text-sidebar-foreground/70">{user.email}</p>
+              <p className="truncate font-bold text-sm text-[#ffffff]">{user.username}</p>
+              <p className="truncate text-xs text-[#b3b3b3]">{user.email}</p>
             </div>
           </div>
           <button
             onClick={logout}
-            className="flex w-full items-center gap-3 rounded-lg px-4 py-2 text-red-400 hover:bg-red-500/10 transition-colors"
+            className="flex w-full items-center gap-3 py-2 text-[#f3727f] hover:text-[#ffffff] transition-colors group"
           >
-            <LogOut className="h-5 w-5" />
-            <span>Logout</span>
+            <LogOut className="h-5 w-5 group-hover:scale-110 transition-transform" />
+            <span className="text-sm uppercase tracking-[1.4px] font-bold">Logout</span>
           </button>
         </div>
       ) : (
-        <div className="border-t border-sidebar-border pt-4">
+        <div className="border-t border-[#121212] pt-4">
           <Link
             href="/login"
-            className="block w-full rounded-lg bg-primary px-4 py-2 text-center font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+            className="btn-pill block w-full bg-[#ffffff] text-black text-center hover:scale-105 transition-transform"
           >
             Sign In
           </Link>

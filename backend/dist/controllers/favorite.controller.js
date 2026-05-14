@@ -79,7 +79,7 @@ const removeFavorite = async (req, res) => {
         const { songId } = req.params;
         await prisma_1.prisma.favorite.delete({
             where: {
-                userId_songId: { userId, songId },
+                userId_songId: { userId, songId: songId },
             },
         });
         return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Lagu dihapus dari favorit.'));

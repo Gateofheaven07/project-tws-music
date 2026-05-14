@@ -4,81 +4,54 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* SoundWave Design System - Light Mode */
+  /* SoundWave Design System - Light Mode (Fallback) */
   --background: #ffffff;
-  --foreground: #000000;
+  --foreground: #121212;
   --card: #f5f5f5;
-  --card-foreground: #000000;
-  --popover: #ffffff;
-  --popover-foreground: #000000;
+  --card-foreground: #121212;
   --primary: #1ed760;
-  --primary-foreground: #000000;
-  --secondary: #191414;
-  --secondary-foreground: #ffffff;
-  --muted: #e0e0e0;
-  --muted-foreground: #666666;
+  --primary-foreground: #ffffff;
+  --secondary: #b3b3b3;
+  --muted: #eeeeee;
+  --muted-foreground: #7c7c7c;
   --accent: #1ed760;
-  --accent-foreground: #000000;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #d4d4d4;
-  --input: #f5f5f5;
-  --ring: #1ed760;
-  --chart-1: #1ed760;
-  --chart-2: #191414;
-  --chart-3: #1db954;
-  --chart-4: #1ed760;
-  --chart-5: #1db954;
+  --border: #4d4d4d;
   --radius: 0.5rem;
-  --sidebar: #f5f5f5;
-  --sidebar-foreground: #000000;
-  --sidebar-primary: #1ed760;
-  --sidebar-primary-foreground: #000000;
-  --sidebar-accent: #1ed760;
-  --sidebar-accent-foreground: #000000;
-  --sidebar-border: #d4d4d4;
-  --sidebar-ring: #1ed760;
 }
 
 .dark {
-  /* SoundWave Design System - Dark Mode (Spotify-inspired) */
-  --background: #121212;
-  --foreground: #ffffff;
-  --card: #191414;
+  /* SoundWave Design System - Spotify Inspired Dark Theme */
+  --background: #121212; /* Base (Level 0) */
+  --foreground: #ffffff; /* --text-base */
+  --card: #181818;       /* Surface (Level 1) */
   --card-foreground: #ffffff;
-  --popover: #282828;
+  --popover: #1f1f1f;    /* Mid Dark */
   --popover-foreground: #ffffff;
-  --primary: #1ed760;
+  --primary: #1ed760;    /* Spotify Green */
   --primary-foreground: #000000;
-  --secondary: #191414;
+  --secondary: #1f1f1f;
   --secondary-foreground: #ffffff;
-  --muted: #404040;
-  --muted-foreground: #b3b3b3;
+  --muted: #1f1f1f;
+  --muted-foreground: #b3b3b3; /* Silver */
   --accent: #1ed760;
   --accent-foreground: #000000;
-  --destructive: #ef4444;
+  --destructive: #f3727f; /* Negative Red */
   --destructive-foreground: #ffffff;
-  --border: #282828;
-  --input: #282828;
+  --border: #4d4d4d;
+  --input: #1f1f1f;
   --ring: #1ed760;
-  --chart-1: #1ed760;
-  --chart-2: #1db954;
-  --chart-3: #1ed760;
-  --chart-4: #1db954;
-  --chart-5: #1ed760;
-  --sidebar: #0f0f0f;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #1ed760;
-  --sidebar-primary-foreground: #000000;
-  --sidebar-accent: #1ed760;
-  --sidebar-accent-foreground: #000000;
-  --sidebar-border: #282828;
-  --sidebar-ring: #1ed760;
+  
+  /* Sidebar specifically usually darker/black in Spotify */
+  --sidebar: #000000;
+  --sidebar-foreground: #b3b3b3;
+  --sidebar-primary: #ffffff;
+  --sidebar-accent: #1f1f1f;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #121212;
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: 'Inter', 'Geist', sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -98,15 +71,13 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-pill: 9999px;
+  --radius-circle: 50%;
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -114,7 +85,6 @@
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 @layer base {
@@ -124,4 +94,35 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Custom Utilities for DESIGN.md */
+  .btn-pill {
+    @apply rounded-full px-6 py-2 font-bold uppercase tracking-[1.4px] text-[14px] transition-all;
+  }
+  
+  .btn-circle {
+    @apply rounded-full flex items-center justify-center p-3 transition-all;
+  }
+
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-md shadow-lg border border-white/5;
+  }
+
+  .text-silver {
+    @apply text-[#b3b3b3];
+  }
+  
+  .text-near-white {
+    @apply text-[#cbcbcb];
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
 }

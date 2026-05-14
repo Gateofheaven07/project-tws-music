@@ -19,7 +19,14 @@ export const search = async (req: Request, res: Response) => {
     const results = await musicService.searchSongs(q);
     
     return res.status(HTTP_STATUS.OK).json(
-      createSuccessResponse(HTTP_STATUS.OK, `Hasil pencarian buat "${q}"`, results)
+      createSuccessResponse(HTTP_STATUS.OK, `Search result for "${q}"`, results, {
+        query: q,
+        total: results.length,
+        provider: {
+          metadata: "deezer",
+          playback: "youtube"
+        }
+      })
     );
   } catch (error: any) {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
@@ -36,7 +43,13 @@ export const trending = async (req: Request, res: Response) => {
     const results = await musicService.getTrendingSongs();
     
     return res.status(HTTP_STATUS.OK).json(
-      createSuccessResponse(HTTP_STATUS.OK, 'Daftar lagu trending hari ini.', results)
+      createSuccessResponse(HTTP_STATUS.OK, 'Daftar lagu trending hari ini.', results, {
+        total: results.length,
+        provider: {
+          metadata: "deezer",
+          playback: "youtube"
+        }
+      })
     );
   } catch (error: any) {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(

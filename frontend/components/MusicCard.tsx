@@ -20,7 +20,7 @@ export const MusicCard = ({ song, isCompact = false }: MusicCardProps) => {
   const { user } = useAuth();
   const { addFavorite, removeFavorite } = useMusic();
 
-  const isFavorited = favoriteSongs.some((s) => s.id === song.id);
+  const isFavorited = favoriteSongs.some((s) => s.musicId === song.musicId);
 
   const handlePlayClick = () => {
     setQueue([song]);
@@ -32,7 +32,7 @@ export const MusicCard = ({ song, isCompact = false }: MusicCardProps) => {
     e.stopPropagation();
     if (!user) return;
     if (isFavorited) {
-      removeFavorite(song.id);
+      removeFavorite(song.musicId);
     } else {
       addFavorite(song);
     }
@@ -40,11 +40,11 @@ export const MusicCard = ({ song, isCompact = false }: MusicCardProps) => {
 
   if (isCompact) {
     return (
-      <div className="flex items-center gap-3 rounded-lg p-2 hover:bg-muted/50 transition-colors group cursor-pointer">
-        <div className="relative h-12 w-12 flex-shrink-0 rounded bg-muted overflow-hidden">
-          {song.thumbnail ? (
+      <div className="flex items-center gap-4 rounded-md p-2 hover:bg-[#282828] transition-colors group cursor-pointer animate-fade-in">
+        <div className="relative h-12 w-12 flex-shrink-0 rounded bg-[#1f1f1f] overflow-hidden shadow-md">
+          {song.album.cover.medium ? (
             <Image
-              src={song.thumbnail}
+              src={song.album.cover.medium}
               alt={song.title}
               fill
               className="object-cover"
@@ -53,73 +53,83 @@ export const MusicCard = ({ song, isCompact = false }: MusicCardProps) => {
               }}
             />
           ) : (
-            <div className="h-full w-full bg-gradient-to-br from-primary/20 to-primary/10" />
+            <div className="h-full w-full bg-[#1f1f1f]" />
           )}
           <button
             onClick={handlePlayClick}
-            className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
           >
             <Play className="h-5 w-5 text-white fill-white" />
           </button>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="truncate font-semibold text-sm text-foreground">{song.title}</p>
-          <p className="truncate text-xs text-muted-foreground">{song.artist}</p>
+          <p className="truncate font-bold text-sm text-[#ffffff] group-hover:underline underline-offset-2">{song.title}</p>
+          <p className="truncate text-[12px] text-[#b3b3b3]">{song.artist.name}</p>
         </div>
+        <button
+          onClick={handleFavoriteClick}
+          className={cn(
+            "p-2 opacity-0 group-hover:opacity-100 transition-all",
+            isFavorited ? "opacity-100 text-[#1ed760]" : "text-[#b3b3b3] hover:text-[#ffffff]"
+          )}
+        >
+          <Heart className={cn("h-4 w-4", isFavorited && "fill-current")} />
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="group relative overflow-hidden rounded-lg bg-card hover:shadow-lg transition-all hover:bg-card/80">
+    <div className="group relative rounded-lg bg-[#181818] p-4 hover:bg-[#282828] transition-all duration-300 shadow-md animate-fade-in cursor-pointer">
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden bg-muted">
-        {song.thumbnail ? (
+      <div className="relative aspect-square overflow-hidden rounded-md bg-[#1f1f1f] shadow-lg mb-4">
+        {song.album.cover.big ? (
           <Image
-            src={song.thumbnail}
+            src={song.album.cover.big}
             alt={song.title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform"
+            className="object-cover"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
           />
         ) : (
-          <div className="h-full w-full bg-gradient-to-br from-primary/30 to-primary/10" />
+          <div className="h-full w-full bg-[#1f1f1f]" />
         )}
 
-        {/* Overlay with play button */}
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Play Button (Spotify Style - Floating on bottom right) */}
+        <div className="absolute right-2 bottom-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
           <button
-            onClick={handlePlayClick}
-            className="rounded-full bg-primary p-4 text-primary-foreground hover:bg-primary/90 transition-colors shadow-lg"
+            onClick={(e) => {
+              e.stopPropagation();
+              handlePlayClick();
+            }}
+            className="rounded-full bg-[#1ed760] p-3 text-black shadow-2xl hover:scale-105 active:scale-95 transition-transform"
           >
-            <Play className="h-6 w-6 fill-current" />
+            <Play className="h-6 w-6 fill-black" />
           </button>
         </div>
-
-        {/* Favorite Button */}
-        <button
-          onClick={handleFavoriteClick}
-          className={cn(
-            'absolute right-2 top-2 rounded-full p-2 transition-all',
-            isFavorited
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-black/40 text-white hover:bg-black/60'
-          )}
-        >
-          <Heart className={cn('h-5 w-5', isFavorited && 'fill-current')} />
-        </button>
       </div>
 
       {/* Info */}
-      <div className="p-4">
-        <p className="truncate font-semibold text-foreground group-hover:text-primary transition-colors">
-          {song.title}
-        </p>
-        <p className="truncate text-sm text-muted-foreground">{song.artist}</p>
-        {song.album && (
-          <p className="truncate text-xs text-muted-foreground/70 mt-1">{song.album}</p>
+      <div className="space-y-1">
+        <div className="flex items-start justify-between gap-2">
+          <p className="truncate font-bold text-[16px] text-[#ffffff] leading-tight flex-1">
+            {song.title}
+          </p>
+          <button
+            onClick={handleFavoriteClick}
+            className={cn(
+              "transition-colors",
+              isFavorited ? "text-[#1ed760]" : "text-[#b3b3b3] hover:text-[#ffffff]"
+            )}
+          >
+            <Heart className={cn("h-4 w-4", isFavorited && "fill-current")} />
+          </button>
+        </div>
+        <p className="truncate text-[14px] text-[#b3b3b3]">{song.artist.name}</p>
+        {song.album.name && (
+          <p className="truncate text-[12px] text-[#b3b3b3]/60">{song.album.name}</p>
         )}
       </div>
     </div>

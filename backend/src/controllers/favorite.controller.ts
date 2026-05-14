@@ -21,10 +21,41 @@ export const getFavorites = async (req: Request, res: Response) => {
     });
 
     // Kita mapping biar formatnya seragam sama hasil search
-    const results = favorites.map((f) => f.song);
+    const results = favorites.map((f) => ({
+      musicId: f.song.id.startsWith('music_') ? f.song.id : `music_dz_${f.song.id}`,
+      title: f.song.title,
+      artist: {
+        id: `artist_unknown`,
+        name: f.song.artist
+      },
+      album: {
+        id: `album_unknown`,
+        name: f.song.album,
+        cover: {
+          small: f.song.thumbnail,
+          medium: f.song.thumbnail,
+          big: f.song.thumbnail,
+          xl: f.song.thumbnail
+        }
+      },
+      duration: f.song.duration,
+      playback: {
+        provider: "youtube",
+        type: "iframe",
+        videoId: f.song.youtubeUrl,
+        embedUrl: f.song.youtubeUrl ? `https://www.youtube.com/embed/${f.song.youtubeUrl}` : null,
+        youtubeUrl: f.song.youtubeUrl ? `https://www.youtube.com/watch?v=${f.song.youtubeUrl}` : null
+      }
+    }));
 
     return res.status(HTTP_STATUS.OK).json(
-      createSuccessResponse(HTTP_STATUS.OK, 'Daftar lagu favorit kamu.', results)
+      createSuccessResponse(HTTP_STATUS.OK, 'Daftar lagu favorit kamu.', results, {
+        total: results.length,
+        provider: {
+          metadata: "database",
+          playback: "youtube"
+        }
+      })
     );
   } catch (error) {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(

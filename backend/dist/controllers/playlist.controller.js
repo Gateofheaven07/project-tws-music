@@ -73,7 +73,7 @@ const addSongToPlaylist = async (req, res) => {
         });
         const playlistSong = await prisma_1.prisma.playlistSong.create({
             data: {
-                playlistId,
+                playlistId: playlistId,
                 songId,
             }
         });
@@ -91,7 +91,7 @@ const getPlaylistDetail = async (req, res) => {
     try {
         const { id } = req.params;
         const playlist = await prisma_1.prisma.playlist.findUnique({
-            where: { id },
+            where: { id: id },
             include: {
                 songs: {
                     include: {
@@ -119,13 +119,13 @@ const deletePlaylist = async (req, res) => {
         const userId = req.user.userId;
         // Pastiin playlist-nya punya user yang login
         const playlist = await prisma_1.prisma.playlist.findFirst({
-            where: { id, userId }
+            where: { id: id, userId }
         });
         if (!playlist) {
             return res.status(constants_1.HTTP_STATUS.NOT_FOUND).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.NOT_FOUND, 'Playlist nggak ketemu atau kamu nggak punya akses.'));
         }
         await prisma_1.prisma.playlist.delete({
-            where: { id }
+            where: { id: id }
         });
         return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Playlist berhasil dihapus.'));
     }

@@ -44,11 +44,11 @@ export const useMusic = () => {
       setSearching(true);
 
       try {
-        // Pake api instance biar token otomatis kejual kalo udah login
         const response = await api.get('/music/search', {
           params: { q: query },
         });
-        setSearchResults(response.data.data);
+        // Pake results sesuai arsitektur baru
+        setSearchResults(response.data.results || []);
       } catch (error) {
         console.error('Gagal nyari musik:', error);
         setSearchResults([]);
@@ -63,7 +63,7 @@ export const useMusic = () => {
     setTrendingLoading(true);
     try {
       const response = await api.get('/music/trending');
-      setTrendingSongs(response.data.data);
+      setTrendingSongs(response.data.results || []);
     } catch (error) {
       console.error('Gagal ngambil lagu trending:', error);
       setTrendingSongs([]);
@@ -77,7 +77,7 @@ export const useMusic = () => {
     setFavoritesLoading(true);
     try {
       const response = await api.get('/favorites');
-      setFavoriteSongs(response.data.data);
+      setFavoriteSongs(response.data.results || []);
     } catch (error) {
       console.error('Gagal ngambil favorit:', error);
     } finally {
@@ -90,11 +90,11 @@ export const useMusic = () => {
       if (!accessToken) return;
       try {
         await api.post('/favorites', {
-          songId: song.id,
+          songId: song.musicId,
           title: song.title,
-          artist: song.artist,
-          album: song.album,
-          thumbnail: song.thumbnail,
+          artist: song.artist.name,
+          album: song.album.name,
+          thumbnail: song.album.cover.medium,
           duration: song.duration
         });
         toggleFavorite(song);
@@ -106,11 +106,11 @@ export const useMusic = () => {
   );
 
   const removeFavorite = useCallback(
-    async (songId: string) => {
+    async (musicId: string) => {
       if (!accessToken) return;
       try {
-        await api.delete(`/favorites/${songId}`);
-        const song = favoriteSongs.find((s) => s.id === songId);
+        await api.delete(`/favorites/${musicId}`);
+        const song = favoriteSongs.find((s) => s.musicId === musicId);
         if (song) toggleFavorite(song);
       } catch (error) {
         console.error('Gagal hapus favorit:', error);

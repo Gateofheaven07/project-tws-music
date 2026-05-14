@@ -39,7 +39,7 @@ export const PlayerBar = () => {
   const { favoriteSongs } = useMusicStore();
   const { addFavorite, removeFavorite } = useMusic();
 
-  const isFavorited = currentSong && favoriteSongs.some((s) => s.id === currentSong.id);
+  const isFavorited = currentSong && favoriteSongs.some((s) => s.musicId === currentSong.musicId);
 
   // Efek buat nyari Video ID YouTube pas lagu ganti
   useEffect(() => {
@@ -57,8 +57,7 @@ export const PlayerBar = () => {
 
         if (response.data.data.videoId) {
           // Update song di store dengan videoId
-          // Kita asumsikan youtubeUrl di store itu nyimpen videoId
-          currentSong.youtubeUrl = response.data.data.videoId;
+          currentSong.playback.videoId = response.data.data.videoId;
         }
       } catch (error) {
         console.error('Gagal ngambil video ID:', error);
@@ -84,13 +83,13 @@ export const PlayerBar = () => {
     <>
       <YouTubePlayer />
 
-      <div className="border-t border-border bg-card px-6 py-4">
-        {/* Now Playing Info */}
-        <div className="mb-4 flex items-center gap-4">
-          <div className="relative h-16 w-16 flex-shrink-0 rounded bg-muted overflow-hidden">
-            {currentSong.thumbnail ? (
+      <div className="h-[90px] bg-black border-t border-[#121212] px-4 flex items-center justify-between fixed bottom-0 left-0 right-0 z-50 shadow-2xl">
+        {/* Left: Now Playing Info (30% width approx) */}
+        <div className="flex items-center gap-4 w-[30%] min-w-[180px]">
+          <div className="relative h-14 w-14 flex-shrink-0 rounded-[4px] bg-[#181818] overflow-hidden shadow-lg group">
+            {currentSong.album.cover.small ? (
               <Image
-                src={currentSong.thumbnail}
+                src={currentSong.album.cover.small}
                 alt={currentSong.title}
                 fill
                 className="object-cover"
@@ -99,118 +98,106 @@ export const PlayerBar = () => {
                 }}
               />
             ) : (
-              <div className="h-full w-full bg-gradient-to-br from-primary/20 to-primary/10" />
+              <div className="h-full w-full bg-[#181818]" />
             )}
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="truncate font-semibold text-foreground">{currentSong.title}</p>
-            <p className="truncate text-sm text-muted-foreground">{currentSong.artist}</p>
+            <p className="truncate font-bold text-[14px] text-[#ffffff] hover:underline cursor-pointer">{currentSong.title}</p>
+            <p className="truncate text-[11px] text-[#b3b3b3] hover:text-[#ffffff] hover:underline cursor-pointer">{currentSong.artist.name}</p>
           </div>
 
           <button
             onClick={() => {
               if (isFavorited) {
-                removeFavorite(currentSong.id);
+                removeFavorite(currentSong.musicId);
               } else {
                 addFavorite(currentSong);
               }
             }}
             className={cn(
-              'rounded-full p-2 transition-colors',
-              isFavorited
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:text-foreground'
+              'transition-colors p-2',
+              isFavorited ? 'text-[#1ed760]' : 'text-[#b3b3b3] hover:text-[#ffffff]'
             )}
           >
             <Heart className={cn('h-5 w-5', isFavorited && 'fill-current')} />
           </button>
         </div>
 
-        {/* Progress Bar */}
-        <div className="mb-4 flex items-center gap-2">
-          <span className="text-xs text-muted-foreground w-8 text-right">{formatTime(currentTime)}</span>
-          <input
-            type="range"
-            min="0"
-            max={duration || 0}
-            value={currentTime || 0}
-            onChange={(e) => {
-              const time = parseFloat(e.target.value);
-              setCurrentTime(time);
-              // Untuk seek YouTube, kita butuh akses ke player-nya.
-              // Kita bisa tambahin action seek di store.
-            }}
-            className="flex-1 h-1 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
-          />
-          <span className="text-xs text-muted-foreground w-8">{formatTime(duration)}</span>
-        </div>
-
-        {/* Controls */}
-        <div className="flex items-center justify-between gap-4">
-          {/* Left Controls */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setRepeatMode(repeatMode === 'off' ? 'all' : repeatMode === 'all' ? 'one' : 'off')}
-              className={cn(
-                'rounded p-2 transition-colors',
-                repeatMode !== 'off'
-                  ? 'bg-primary/20 text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-              title={`Repeat: ${repeatMode}`}
-            >
-              <Repeat className="h-5 w-5" />
-            </button>
+        {/* Center: Controls & Progress (40% width approx) */}
+        <div className="flex flex-col items-center max-w-[40%] w-full gap-2">
+          {/* Controls */}
+          <div className="flex items-center gap-6">
             <button
               onClick={toggleShuffle}
               className={cn(
-                'rounded p-2 transition-colors',
-                isShuffle
-                  ? 'bg-primary/20 text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
+                'transition-colors',
+                isShuffle ? 'text-[#1ed760] relative after:content-["•"] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:text-[8px]' : 'text-[#b3b3b3] hover:text-[#ffffff]'
               )}
-              title="Shuffle"
             >
-              <Shuffle className="h-5 w-5" />
+              <Shuffle className="h-4 w-4" />
             </button>
-          </div>
-
-          {/* Center Controls */}
-          <div className="flex items-center gap-4">
             <button
               onClick={previous}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              title="Previous"
+              className="text-[#b3b3b3] hover:text-[#ffffff] transition-colors"
             >
-              <SkipBack className="h-6 w-6" />
+              <SkipBack className="h-5 w-5 fill-current" />
             </button>
             <button
               onClick={togglePlayPause}
               disabled={isFetchingId}
-              className="rounded-full bg-primary p-3 text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
-              title={isPlaying ? 'Pause' : 'Play'}
+              className="h-8 w-8 rounded-full bg-[#ffffff] flex items-center justify-center text-black hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
             >
               {isFetchingId ? (
-                <Loader className="h-6 w-6 animate-spin" />
+                <Loader className="h-4 w-4 animate-spin" />
               ) : isPlaying ? (
-                <Pause className="h-6 w-6" />
+                <Pause className="h-5 w-5 fill-black" />
               ) : (
-                <Play className="h-6 w-6 ml-0.5" />
+                <Play className="h-5 w-5 fill-black ml-0.5" />
               )}
             </button>
             <button
               onClick={next}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              title="Next"
+              className="text-[#b3b3b3] hover:text-[#ffffff] transition-colors"
             >
-              <SkipForward className="h-6 w-6" />
+              <SkipForward className="h-5 w-5 fill-current" />
+            </button>
+            <button
+              onClick={() => setRepeatMode(repeatMode === 'off' ? 'all' : repeatMode === 'all' ? 'one' : 'off')}
+              className={cn(
+                'transition-colors',
+                repeatMode !== 'off' ? 'text-[#1ed760] relative after:content-["•"] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:text-[8px]' : 'text-[#b3b3b3] hover:text-[#ffffff]'
+              )}
+            >
+              <Repeat className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Right Controls - Volume */}
-          <div className="flex items-center gap-2">
-            <Volume2 className="h-5 w-5 text-muted-foreground" />
+          {/* Progress Bar */}
+          <div className="flex items-center gap-2 w-full max-w-[450px]">
+            <span className="text-[11px] text-[#b3b3b3] w-8 text-right font-medium">{formatTime(currentTime)}</span>
+            <div className="relative flex-1 group">
+              <input
+                type="range"
+                min="0"
+                max={duration || 0}
+                value={currentTime || 0}
+                onChange={(e) => {
+                  const time = parseFloat(e.target.value);
+                  setCurrentTime(time);
+                }}
+                className="w-full h-1 bg-[#4d4d4d] rounded-full appearance-none cursor-pointer accent-[#1ed760] hover:accent-[#1db954]"
+              />
+              {/* Optional: Visual progress highlight for custom styling if needed */}
+            </div>
+            <span className="text-[11px] text-[#b3b3b3] w-8 font-medium">{formatTime(duration)}</span>
+          </div>
+        </div>
+
+        {/* Right: Volume & Extra (30% width approx) */}
+        <div className="flex items-center justify-end gap-3 w-[30%]">
+          <div className="flex items-center gap-2 w-32">
+            <Volume2 className="h-5 w-5 text-[#b3b3b3]" />
             <input
               type="range"
               min="0"
@@ -222,8 +209,7 @@ export const PlayerBar = () => {
                 setVolumeState(vol);
                 setVolume(vol);
               }}
-              className="w-24 h-1 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
-              title="Volume"
+              className="flex-1 h-1 bg-[#4d4d4d] rounded-full appearance-none cursor-pointer accent-[#ffffff] hover:accent-[#1ed760]"
             />
           </div>
         </div>
