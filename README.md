@@ -1,419 +1,83 @@
-# SoundWave - Modern Music Player
+# SoundWave - Platform Streaming Musik Modern
 
-A fullstack music streaming application inspired by Spotify, built with Next.js, React, TypeScript, and PostgreSQL.
+SoundWave adalah platform streaming musik fullstack yang terinspirasi dari Spotify. Dibuat menggunakan Next.js (Frontend) dan Express.js (Backend), platform ini memungkinkan pengguna untuk mencari lagu, membuat playlist, menandai lagu favorit, dan memutar musik secara real-time lewat integrasi YouTube Iframe API.
 
-## Features
+## 🚀 Fitur Utama
 
-### Core Features
-- **User Authentication**: Register, login, and manage user accounts with JWT-based authentication
-- **Music Discovery**: Search for songs via Deezer API with real-time results
-- **Trending Songs**: Discover what's trending worldwide
-- **Playlists**: Create, manage, and organize your playlists
-- **Favorites**: Like and save your favorite songs
-- **Music Player**: Full-featured music player with play/pause, skip, volume control
-- **Queue Management**: Queue management with repeat and shuffle modes
+- **Autentikasi User**: Daftar, login, dan manajemen sesi menggunakan JWT (JSON Web Token).
+- **Pencarian Musik**: Integrasi dengan Deezer API untuk metadata lagu yang lengkap.
+- **Playback Real-time**: Menggunakan YouTube Iframe API untuk pemutaran audio yang lancar tanpa gangguan.
+- **Playlist Management**: Bikin playlist sendiri dan atur lagu-lagu kesukaanmu.
+- **Lagu Favorit**: Simpan lagu yang kamu suka dengan satu klik (ikon hati).
+- **Riwayat Putar**: Catat otomatis lagu-lagu yang baru saja kamu dengar.
+- **User Interface Premium**: Desain dark mode yang elegan, responsif, dan animasi halus ala Spotify.
 
-### Design
-- **Spotify-Inspired Dark Theme**: Professional dark UI with green accent colors (#1ed760)
-- **Responsive Layout**: Mobile-first design with responsive breakpoints
-- **Smooth Animations**: Polished transitions and hover effects
-- **Modern Components**: Built with Radix UI and Tailwind CSS
+## 🛠️ Stack Teknologi
 
-## Tech Stack
+### Monorepo Structure
+Proyek ini menggunakan struktur monorepo agar pengembangan frontend dan backend bisa dilakukan secara bersamaan dengan mudah.
 
-### Frontend
-- **Framework**: Next.js 15 (App Router)
-- **UI Library**: React 19 with TypeScript
-- **State Management**: Zustand
-- **Styling**: Tailwind CSS 4
-- **Data Fetching**: axios, SWR
-- **Icons**: Lucide React
-- **Image Optimization**: Next.js Image
+- **Frontend**: Next.js 15, TypeScript, Tailwind CSS, Lucide React, Zustand (State Management), TanStack Query (Data Fetching).
+- **Backend**: Node.js, Express.js, TypeScript, Prisma ORM, PostgreSQL (Neon).
+- **Auth**: JWT (jsonwebtoken), bcryptjs.
+- **APIs**: Deezer API (Metadata), YouTube Data API v3 (Playback).
 
-### Backend
-- **Runtime**: Node.js
-- **API**: Next.js API Routes
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: JWT (jsonwebtoken)
-- **Password Hashing**: bcryptjs
-- **API Integration**: Deezer API (no auth required)
+## 📁 Struktur Proyek
 
-### DevTools
-- **Language**: TypeScript 5.7
-- **Package Manager**: pnpm
-- **Linting**: ESLint
-
-## Project Structure
-
-```
-soundwave/
-├── app/
-│   ├── api/                    # API routes
-│   │   ├── auth/              # Authentication endpoints
-│   │   ├── music/             # Music search & trending
-│   │   ├── playlists/         # Playlist CRUD operations
-│   │   └── favorites/         # Favorite songs management
-│   ├── auth/                  # Auth pages (login, register)
-│   ├── discover/              # Music discovery page
-│   ├── favorites/             # Favorites page
-│   ├── playlists/             # Playlists management
-│   ├── layout.tsx             # Root layout
-│   ├── page.tsx               # Home page
-│   └── globals.css            # Global styles
-│
-├── components/
-│   ├── Sidebar.tsx            # Sidebar navigation
-│   ├── Header.tsx             # Header with search
-│   ├── PlayerBar.tsx          # Music player controls
-│   └── MusicCard.tsx          # Music card component
-│
-├── lib/
-│   ├── auth/
-│   │   ├── jwt.ts             # JWT token handling
-│   │   ├── password.ts        # Password hashing
-│   │   └── middleware.ts      # Auth middleware
-│   ├── api/
-│   │   ├── constants.ts       # API constants
-│   │   └── response.ts        # Response helpers
-│   ├── music/
-│   │   └── service.ts         # Music search service
-│   ├── prisma.ts              # Prisma client
-│   └── utils.ts               # Utility functions
-│
-├── store/
-│   ├── authStore.ts           # Auth state (Zustand)
-│   ├── playerStore.ts         # Player state
-│   └── musicStore.ts          # Music discovery state
-│
-├── hooks/
-│   ├── useAuth.ts             # Auth hook
-│   ├── useMusic.ts            # Music hook
-│   └── usePlaylist.ts         # Playlist hook
-│
-├── prisma/
-│   └── schema.prisma          # Database schema
-│
-└── public/                    # Static assets
+```text
+project-tws/
+├── backend/                # Server Express.js
+│   ├── src/
+│   │   ├── controllers/    # Logika API (Auth, Music, Playlist, etc.)
+│   │   ├── services/       # Integrasi API Eksternal (Deezer, YouTube)
+│   │   ├── routes/         # Definisi Endpoint
+│   │   ├── middlewares/    # Proteksi Auth & Error Handling
+│   │   └── prisma/         # Database Schema
+├── frontend/               # Aplikasi Next.js
+│   ├── app/                # Halaman (Discover, Favorites, Playlists)
+│   ├── components/         # UI Components (PlayerBar, Sidebar, etc.)
+│   ├── hooks/              # Custom Hooks (useAuth, useMusic)
+│   ├── store/              # Zustand Stores
+│   └── lib/                # API Client (Axios Interceptor)
+└── package.json            # Root config (Concurrently)
 ```
 
-## Getting Started
+## 🏁 Cara Menjalankan
 
-### Prerequisites
-- Node.js 18+
-- PostgreSQL database
-- pnpm (or npm/yarn)
+### 1. Persiapan Database & API
+- Siapkan database PostgreSQL (disarankan pake Neon.tech).
+- Dapatkan `YOUTUBE_API_KEY` dari Google Cloud Console.
 
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/soundwave.git
-   cd soundwave
-   ```
-
-2. **Install dependencies**
-   ```bash
-   pnpm install
-   ```
-
-3. **Set up environment variables**
-   Create `.env.local`:
-   ```env
-   # Database
-   DATABASE_URL="postgresql://user:password@localhost:5432/soundwave"
-
-   # JWT
-   JWT_SECRET="your-super-secret-jwt-key"
-   JWT_REFRESH_SECRET="your-super-secret-refresh-key"
-
-   # API Keys
-   DEEZER_API_KEY="your-deezer-api-key"
-   YOUTUBE_API_KEY="your-youtube-api-key"
-
-   # URLs
-   NEXT_PUBLIC_API_URL="http://localhost:3000/api"
-   NEXT_PUBLIC_SITE_URL="http://localhost:3000"
-
-   # Environment
-   NODE_ENV="development"
-   ```
-
-4. **Initialize database**
-   ```bash
-   pnpm prisma generate
-   pnpm prisma db push
-   ```
-
-5. **Run development server**
-   ```bash
-   pnpm dev
-   ```
-
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## API Documentation
-
-### Authentication
-
-#### Register
-```http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "username": "username",
-  "password": "password123"
-}
+### 2. Setup Environment Variables
+Buat file `.env` di folder `backend/`:
+```env
+DATABASE_URL="postgresql://..."
+JWT_SECRET="rahasia_banget"
+YOUTUBE_API_KEY="AIza..."
 ```
 
-Response:
-```json
-{
-  "success": true,
-  "status": 201,
-  "message": "User registered successfully",
-  "data": {
-    "user": { "id", "email", "username", "avatar" },
-    "tokens": { "accessToken", "refreshToken" }
-  }
-}
+Buat file `.env` di folder `frontend/`:
+```env
+NEXT_PUBLIC_API_URL="http://localhost:5000/api"
 ```
 
-#### Login
-```http
-POST /api/auth/login
-Content-Type: application/json
+### 3. Install & Jalankan
+Jalankan perintah ini di root directory:
 
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-#### Get Current User
-```http
-GET /api/auth/me
-Authorization: Bearer <accessToken>
-```
-
-### Music
-
-#### Search Music
-```http
-GET /api/music/search?q=taylor+swift
-```
-
-Returns: Array of songs matching the query
-
-#### Get Trending Songs
-```http
-GET /api/music/trending
-```
-
-Returns: Array of trending songs
-
-### Playlists
-
-#### Get All Playlists
-```http
-GET /api/playlists
-Authorization: Bearer <accessToken>
-```
-
-#### Create Playlist
-```http
-POST /api/playlists
-Authorization: Bearer <accessToken>
-Content-Type: application/json
-
-{
-  "name": "My Playlist",
-  "description": "My favorite songs",
-  "isPublic": false
-}
-```
-
-#### Add Song to Playlist
-```http
-POST /api/playlists/:playlistId/songs
-Authorization: Bearer <accessToken>
-Content-Type: application/json
-
-{
-  "songId": "song-id"
-}
-```
-
-#### Remove Song from Playlist
-```http
-DELETE /api/playlists/:playlistId/songs/:songId
-Authorization: Bearer <accessToken>
-```
-
-#### Delete Playlist
-```http
-DELETE /api/playlists/:playlistId
-Authorization: Bearer <accessToken>
-```
-
-### Favorites
-
-#### Get Favorite Songs
-```http
-GET /api/favorites
-Authorization: Bearer <accessToken>
-```
-
-#### Add to Favorites
-```http
-POST /api/favorites
-Authorization: Bearer <accessToken>
-Content-Type: application/json
-
-{
-  "songId": "song-id"
-}
-```
-
-#### Remove from Favorites
-```http
-DELETE /api/favorites/:songId
-Authorization: Bearer <accessToken>
-```
-
-## Development
-
-### Database Management
 ```bash
-# View database in Prisma Studio
-pnpm prisma studio
+# Install semua dependencies
+npm install
 
-# Create migration
-pnpm prisma migrate dev --name "migration-name"
-
-# Reset database
-pnpm prisma db push --force-reset
+# Jalankan frontend & backend sekaligus
+npm run dev
 ```
 
-### Code Quality
-```bash
-# Run linter
-pnpm lint
+Frontend akan jalan di `http://localhost:3000` dan Backend di `http://localhost:5000`.
 
-# Run type check
-pnpm tsc --noEmit
-```
+## 📝 Catatan Implementasi
+- Kode ini menggunakan **Indonesian Comments** agar lebih mudah dipahami oleh pengembang lokal.
+- Menggunakan **YouTube Iframe API** yang disembunyikan untuk menangani playback audio saja, sehingga tampilan tetap bersih.
+- Data fetching di frontend diproteksi oleh **Axios Interceptors** yang otomatis menyisipkan token JWT.
 
-### Build
-```bash
-# Build for production
-pnpm build
-
-# Start production server
-pnpm start
-```
-
-## Deployment
-
-### Vercel Deployment
-
-1. **Push to GitHub**
-   ```bash
-   git push origin main
-   ```
-
-2. **Connect to Vercel**
-   - Go to [vercel.com](https://vercel.com)
-   - Import your GitHub repository
-   - Set environment variables
-
-3. **Configure Environment**
-   In Vercel dashboard, set:
-   - `DATABASE_URL`
-   - `JWT_SECRET`
-   - `JWT_REFRESH_SECRET`
-   - `DEEZER_API_KEY`
-   - `YOUTUBE_API_KEY`
-
-4. **Deploy**
-   ```bash
-   pnpm deploy
-   ```
-
-### Other Platforms
-
-#### Render
-1. Create new Web Service
-2. Connect GitHub repository
-3. Set environment variables
-4. Deploy
-
-#### Railway
-1. Create new project
-2. Add PostgreSQL database
-3. Deploy from GitHub
-4. Set environment variables
-
-## Performance Optimization
-
-### Frontend
-- Image optimization with Next.js Image
-- Code splitting with dynamic imports
-- Memoization with React.memo
-- State management with Zustand (minimal re-renders)
-
-### Backend
-- Database query optimization with Prisma
-- Caching of music data
-- Lazy loading of playlists
-- Efficient pagination
-
-## Security
-
-- JWT-based authentication with access/refresh tokens
-- Password hashing with bcryptjs
-- SQL injection prevention with Prisma parameterized queries
-- CORS headers on API routes
-- Secure HTTP-only cookies (can be added)
-
-## Future Enhancements
-
-- [ ] Spotify OAuth integration
-- [ ] Apple Music integration
-- [ ] Real audio streaming (integrate with real music services)
-- [ ] Social features (follow users, share playlists)
-- [ ] Advanced search filters
-- [ ] Listening history analytics
-- [ ] Recommendation engine
-- [ ] Mobile app (React Native)
-- [ ] Progressive Web App (PWA)
-- [ ] Dark/Light mode toggle
-- [ ] User profiles
-- [ ] Collaborative playlists
-
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For issues, questions, or suggestions, please open an issue on GitHub or contact the maintainers.
-
-## Acknowledgments
-
-- Inspired by [Spotify](https://spotify.com)
-- Built with [Next.js](https://nextjs.org)
-- UI components from [Radix UI](https://radix-ui.com)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Database with [Prisma](https://prisma.io)
+---
+Dibuat dengan ❤️ oleh Antigravity.

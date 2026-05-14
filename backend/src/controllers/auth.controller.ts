@@ -5,16 +5,23 @@ import { createAccessToken, createRefreshToken } from '../lib/auth/jwt';
 import { HTTP_STATUS, ERROR_MESSAGES } from '../utils/constants';
 import { createSuccessResponse, createErrorResponse } from '../utils/response';
 
+/**
+ * Controller buat nanganin pendaftaran user baru.
+ * Kita bakal ngecek dulu apa email/username udah kepake atau belum.
+ */
+
 export const register = async (req: Request, res: Response) => {
   try {
     const { email, username, password } = req.body;
 
+    // Validasi input sederhana, nanti bisa ditambah Zod kalau mau lebih ketat
     if (!email || !username || !password) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json(
-        createErrorResponse(HTTP_STATUS.BAD_REQUEST, 'Email, username, and password are required')
+        createErrorResponse(HTTP_STATUS.BAD_REQUEST, 'Email, username, sama password wajib diisi ya.')
       );
     }
 
+    // Cek dulu apa user udah terdaftar
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [{ email }, { username }],
@@ -23,12 +30,14 @@ export const register = async (req: Request, res: Response) => {
 
     if (existingUser) {
       return res.status(HTTP_STATUS.CONFLICT).json(
-        createErrorResponse(HTTP_STATUS.CONFLICT, ERROR_MESSAGES.USER_ALREADY_EXISTS)
+        createErrorResponse(HTTP_STATUS.CONFLICT, 'Wah, email atau username ini udah ada yang punya.')
       );
     }
 
+    // Amankan password sebelum disimpen
     const hashedPassword = await hashPassword(password);
 
+    // Bikin user baru di database
     const user = await prisma.user.create({
       data: {
         email,
@@ -37,6 +46,7 @@ export const register = async (req: Request, res: Response) => {
       },
     });
 
+    // Buat token akses biar user langsung login pas abis daftar
     const accessToken = createAccessToken({
       userId: user.id,
       email: user.email,
@@ -50,7 +60,7 @@ export const register = async (req: Request, res: Response) => {
     });
 
     return res.status(HTTP_STATUS.CREATED).json(
-      createSuccessResponse(HTTP_STATUS.CREATED, 'User registered successfully', {
+      createSuccessResponse(HTTP_STATUS.CREATED, 'Yeay! Akun kamu berhasil dibuat.', {
         user: {
           id: user.id,
           email: user.email,
@@ -68,7 +78,7 @@ export const register = async (req: Request, res: Response) => {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
       createErrorResponse(
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
-        ERROR_MESSAGES.SERVER_ERROR,
+        'Aduh, server lagi pusing nih pas mau daftarin kamu.',
         error instanceof Error ? error.message : 'Unknown error'
       )
     );
@@ -81,28 +91,31 @@ export const login = async (req: Request, res: Response) => {
 
     if (!email || !password) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json(
-        createErrorResponse(HTTP_STATUS.BAD_REQUEST, 'Email and password are required')
+        createErrorResponse(HTTP_STATUS.BAD_REQUEST, 'Email sama password jangan sampe kosong ya.')
       );
     }
 
+    // Cari user berdasarkan email
     const user = await prisma.user.findUnique({
       where: { email },
     });
 
     if (!user) {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json(
-        createErrorResponse(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.INVALID_CREDENTIALS)
+        createErrorResponse(HTTP_STATUS.UNAUTHORIZED, 'Email atau password kamu salah, coba cek lagi deh.')
       );
     }
 
+    // Cek passwordnya cocok apa nggak
     const isPasswordValid = await verifyPassword(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json(
-        createErrorResponse(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.INVALID_CREDENTIALS)
+        createErrorResponse(HTTP_STATUS.UNAUTHORIZED, 'Email atau password kamu salah, coba cek lagi deh.')
       );
     }
 
+    // Kalo cocok, kasih token buat akses API
     const accessToken = createAccessToken({
       userId: user.id,
       email: user.email,
@@ -116,7 +129,7 @@ export const login = async (req: Request, res: Response) => {
     });
 
     return res.status(HTTP_STATUS.OK).json(
-      createSuccessResponse(HTTP_STATUS.OK, 'Login successful', {
+      createSuccessResponse(HTTP_STATUS.OK, 'Selamat datang kembali! Kamu berhasil login.', {
         user: {
           id: user.id,
           email: user.email,
@@ -134,14 +147,59 @@ export const login = async (req: Request, res: Response) => {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
       createErrorResponse(
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
-        ERROR_MESSAGES.SERVER_ERROR,
+        'Waduh, ada kendala pas mau login-in kamu.',
         error instanceof Error ? error.message : 'Unknown error'
       )
     );
   }
 };
 
+/**
+ * Ambil data user yang lagi login.
+ */
 export const getMe = async (req: Request, res: Response) => {
-  // Logic will be implemented with middleware to populate req.user
-  return res.json({ message: 'Get Me endpoint' });
+  try {
+    const userId = (req as any).user?.userId;
+
+    if (!userId) {
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json(
+        createErrorResponse(HTTP_STATUS.UNAUTHORIZED, 'Identitas kamu nggak ketemu nih.')
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        avatar: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json(
+        createErrorResponse(HTTP_STATUS.NOT_FOUND, 'User-nya nggak ada di database kita.')
+      );
+    }
+
+    return res.status(HTTP_STATUS.OK).json(
+      createSuccessResponse(HTTP_STATUS.OK, 'Ini data profil kamu ya.', { user })
+    );
+  } catch (error) {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      createErrorResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Gagal ngambil data profil kamu.')
+    );
+  }
+};
+
+/**
+ * Buat logout. Karena pake JWT, biasanya frontend tinggal hapus token di storage aja.
+ * Tapi kita kasih response success aja buat formalitas.
+ */
+export const logout = async (req: Request, res: Response) => {
+  return res.status(HTTP_STATUS.OK).json(
+    createSuccessResponse(HTTP_STATUS.OK, 'Sampai jumpa lagi! Kamu berhasil logout.')
+  );
 };

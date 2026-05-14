@@ -1,15 +1,20 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle, Heart } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle, Heart, Loader } from 'lucide-react';
 import { usePlayerStore } from '@/store/playerStore';
 import { useMusicStore } from '@/store/musicStore';
 import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
+import { YouTubePlayer } from './YouTubePlayer';
+import api from '@/lib/api';
 
+/**
+ * Bar Player di bagian bawah. Ini pusat kontrol musik kita.
+ */
 export const PlayerBar = () => {
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isFetchingId, setIsFetchingId] = useState(false);
   const [volume, setVolumeState] = useState(0.7);
   const {
     currentSong,
@@ -36,68 +41,36 @@ export const PlayerBar = () => {
 
   const isFavorited = currentSong && favoriteSongs.some((s) => s.id === currentSong.id);
 
-  // Handle audio element updates
+  // Efek buat nyari Video ID YouTube pas lagu ganti
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    const fetchVideoId = async () => {
+      if (!currentSong || currentSong.youtubeUrl) return;
 
-    if (isPlaying) {
-      audio.play().catch((e) => {
-        console.error('[v0] Play error:', e);
-        pause();
-      });
-    } else {
-      audio.pause();
-    }
-  }, [isPlaying, pause]);
+      setIsFetchingId(true);
+      try {
+        const response = await api.get('/music/stream-id', {
+          params: {
+            artist: currentSong.artist,
+            title: currentSong.title,
+          },
+        });
 
-  // Update audio source
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !currentSong) return;
+        if (response.data.data.videoId) {
+          // Update song di store dengan videoId
+          // Kita asumsikan youtubeUrl di store itu nyimpen videoId
+          currentSong.youtubeUrl = response.data.data.videoId;
+        }
+      } catch (error) {
+        console.error('Gagal ngambil video ID:', error);
+      } finally {
+        setIsFetchingId(false);
+      }
+    };
 
-    // Use deezerUrl or youtubeUrl (in production, would use proper streaming service)
-    audio.src = currentSong.youtubeUrl || currentSong.deezerUrl || '';
+    fetchVideoId();
   }, [currentSong]);
 
-  // Handle volume changes
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (audio) {
-      audio.volume = storeVolume;
-    }
-    setVolumeState(storeVolume);
-  }, [storeVolume]);
-
-  // Handle time update
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
-
-  // Handle metadata loaded
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-    }
-  };
-
-  // Handle song ended
-  const handleEnded = () => {
-    if (repeatMode === 'one') {
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch((e) => {
-          console.error('[v0] Replay error:', e);
-        });
-      }
-    } else {
-      next();
-    }
-  };
-
-  // Format time
+  // Format waktu (detik ke mm:ss)
   const formatTime = (seconds: number) => {
     if (!seconds || !isFinite(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
@@ -109,13 +82,7 @@ export const PlayerBar = () => {
 
   return (
     <>
-      <audio
-        ref={audioRef}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onEnded={handleEnded}
-        crossOrigin="anonymous"
-      />
+      <YouTubePlayer />
 
       <div className="border-t border-border bg-card px-6 py-4">
         {/* Now Playing Info */}
@@ -169,10 +136,10 @@ export const PlayerBar = () => {
             max={duration || 0}
             value={currentTime || 0}
             onChange={(e) => {
-              setCurrentTime(parseFloat(e.target.value));
-              if (audioRef.current) {
-                audioRef.current.currentTime = parseFloat(e.target.value);
-              }
+              const time = parseFloat(e.target.value);
+              setCurrentTime(time);
+              // Untuk seek YouTube, kita butuh akses ke player-nya.
+              // Kita bisa tambahin action seek di store.
             }}
             className="flex-1 h-1 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
           />
@@ -220,10 +187,13 @@ export const PlayerBar = () => {
             </button>
             <button
               onClick={togglePlayPause}
-              className="rounded-full bg-primary p-3 text-primary-foreground hover:opacity-90 transition-opacity"
+              disabled={isFetchingId}
+              className="rounded-full bg-primary p-3 text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
               title={isPlaying ? 'Pause' : 'Play'}
             >
-              {isPlaying ? (
+              {isFetchingId ? (
+                <Loader className="h-6 w-6 animate-spin" />
+              ) : isPlaying ? (
                 <Pause className="h-6 w-6" />
               ) : (
                 <Play className="h-6 w-6 ml-0.5" />

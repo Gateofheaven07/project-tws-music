@@ -7,7 +7,7 @@ import { Header } from '@/components/Header';
 import { PlayerBar } from '@/components/PlayerBar';
 import { useAuth } from '@/hooks/useAuth';
 import { Plus, Loader, Trash2 } from 'lucide-react';
-import axios from 'axios';
+import api from '@/lib/api';
 import Link from 'next/link';
 
 interface Playlist {
@@ -41,12 +41,10 @@ export default function PlaylistsPage() {
     if (!accessToken) return;
     setIsLoading(true);
     try {
-      const response = await axios.get('/api/playlists', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      const response = await api.get('/playlists');
       setPlaylists(response.data.data);
     } catch (error) {
-      console.error('[v0] Fetch playlists error:', error);
+      console.error('Gagal ngambil playlist:', error);
     } finally {
       setIsLoading(false);
     }
@@ -58,22 +56,16 @@ export default function PlaylistsPage() {
 
     setIsCreating(true);
     try {
-      const response = await axios.post(
-        '/api/playlists',
-        {
-          name: newPlaylistName,
-          description: newPlaylistDesc,
-        },
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
+      const response = await api.post('/playlists', {
+        name: newPlaylistName,
+        description: newPlaylistDesc,
+      });
       setPlaylists([response.data.data, ...playlists]);
       setNewPlaylistName('');
       setNewPlaylistDesc('');
       setShowCreateForm(false);
     } catch (error) {
-      console.error('[v0] Create playlist error:', error);
+      console.error('Gagal bikin playlist:', error);
     } finally {
       setIsCreating(false);
     }
@@ -82,12 +74,10 @@ export default function PlaylistsPage() {
   const handleDeletePlaylist = async (id: string) => {
     if (!accessToken) return;
     try {
-      await axios.delete(`/api/playlists/${id}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      await api.delete(`/playlists/${id}`);
       setPlaylists(playlists.filter((p) => p.id !== id));
     } catch (error) {
-      console.error('[v0] Delete playlist error:', error);
+      console.error('Gagal hapus playlist:', error);
     }
   };
 
@@ -96,19 +86,11 @@ export default function PlaylistsPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-background">
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-64 flex-shrink-0">
-          <Sidebar />
-        </div>
+    <div className="flex flex-col h-full overflow-hidden">
+      <Header title="Your Playlists" />
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Header title="Your Playlists" />
-
-          {/* Content Area */}
-          <main className="flex-1 overflow-y-auto">
+      {/* Content Area */}
+      <main className="flex-1 overflow-y-auto">
             <div className="p-8">
               {/* Create Playlist Section */}
               <div className="mb-8">

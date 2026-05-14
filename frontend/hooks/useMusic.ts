@@ -3,9 +3,12 @@
 import { useCallback } from 'react';
 import { useMusicStore } from '@/store/musicStore';
 import { useAuthStore } from '@/store/authStore';
-import axios from 'axios';
+import api from '@/lib/api';
 import type { Song } from '@/store/playerStore';
 
+/**
+ * Hook buat urusan musik: nyari lagu, lagu ngetren, favorit, dsb.
+ */
 export const useMusic = () => {
   const {
     searchResults,
@@ -41,12 +44,13 @@ export const useMusic = () => {
       setSearching(true);
 
       try {
-        const response = await axios.get('/api/music/search', {
+        // Pake api instance biar token otomatis kejual kalo udah login
+        const response = await api.get('/music/search', {
           params: { q: query },
         });
         setSearchResults(response.data.data);
       } catch (error) {
-        console.error('[v0] Search error:', error);
+        console.error('Gagal nyari musik:', error);
         setSearchResults([]);
       } finally {
         setSearching(false);
@@ -58,10 +62,10 @@ export const useMusic = () => {
   const getTrendingSongs = useCallback(async () => {
     setTrendingLoading(true);
     try {
-      const response = await axios.get('/api/music/trending');
+      const response = await api.get('/music/trending');
       setTrendingSongs(response.data.data);
     } catch (error) {
-      console.error('[v0] Trending songs error:', error);
+      console.error('Gagal ngambil lagu trending:', error);
       setTrendingSongs([]);
     } finally {
       setTrendingLoading(false);
@@ -72,12 +76,10 @@ export const useMusic = () => {
     if (!accessToken) return;
     setFavoritesLoading(true);
     try {
-      const response = await axios.get('/api/favorites', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      const response = await api.get('/favorites');
       setFavoriteSongs(response.data.data);
     } catch (error) {
-      console.error('[v0] Get favorites error:', error);
+      console.error('Gagal ngambil favorit:', error);
     } finally {
       setFavoritesLoading(false);
     }
@@ -87,16 +89,17 @@ export const useMusic = () => {
     async (song: Song) => {
       if (!accessToken) return;
       try {
-        await axios.post(
-          '/api/favorites',
-          { songId: song.id },
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        );
+        await api.post('/favorites', {
+          songId: song.id,
+          title: song.title,
+          artist: song.artist,
+          album: song.album,
+          thumbnail: song.thumbnail,
+          duration: song.duration
+        });
         toggleFavorite(song);
       } catch (error) {
-        console.error('[v0] Add favorite error:', error);
+        console.error('Gagal nambah favorit:', error);
       }
     },
     [accessToken, toggleFavorite]
@@ -106,13 +109,11 @@ export const useMusic = () => {
     async (songId: string) => {
       if (!accessToken) return;
       try {
-        await axios.delete(`/api/favorites/${songId}`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        await api.delete(`/favorites/${songId}`);
         const song = favoriteSongs.find((s) => s.id === songId);
         if (song) toggleFavorite(song);
       } catch (error) {
-        console.error('[v0] Remove favorite error:', error);
+        console.error('Gagal hapus favorit:', error);
       }
     },
     [accessToken, favoriteSongs, toggleFavorite]
@@ -124,6 +125,7 @@ export const useMusic = () => {
     searchQuery,
     isSearching,
     searchMusic,
+    setSearchQuery,
     clearSearch,
 
     // Trending

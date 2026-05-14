@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import axios from 'axios';
+import api from '@/lib/api';
 
 export interface RegisterData {
   email: string;
@@ -35,7 +35,7 @@ export const useAuth = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.post('/api/auth/register', data);
+        const response = await api.post('/auth/register', data);
         const { user: userData, tokens } = response.data.data;
         setUser(userData);
         setTokens(tokens.accessToken, tokens.refreshToken);
@@ -56,7 +56,7 @@ export const useAuth = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.post('/api/auth/login', data);
+        const response = await api.post('/auth/login', data);
         const { user: userData, tokens } = response.data.data;
         setUser(userData);
         setTokens(tokens.accessToken, tokens.refreshToken);
@@ -80,14 +80,10 @@ export const useAuth = () => {
   const getCurrentUser = useCallback(async () => {
     if (!accessToken) return null;
     try {
-      const response = await axios.get('/api/auth/me', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await api.get('/auth/me');
       return response.data.data;
     } catch (err) {
-      console.error('[v0] Get current user error:', err);
+      console.error('Gagal ngambil data user:', err);
       return null;
     }
   }, [accessToken]);

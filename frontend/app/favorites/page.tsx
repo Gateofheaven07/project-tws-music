@@ -29,19 +29,11 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-background">
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-64 flex-shrink-0">
-          <Sidebar />
-        </div>
+    <div className="flex flex-col h-full overflow-hidden">
+      <Header title="Your Favorite Songs" />
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Header title="Your Favorite Songs" />
-
-          {/* Content Area */}
-          <main className="flex-1 overflow-y-auto">
+      {/* Content Area */}
+      <main className="flex-1 overflow-y-auto">
             <div className="p-8">
               {isFavoritesLoading ? (
                 <div className="flex items-center justify-center h-32">

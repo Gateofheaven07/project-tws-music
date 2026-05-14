@@ -16,19 +16,11 @@ export default function DiscoverPage() {
   }, [getTrendingSongs]);
 
   return (
-    <div className="flex h-screen flex-col bg-background">
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-64 flex-shrink-0">
-          <Sidebar />
-        </div>
+    <div className="flex flex-col h-full overflow-hidden">
+      <Header title="Discover Music" />
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Header title="Discover Music" />
-
-          {/* Content Area */}
-          <main className="flex-1 overflow-y-auto">
+      {/* Content Area */}
+      <main className="flex-1 overflow-y-auto">
             <div className="p-8">
               {searchQuery ? (
                 // Search Results

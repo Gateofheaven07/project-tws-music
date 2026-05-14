@@ -3,6 +3,7 @@ export interface ApiResponse<T = any> {
   status: number;
   message: string;
   data?: T;
+  results?: T extends Array<any> ? T : never;
   error?: string;
 }
 
@@ -11,12 +12,19 @@ export const createSuccessResponse = <T>(
   message: string,
   data?: T
 ): ApiResponse<T> => {
-  return {
+  const response: ApiResponse<T> = {
     success: true,
     status,
     message,
-    data,
   };
+
+  if (Array.isArray(data)) {
+    response.results = data as any;
+  } else {
+    response.data = data;
+  }
+
+  return response;
 };
 
 export const createErrorResponse = (

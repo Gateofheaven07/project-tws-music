@@ -18,18 +18,11 @@ export default function HomePage() {
   }, [getTrendingSongs]);
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Sidebar */}
-      <div className="w-64 flex-shrink-0">
-        <Sidebar />
-      </div>
+    <div className="flex flex-col h-full overflow-hidden">
+      <Header title="Welcome to SoundWave" />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header title="Welcome to SoundWave" />
-
-        {/* Content Area */}
-        <main className="flex-1 overflow-y-auto">
+      {/* Content Area */}
+      <main className="flex-1 overflow-y-auto">
           {!user ? (
             // Not authenticated
             <div className="flex h-full items-center justify-center">

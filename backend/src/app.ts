@@ -3,8 +3,12 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Import routes (to be created)
+// Import routes
 import authRoutes from './routes/auth.routes';
+import musicRoutes from './routes/music.routes';
+import playlistRoutes from './routes/playlist.routes';
+import favoriteRoutes from './routes/favorite.routes';
+import historyRoutes from './routes/history.routes';
 
 dotenv.config();
 
@@ -21,6 +25,10 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/music', musicRoutes);
+app.use('/api/playlists', playlistRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use('/api/history', historyRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
