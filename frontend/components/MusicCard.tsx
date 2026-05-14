@@ -40,8 +40,8 @@ export const MusicCard = ({ song, isCompact = false }: MusicCardProps) => {
 
   if (isCompact) {
     return (
-      <div className="flex items-center gap-4 rounded-md p-2 hover:bg-[#282828] transition-colors group cursor-pointer animate-fade-in">
-        <div className="relative h-12 w-12 flex-shrink-0 rounded bg-[#1f1f1f] overflow-hidden shadow-md">
+      <div className="flex items-center gap-4 rounded-md p-2 hover:bg-surface-elevated transition-colors group cursor-pointer animate-fade-in">
+        <div className="relative h-12 w-12 flex-shrink-0 rounded bg-surface-interactive overflow-hidden shadow-md">
           {song.album.cover.medium ? (
             <Image
               src={song.album.cover.medium}
@@ -63,14 +63,14 @@ export const MusicCard = ({ song, isCompact = false }: MusicCardProps) => {
           </button>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="truncate font-bold text-sm text-[#ffffff] group-hover:underline underline-offset-2">{song.title}</p>
-          <p className="truncate text-[12px] text-[#b3b3b3]">{song.artist.name}</p>
+          <p className="truncate font-bold text-sm text-foreground group-hover:underline underline-offset-2">{song.title}</p>
+          <p className="truncate text-[12px] text-text-secondary">{song.artist.name}</p>
         </div>
         <button
           onClick={handleFavoriteClick}
           className={cn(
             "p-2 opacity-0 group-hover:opacity-100 transition-all",
-            isFavorited ? "opacity-100 text-[#1ed760]" : "text-[#b3b3b3] hover:text-[#ffffff]"
+            isFavorited ? "opacity-100 text-spotify-green" : "text-text-secondary hover:text-foreground"
           )}
         >
           <Heart className={cn("h-4 w-4", isFavorited && "fill-current")} />
@@ -80,9 +80,9 @@ export const MusicCard = ({ song, isCompact = false }: MusicCardProps) => {
   }
 
   return (
-    <div className="group relative rounded-lg bg-[#181818] p-4 hover:bg-[#282828] transition-all duration-300 shadow-md animate-fade-in cursor-pointer">
+    <div className="group relative rounded-lg bg-card p-4 hover:bg-surface-elevated transition-all duration-300 shadow-md animate-fade-in cursor-pointer">
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden rounded-md bg-[#1f1f1f] shadow-lg mb-4">
+      <div className="relative aspect-square overflow-hidden rounded-md bg-surface-interactive shadow-lg mb-4">
         {song.album.cover.big ? (
           <Image
             src={song.album.cover.big}
@@ -104,7 +104,7 @@ export const MusicCard = ({ song, isCompact = false }: MusicCardProps) => {
               e.stopPropagation();
               handlePlayClick();
             }}
-            className="rounded-full bg-[#1ed760] p-3 text-black shadow-2xl hover:scale-105 active:scale-95 transition-transform"
+            className="rounded-full bg-spotify-green p-3 text-black shadow-2xl hover:scale-105 active:scale-95 transition-transform"
           >
             <Play className="h-6 w-6 fill-black" />
           </button>
@@ -114,22 +114,22 @@ export const MusicCard = ({ song, isCompact = false }: MusicCardProps) => {
       {/* Info */}
       <div className="space-y-1">
         <div className="flex items-start justify-between gap-2">
-          <p className="truncate font-bold text-[16px] text-[#ffffff] leading-tight flex-1">
+          <p className="truncate font-bold text-[16px] text-foreground leading-tight flex-1">
             {song.title}
           </p>
           <button
             onClick={handleFavoriteClick}
             className={cn(
               "transition-colors",
-              isFavorited ? "text-[#1ed760]" : "text-[#b3b3b3] hover:text-[#ffffff]"
+              isFavorited ? "text-spotify-green" : "text-text-secondary hover:text-foreground"
             )}
           >
             <Heart className={cn("h-4 w-4", isFavorited && "fill-current")} />
           </button>
         </div>
-        <p className="truncate text-[14px] text-[#b3b3b3]">{song.artist.name}</p>
+        <p className="truncate text-[14px] text-text-secondary">{song.artist.name}</p>
         {song.album.name && (
-          <p className="truncate text-[12px] text-[#b3b3b3]/60">{song.album.name}</p>
+          <p className="truncate text-[12px] text-text-secondary/60">{song.album.name}</p>
         )}
       </div>
     </div>

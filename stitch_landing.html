@@ -1,0 +1,229 @@
+<!DOCTYPE html><html class="dark" lang="id" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>MusikKita - Dengarkan musik tanpa batas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#4a4949",
+                      "outline-variant": "#3c4a3c",
+                      "on-tertiary-container": "#4b4b4b",
+                      "on-secondary-fixed": "#1c1b1b",
+                      "tertiary": "#d9d7d6",
+                      "inverse-on-surface": "#2f3131",
+                      "secondary-fixed-dim": "#c8c6c5",
+                      "tertiary-container": "#bdbbba",
+                      "on-secondary-fixed-variant": "#474646",
+                      "surface-interactive": "#1F1F1F",
+                      "primary-container": "#1ed760",
+                      "on-tertiary-fixed": "#1c1b1b",
+                      "surface-bright": "#38393a",
+                      "border-default": "#4D4D4D",
+                      "secondary": "#c8c6c5",
+                      "text-primary": "#FFFFFF",
+                      "on-primary": "#003913",
+                      "text-secondary": "#B3B3B3",
+                      "outline": "#859583",
+                      "surface-container-highest": "#343535",
+                      "inverse-surface": "#e3e2e2",
+                      "on-primary-fixed": "#002108",
+                      "surface-dim": "#121414",
+                      "status-warning": "#FFA42B",
+                      "primary": "#4cf479",
+                      "surface": "#121414",
+                      "on-primary-container": "#005721",
+                      "surface-tint": "#34e36a",
+                      "on-error": "#690005",
+                      "on-background": "#e3e2e2",
+                      "tertiary-fixed-dim": "#c8c6c5",
+                      "tertiary-fixed": "#e5e2e1",
+                      "on-tertiary-fixed-variant": "#474746",
+                      "on-secondary": "#313030",
+                      "secondary-fixed": "#e5e2e1",
+                      "error-container": "#93000a",
+                      "surface-variant": "#343535",
+                      "primary-fixed-dim": "#34e36a",
+                      "on-primary-fixed-variant": "#00531f",
+                      "status-negative": "#F3727F",
+                      "status-info": "#539DF5",
+                      "on-surface-variant": "#bbcbb8",
+                      "on-tertiary": "#313030",
+                      "primary-fixed": "#69ff89",
+                      "inverse-primary": "#006e2c",
+                      "surface-container-lowest": "#0d0e0f",
+                      "on-error-container": "#ffdad6",
+                      "surface-container-high": "#292a2a",
+                      "surface-container": "#1e2020",
+                      "error": "#ffb4ab",
+                      "surface-elevated": "#252525",
+                      "background": "#121414",
+                      "surface-container-low": "#1a1c1c",
+                      "on-surface": "#e3e2e2",
+                      "on-secondary-container": "#bab8b7"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "base": "8px",
+                      "xl": "32px",
+                      "pill-padding-y": "8px",
+                      "lg": "24px",
+                      "search-padding-left": "48px",
+                      "search-padding-right": "96px",
+                      "xs": "4px",
+                      "sm": "12px",
+                      "pill-padding-x": "16px"
+              },
+              "fontFamily": {
+                      "button-nav": ["Hanken Grotesk"],
+                      "body-bold": ["Hanken Grotesk"],
+                      "feature-heading": ["Hanken Grotesk"],
+                      "small-label": ["Hanken Grotesk"],
+                      "section-title": ["Hanken Grotesk"],
+                      "button-upper": ["Hanken Grotesk"],
+                      "micro": ["Hanken Grotesk"],
+                      "caption": ["Hanken Grotesk"],
+                      "body-reg": ["Hanken Grotesk"]
+              },
+              "fontSize": {
+                      "button-nav": ["14px", {"lineHeight": "normal", "letterSpacing": "0.14px", "fontWeight": "700"}],
+                      "body-bold": ["16px", {"lineHeight": "1.5", "letterSpacing": "normal", "fontWeight": "700"}],
+                      "feature-heading": ["18px", {"lineHeight": "1.3", "letterSpacing": "normal", "fontWeight": "700"}],
+                      "small-label": ["12px", {"lineHeight": "1.5", "letterSpacing": "normal", "fontWeight": "700"}],
+                      "section-title": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "button-upper": ["14px", {"lineHeight": "1.0", "letterSpacing": "1.8px", "fontWeight": "700"}],
+                      "micro": ["10px", {"lineHeight": "1.2", "letterSpacing": "normal", "fontWeight": "400"}],
+                      "caption": ["14px", {"lineHeight": "1.5", "letterSpacing": "normal", "fontWeight": "400"}],
+                      "body-reg": ["16px", {"lineHeight": "1.5", "letterSpacing": "normal", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style data-stitch-cursor=""></style><style data-stitch-scroll-lock=""></style></head>
+<body class="bg-background text-text-primary antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface/80 backdrop-blur-md bg-surface dark:bg-surface shadow-md">
+<div class="flex justify-between items-center px-xl py-md max-w-[1440px] mx-auto">
+<div class="font-section-title text-section-title text-primary tracking-tighter">Soundwave</div>
+<div class="hidden md:flex gap-xl items-center font-button-nav text-button-nav">
+<a class="text-text-primary hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Tentang Kami</a>
+<a class="text-text-primary hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Dukungan</a>
+<a class="text-text-primary hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Cari Musik</a>
+<span class="w-px h-6 bg-border-default mx-sm"></span>
+<a class="text-text-primary hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Daftar</a>
+<a class="text-text-primary hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Masuk</a>
+<button class="bg-primary-container text-on-primary font-button-upper text-button-upper py-pill-padding-y px-pill-padding-x rounded-full hover:scale-105 transition-transform">
+                    MULAI SEKARANG
+                </button>
+</div>
+</div>
+</nav>
+<main class="flex-grow pt-24">
+<!-- Hero Section -->
+<section class="relative w-full h-[819px] flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0 bg-surface-dim">
+<img alt="Abstract dark sound waves background" class="w-full h-full object-cover opacity-40 mix-blend-luminosity" data-alt="A highly atmospheric, dark background depicting abstract sound waves or fluid musical energy. The scene is illuminated by subtle, glowing green accents reminiscent of Spotify's vibrant #1ed760 hue, set against a deep, almost pitch-black #121212 canvas. The mood is immersive, energetic yet mysterious, perfectly capturing a premium digital music streaming aesthetic. Smooth curves and gradients dominate the composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBE73-H7Zw2GiJW4R7VZZsMVZFqk0R5mtuV44PK__EAu9HfatUgKulhkR3KpJoCfVMMhlgBBr7qUENctX_8KPLo2VXioCEnlUmlsznMT9qPEljKHGZDQdBdeSldN_RYt8Lx-u1w9VrcZVW9Ojha2nqNR_hquyeVXcS_q3MzrtSqKivD5awt_5r0U9q6-fJyiPKjA8Ak8x0QdYRA8HD2X7lkQN87Ic68S4RSlPdcdO8LNs5rDW-QOy7n5lPxQ_PPyys53vgrhYmCCUQ">
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
+</div>
+<div class="relative z-10 text-center px-md max-w-4xl mx-auto flex flex-col items-center gap-lg">
+<h1 class="text-5xl md:text-7xl font-section-title font-bold tracking-tight text-text-primary">
+                    Dengarkan musik tanpa batas.
+                </h1>
+<p class="font-body-reg text-body-reg text-text-secondary max-w-2xl mt-sm">
+                    Jutaan lagu dan podcast. Tanpa kartu kredit.
+                </p>
+<button class="mt-lg bg-primary-container text-on-primary font-button-upper text-button-upper py-[16px] px-[32px] rounded-full hover:scale-105 transition-transform shadow-[0_8px_24px_rgba(30,215,96,0.2)]">DAPATKAN SOUNDWAVE GRATIS</button>
+</div>
+</section>
+<!-- Features Section -->
+<section class="py-24 px-md md:px-xl max-w-[1440px] mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-xl">
+<!-- Feature 1 -->
+<div class="bg-surface-container rounded-lg p-xl flex flex-col items-center text-center gap-md hover:bg-surface-elevated transition-colors duration-300">
+<div class="w-16 h-16 rounded-full bg-surface-bright flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="mood">mood</span>
+</div>
+<h3 class="font-feature-heading text-feature-heading text-text-primary">Musik untuk setiap suasana</h3>
+<p class="font-body-reg text-body-reg text-text-secondary">Dengarkan playlist yang sesuai dengan mood kamu, kapan saja.</p>
+</div>
+<!-- Feature 2 -->
+
+<!-- Feature 3 -->
+<div class="bg-surface-container rounded-lg p-xl flex flex-col items-center text-center gap-md hover:bg-surface-elevated transition-colors duration-300">
+<div class="w-16 h-16 rounded-full bg-surface-bright flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="high_quality">high_quality</span>
+</div>
+<h3 class="font-feature-heading text-feature-heading text-text-primary">Kualitas suara premium</h3>
+<p class="font-body-reg text-body-reg text-text-secondary">Nikmati audio sejernih kristal untuk pengalaman mendengarkan terbaik.</p>
+</div><!-- Feature 3 -->
+<div class="bg-surface-container rounded-lg p-xl flex flex-col items-center text-center gap-md hover:bg-surface-elevated transition-colors duration-300">
+  <div class="w-16 h-16 rounded-full bg-surface-bright flex items-center justify-center mb-sm">
+    <span class="material-symbols-outlined text-primary text-3xl" data-icon="devices">devices</span>
+  </div>
+  <h3 class="font-feature-heading text-feature-heading text-text-primary">Putar di mana saja</h3>
+  <p class="font-body-reg text-body-reg text-text-secondary">Streaming musik favorit Anda di ponsel, tablet, atau desktop dengan lancar.</p>
+</div>
+</div>
+</section>
+<!-- Pricing Section -->
+
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest w-full py-xl border-t border-border-default">
+<div class="max-w-[1440px] mx-auto px-xl grid grid-cols-2 md:grid-cols-4 gap-lg mb-xl">
+<!-- Brand Column -->
+<div class="col-span-2 md:col-span-1">
+<div class="font-section-title text-section-title text-primary mb-md">Soundwave</div>
+</div>
+<!-- Links Column 1 -->
+<div>
+<h4 class="font-body-bold text-body-bold text-text-primary mb-sm">PERUSAHAAN</h4>
+<ul class="flex flex-col gap-xs font-caption text-caption">
+<li class=""><a class="text-text-secondary hover:text-text-primary hover:underline transition-opacity duration-200" href="#">Tentang</a></li>
+<li class=""><a class="text-text-secondary hover:text-text-primary hover:underline transition-opacity duration-200" href="#">Pekerjaan</a></li>
+<li class=""><a class="text-text-secondary hover:text-text-primary hover:underline transition-opacity duration-200" href="#">For the Record</a></li>
+</ul>
+</div>
+<!-- Links Column 2 -->
+<div>
+<h4 class="font-body-bold text-body-bold text-text-primary mb-sm">KOMUNITAS</h4>
+<ul class="flex flex-col gap-xs font-caption text-caption">
+<li class=""><a class="text-text-secondary hover:text-text-primary hover:underline transition-opacity duration-200" href="#">Developer</a></li>
+<li class=""><a class="text-text-secondary hover:text-text-primary hover:underline transition-opacity duration-200" href="#">Investor</a></li>
+<li class=""><a class="text-text-secondary hover:text-text-primary hover:underline transition-opacity duration-200" href="#">Vendor</a></li>
+</ul>
+</div>
+<!-- Links Column 3 (Empty for balance, or could add more) -->
+<div>
+<h4 class="font-body-bold text-body-bold text-text-primary mb-sm">TAUTAN BERGUNA</h4>
+<ul class="flex flex-col gap-xs font-caption text-caption">
+<li class=""><a class="text-text-secondary hover:text-text-primary hover:underline transition-opacity duration-200" href="#">Dukungan</a></li>
+<li class=""><a class="text-text-secondary hover:text-text-primary hover:underline transition-opacity duration-200" href="#">Aplikasi Mobile</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-[1440px] mx-auto px-xl pt-lg border-t border-border-default/50 flex justify-between items-center">
+<span class="font-caption text-caption text-text-secondary">© 2024 Soundwave. Musik untuk setiap momen.</span>
+</div>
+</footer>
+
+
+</body></html>

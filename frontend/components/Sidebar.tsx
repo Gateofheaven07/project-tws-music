@@ -18,10 +18,10 @@ export const Sidebar = () => {
   ];
 
   return (
-    <div className="flex h-screen w-64 flex-col gap-4 bg-black p-6 text-[#b3b3b3]">
+    <div className="flex h-screen w-64 flex-col gap-4 bg-black p-6 text-text-secondary">
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-2 mb-4 text-[#ffffff] hover:text-[#1ed760] transition-colors">
-        <Music className="h-8 w-8 text-[#1ed760]" />
+      <Link href="/" className="flex items-center gap-2 mb-4 text-spotify-green hover:opacity-80 transition-opacity">
+        <Music className="h-8 w-8 text-spotify-green" />
         <span className="text-xl font-bold tracking-tight">SoundWave</span>
       </Link>
 
@@ -37,13 +37,13 @@ export const Sidebar = () => {
               className={cn(
                 'flex items-center gap-4 py-2 transition-all duration-200 group',
                 isActive
-                  ? 'text-[#ffffff] font-bold'
-                  : 'hover:text-[#ffffff]'
+                  ? 'text-foreground font-bold'
+                  : 'hover:text-foreground'
               )}
             >
               <Icon className={cn(
                 "h-6 w-6 transition-colors",
-                isActive ? "text-[#ffffff]" : "group-hover:text-[#ffffff]"
+                isActive ? "text-foreground" : "group-hover:text-foreground"
               )} />
               <span className="text-[14px]">{item.label}</span>
             </Link>
@@ -53,29 +53,29 @@ export const Sidebar = () => {
 
       {/* User Section */}
       {user ? (
-        <div className="border-t border-[#121212] pt-4">
-          <div className="mb-4 flex items-center gap-3 rounded-lg bg-[#121212] p-3 shadow-md">
-            <div className="h-10 w-10 rounded-full bg-[#1ed760] flex items-center justify-center text-black font-bold shadow-lg">
+        <div className="border-t border-surface-container pt-4">
+          <div className="mb-4 flex items-center gap-3 rounded-lg bg-surface-container p-3 shadow-md">
+            <div className="h-10 w-10 rounded-full bg-spotify-green flex items-center justify-center text-black font-bold shadow-lg">
               {user.username[0].toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="truncate font-bold text-sm text-[#ffffff]">{user.username}</p>
-              <p className="truncate text-xs text-[#b3b3b3]">{user.email}</p>
+              <p className="truncate font-bold text-sm text-foreground">{user.username}</p>
+              <p className="truncate text-xs text-text-secondary">{user.email}</p>
             </div>
           </div>
           <button
             onClick={logout}
-            className="flex w-full items-center gap-3 py-2 text-[#f3727f] hover:text-[#ffffff] transition-colors group"
+            className="flex w-full items-center gap-3 py-2 text-destructive hover:text-foreground transition-colors group"
           >
             <LogOut className="h-5 w-5 group-hover:scale-110 transition-transform" />
             <span className="text-sm uppercase tracking-[1.4px] font-bold">Logout</span>
           </button>
         </div>
       ) : (
-        <div className="border-t border-[#121212] pt-4">
+        <div className="border-t border-surface-container pt-4">
           <Link
             href="/login"
-            className="btn-pill block w-full bg-[#ffffff] text-black text-center hover:scale-105 transition-transform"
+            className="btn-pill block w-full bg-foreground text-black text-center hover:scale-105 transition-transform"
           >
             Sign In
           </Link>

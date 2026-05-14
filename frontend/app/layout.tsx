@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Hanken_Grotesk, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import QueryProvider from '@/providers/QueryProvider'
 import { LayoutContent } from '@/components/LayoutContent'
 
-const _geist = Geist({ subsets: ["latin"] });
+const hankenGrotesk = Hanken_Grotesk({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="font-sans antialiased bg-background text-foreground flex flex-col h-screen overflow-hidden">
+      <body className={`${hankenGrotesk.className} antialiased bg-background text-foreground flex flex-col h-screen overflow-hidden`}>
         <QueryProvider>
           <LayoutContent>{children}</LayoutContent>
         </QueryProvider>

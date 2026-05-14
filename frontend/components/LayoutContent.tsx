@@ -3,12 +3,16 @@
 import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { PlayerBar } from '@/components/PlayerBar';
+import { useAuth } from '@/hooks/useAuth';
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  
   const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/register');
+  const isLandingPage = pathname === '/' && !user;
 
-  if (isAuthPage) {
+  if (isAuthPage || isLandingPage) {
     return <div className="flex-1 overflow-auto">{children}</div>;
   }
 
