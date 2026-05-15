@@ -69,11 +69,22 @@ export const createPlaylist = async (req: Request, res: Response) => {
 export const addSongToPlaylist = async (req: Request, res: Response) => {
   try {
     const playlistId = (req.params.playlistId || req.params.id) as string; // Support both params based on route
+    const userId = (req as any).user.userId;
     const { musicId, title, artist, cover, duration, videoId } = req.body;
 
     if (!musicId) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json(
         createErrorResponse(HTTP_STATUS.BAD_REQUEST, 'ID Lagunya mana?')
+      );
+    }
+
+    const playlist = await prisma.playlist.findFirst({
+      where: { id: playlistId, userId }
+    });
+
+    if (!playlist) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json(
+        createErrorResponse(HTTP_STATUS.NOT_FOUND, 'Playlist nggak ketemu atau kamu nggak punya akses.')
       );
     }
 
@@ -109,9 +120,10 @@ export const addSongToPlaylist = async (req: Request, res: Response) => {
 export const getPlaylistDetail = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
+    const userId = (req as any).user.userId;
 
-    const playlist = await prisma.playlist.findUnique({
-      where: { id },
+    const playlist = await prisma.playlist.findFirst({
+      where: { id, userId },
       include: {
         songs: {
           orderBy: {
@@ -172,6 +184,56 @@ export const getPlaylistDetail = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
       createErrorResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Gagal ngambil detail playlist.')
+    );
+  }
+};
+
+/**
+ * Edit nama dan deskripsi playlist.
+ */
+export const updatePlaylist = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const userId = (req as any).user.userId;
+    const { name, description } = req.body;
+    const cleanName = typeof name === 'string' ? name.trim() : '';
+    const cleanDescription = typeof description === 'string' ? description.trim() : '';
+
+    if (!cleanName) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json(
+        createErrorResponse(HTTP_STATUS.BAD_REQUEST, 'Nama playlist wajib diisi.')
+      );
+    }
+
+    const playlist = await prisma.playlist.findFirst({
+      where: { id, userId }
+    });
+
+    if (!playlist) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json(
+        createErrorResponse(HTTP_STATUS.NOT_FOUND, 'Playlist nggak ketemu atau kamu nggak punya akses.')
+      );
+    }
+
+    const updatedPlaylist = await prisma.playlist.update({
+      where: { id },
+      data: {
+        name: cleanName,
+        description: cleanDescription || null,
+      },
+      include: {
+        _count: {
+          select: { songs: true }
+        }
+      }
+    });
+
+    return res.status(HTTP_STATUS.OK).json(
+      createSuccessResponse(HTTP_STATUS.OK, 'Playlist berhasil diperbarui.', updatedPlaylist)
+    );
+  } catch (error) {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      createErrorResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Gagal memperbarui playlist.')
     );
   }
 };

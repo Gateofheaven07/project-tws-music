@@ -3,26 +3,36 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useMusic } from '@/hooks/useMusic';
-import { Sidebar } from '@/components/Sidebar';
-import { Header } from '@/components/Header';
 import { MusicCard } from '@/components/MusicCard';
+import { GenreCard } from '@/components/GenreCard';
 import Link from 'next/link';
-import { Loader, Music, Search, ListMusic, Heart } from 'lucide-react';
+import { Loader, Music } from 'lucide-react';
 
 export default function HomePage() {
   const { user } = useAuth();
-  const { trendingSongs, isTrendingLoading, getTrendingSongs } = useMusic();
+  const {
+    trendingSongs,
+    isTrendingLoading,
+    getTrendingSongs,
+    genres,
+    isGenresLoading,
+    genresError,
+    getGenres,
+  } = useMusic();
 
   useEffect(() => {
+    if (!user) return;
+
     getTrendingSongs();
-  }, [getTrendingSongs]);
+    getGenres();
+  }, [user, getTrendingSongs, getGenres]);
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
       {!user ? (
-        /* Landing Page View */
+        /* Tampilan awal untuk pengunjung yang belum masuk */
         <div className="flex flex-col h-full overflow-y-auto antialiased">
-          {/* TopNavBar */}
+          {/* Navigasi utama di landing page */}
           <nav className="fixed top-0 w-full z-50 bg-card/80 backdrop-blur-md shadow-md">
             <div className="flex justify-between items-center px-8 py-4 max-w-[1440px] mx-auto">
               <div className="text-2xl font-bold tracking-tighter text-primary">Soundwave</div>
@@ -41,7 +51,7 @@ export default function HomePage() {
           </nav>
 
           <main className="flex-grow pt-24">
-            {/* Hero Section */}
+            {/* Bagian utama landing page */}
             <section className="relative w-full h-[819px] flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 z-0 bg-background">
                 <img alt="Abstract dark sound waves background" className="w-full h-full object-cover opacity-40 mix-blend-luminosity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBE73-H7Zw2GiJW4R7VZZsMVZFqk0R5mtuV44PK__EAu9HfatUgKulhkR3KpJoCfVMMhlgBBr7qUENctX_8KPLo2VXioCEnlUmlsznMT9qPEljKHGZDQdBdeSldN_RYt8Lx-u1w9VrcZVW9Ojha2nqNR_hquyeVXcS_q3MzrtSqKivD5awt_5r0U9q6-fJyiPKjA8Ak8x0QdYRA8HD2X7lkQN87Ic68S4RSlPdcdO8LNs5rDW-QOy7n5lPxQ_PPyys53vgrhYmCCUQ" />
@@ -60,10 +70,10 @@ export default function HomePage() {
               </div>
             </section>
 
-            {/* Features Section */}
+            {/* Ringkasan fitur utama */}
             <section className="py-24 px-4 md:px-8 max-w-[1440px] mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Feature 1 */}
+                {/* Fitur suasana */}
                 <div className="bg-[#1e2020] rounded-[2rem] p-8 flex flex-col items-center text-center gap-4 hover:bg-[#252525] transition-colors duration-300">
                   <div className="w-16 h-16 rounded-full bg-[#38393a] flex items-center justify-center mb-3">
                     <Music className="text-primary h-8 w-8" />
@@ -71,7 +81,7 @@ export default function HomePage() {
                   <h3 className="text-lg font-bold text-foreground">Musik untuk setiap suasana</h3>
                   <p className="text-base text-[#B3B3B3]">Dengarkan playlist yang sesuai dengan mood kamu, kapan saja.</p>
                 </div>
-                {/* Feature 2 */}
+                {/* Fitur kualitas audio */}
                 <div className="bg-[#1e2020] rounded-[2rem] p-8 flex flex-col items-center text-center gap-4 hover:bg-[#252525] transition-colors duration-300">
                   <div className="w-16 h-16 rounded-full bg-[#38393a] flex items-center justify-center mb-3">
                     <div className="text-primary font-bold text-xl">HQ</div>
@@ -79,7 +89,7 @@ export default function HomePage() {
                   <h3 className="text-lg font-bold text-foreground">Kualitas suara premium</h3>
                   <p className="text-base text-[#B3B3B3]">Nikmati audio sejernih kristal untuk pengalaman mendengarkan terbaik.</p>
                 </div>
-                {/* Feature 3 */}
+                {/* Fitur lintas perangkat */}
                 <div className="bg-[#1e2020] rounded-[2rem] p-8 flex flex-col items-center text-center gap-4 hover:bg-[#252525] transition-colors duration-300">
                   <div className="w-16 h-16 rounded-full bg-[#38393a] flex items-center justify-center mb-3">
                     <div className="w-8 h-8 border-2 border-primary rounded-sm" />
@@ -91,7 +101,7 @@ export default function HomePage() {
             </section>
           </main>
 
-          {/* Footer */}
+          {/* Footer landing page */}
           <footer className="bg-[#0d0e0f] w-full py-8 border-t border-border">
             <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
               <div className="col-span-2 md:col-span-1">
@@ -127,7 +137,7 @@ export default function HomePage() {
           </footer>
         </div>
       ) : (
-        /* Tampilan Beranda Terautentikasi (Authenticated View) */
+        /* Tampilan beranda setelah pengguna masuk */
         <div className="flex-1 relative flex flex-col h-full bg-gradient-to-b from-[#1F2937]/30 to-background overflow-y-auto">
           {/* Header Tetap (Sticky Header) */}
           <header className="sticky top-0 z-30 flex justify-between items-center px-4 md:px-8 py-6 bg-background/80 backdrop-blur-md shadow-sm">
@@ -147,58 +157,32 @@ export default function HomePage() {
           <div className="pt-6 px-4 md:px-8 flex flex-col gap-8 pb-24">
             <h2 className="md:hidden text-[24px] font-bold tracking-tight text-white mb-[-16px]">Selamat Malam</h2>
             
-            {/* Bagian: Baru diputar */}
+            {/* Bagian: kategori musik dari Deezer */}
             <section>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                {/* Item 1 */}
-                <div className="group flex items-center bg-[#292a2a] hover:bg-[#252525] transition-colors duration-300 rounded-md overflow-hidden cursor-pointer relative shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-                  <img className="w-14 h-14 md:w-20 md:h-20 object-cover" alt="Lofi Beats" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWeNthhFMQPKxBBnI_zhoK27JiUQzqriJZ9FcRYeCtosX6xz64e9vdneBcxAgm6xBLYdW8dXCWRjmK6nUbM8O2-2scgNpGZJnz4QUZDdAHmz9ifNT5vjxndCY2HjHF18DoUTDRUi8plii-xVfmK1GevLW5bTIFOk-l2GferA3WlGGHtYwUw23lwGs2RgEidTa7aSLj3ZDSIFrl7Wq_NYz4m6JYU1QNNCRuFkNzH3Uh_XBzUT0baJuXwEYKibxvmBp_CtiqKKsZI8Q" />
-                  <span className="font-bold text-[16px] text-white px-3 md:px-4 truncate">Lofi Beats</span>
-                  <button className="absolute right-4 w-10 h-10 rounded-full bg-[#1ed760] text-[#005721] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg translate-y-2 group-hover:translate-y-0">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-                  </button>
+              {isGenresLoading ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="h-14 animate-pulse rounded-md bg-[#292a2a] md:h-20"
+                    />
+                  ))}
                 </div>
-                {/* Item 2 */}
-                <div className="group flex items-center bg-[#292a2a] hover:bg-[#252525] transition-colors duration-300 rounded-md overflow-hidden cursor-pointer relative shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-                  <img className="w-14 h-14 md:w-20 md:h-20 object-cover" alt="This Is Hindia" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWKaI-z-6vfqEztduxvgOySr_4vU4ahgeZpYqC-C3FAVJuOhudS_bvF1h1lapShZTnWYevkgOVKAGXs74iPyJ7jKq2Sze0-UFXUuxKy3QmXVP8lCZchcHzgo3BiWeGDh1CaOQabqCV-pQEn3ClTX0z3AYwKnM7GXbSnTSduWDNveogXmvDCiPvaOlIpH39vEd6SpuRcPKaSyrxt-rJq0PpjnBgtUoPozxayQ_3i8oFibKGAOIRlQsKCGHdADcR5bfLZBSoE1t_dOk" />
-                  <span className="font-bold text-[16px] text-white px-3 md:px-4 truncate">This Is Hindia</span>
-                  <button className="absolute right-4 w-10 h-10 rounded-full bg-[#1ed760] text-[#005721] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg translate-y-2 group-hover:translate-y-0">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-                  </button>
+              ) : genresError ? (
+                <p className="text-sm text-[#b3b3b3]">{genresError}</p>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                  {genres.slice(0, 6).map((genre, index) => (
+                    <GenreCard
+                      key={genre.id}
+                      genre={genre}
+                      variant="wide"
+                      href={`/discover?genreId=${genre.id}&genreName=${encodeURIComponent(genre.name)}`}
+                      className={index > 3 ? 'hidden md:flex' : undefined}
+                    />
+                  ))}
                 </div>
-                {/* Item 3 */}
-                <div className="group flex items-center bg-[#292a2a] hover:bg-[#252525] transition-colors duration-300 rounded-md overflow-hidden cursor-pointer relative shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-                  <img className="w-14 h-14 md:w-20 md:h-20 object-cover" alt="Acoustic Hits" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzflyggRy5rsCELAX14iFC_6mPsH7FsJ-U8Zmzb1ZamKMndM7h_U1x1L3xMA3LCq9IgSPXUWCNaoqfbjWNEwbsbs03TTrW4KTaBxmAB80lqjNVUjo-9YChMlPR0xS3uEc1fT5CROOIzapkBcN8coPehcG7EbM2Gezisb3lbyayUK_e2sIL4KELKYewft8xieTeKQV3RzT2OgfKjU6Ahs57NF014TQUfDD9a4hicQVgBGJSRVGCepg28_S7fPaiy-Omw70wb7757FQ" />
-                  <span className="font-bold text-[16px] text-white px-3 md:px-4 truncate">Acoustic Hits</span>
-                  <button className="absolute right-4 w-10 h-10 rounded-full bg-[#1ed760] text-[#005721] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg translate-y-2 group-hover:translate-y-0">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-                  </button>
-                </div>
-                {/* Item 4 */}
-                <div className="group flex items-center bg-[#292a2a] hover:bg-[#252525] transition-colors duration-300 rounded-md overflow-hidden cursor-pointer relative shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-                  <img className="w-14 h-14 md:w-20 md:h-20 object-cover" alt="Indie Lokal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEkS2gGQHzlD3_oJ-hI2io_V7Hia8Z2mbRSRYaPoWRjsUl0ApJp006trLpW9R03s7EfIJNv-Hpq8JA4lt43wkxhDKMjTMWBp4HHPEdfO4cjBzeCaQVRg2Ieeaj8MqN1EKvWRLzBQmTzO2AKy5Sdvy40zlM6uDzbyyTcVPrgMRNKD4KBaC91CPwndloU4Gs2DSIDpeQOa7ezG0FqNj05HBwzBS3rPKjPnhg6mPSvacXgvWufalttBdn3Esp7Rvwsf_zTSZ6n41dwQw" />
-                  <span className="font-bold text-[16px] text-white px-3 md:px-4 truncate">Indie Lokal</span>
-                  <button className="absolute right-4 w-10 h-10 rounded-full bg-[#1ed760] text-[#005721] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg translate-y-2 group-hover:translate-y-0">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-                  </button>
-                </div>
-                {/* Item 5 */}
-                <div className="hidden md:flex group items-center bg-[#292a2a] hover:bg-[#252525] transition-colors duration-300 rounded-md overflow-hidden cursor-pointer relative shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-                  <img className="w-14 h-14 md:w-20 md:h-20 object-cover" alt="Fokus Malam" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQO8EihuUNmhtDfQuFfa8qjzVXKEgmMN3evmWo-8OdyeuvZyGJIf1C6Uh-JmxDiC-Io50P9kPm_csm-RT0PntO9Ge2Szdo8cSiDsLamC2-3GeWXu2QqPAHxi4UxLLoM7LMaui0ro0uCIJglAPvpzB4nxslU5OdpLBZmuhO-AECCS7RxQs0ZLPdGNjvewsZGME1eq9w7sJlKL69XCEBALT8VNhERsLG20MFO7Tswxlm5U6QFXCWgmi6pKp_IYdQCrmHNV5E49FSMvQ" />
-                  <span className="font-bold text-[16px] text-white px-3 md:px-4 truncate">Fokus Malam</span>
-                  <button className="absolute right-4 w-10 h-10 rounded-full bg-[#1ed760] text-[#005721] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg translate-y-2 group-hover:translate-y-0">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-                  </button>
-                </div>
-                {/* Item 6 */}
-                <div className="hidden md:flex group items-center bg-[#292a2a] hover:bg-[#252525] transition-colors duration-300 rounded-md overflow-hidden cursor-pointer relative shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-                  <img className="w-14 h-14 md:w-20 md:h-20 object-cover" alt="Top 50 Indonesia" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqtBpM4Py1ZmSsIcDFTLn-fO98aIEkFzZ4EsS8nXHJPNNQPdKLjZxslfQiwd_K29lqScjyVy7_5EFNxhBzAl8D06YQFmj1WgM-NErQoaHSOilu2R7iY3Aa6ZU1R1xjmV7tssSOwEOBTt2r3dIFfiC_k8DPArDTsfickP-zyvkCz_-MSx_FX_7_gfIXEAVU6GM5vx1qmsPMBwUW4bA2mU785KjlN8NJniAkelHRf1IxymCiOp8n6wVQKf5N4_RodUGUgFJr7NYxCF0" />
-                  <span className="font-bold text-[16px] text-white px-3 md:px-4 truncate">Top 50 Indonesia</span>
-                  <button className="absolute right-4 w-10 h-10 rounded-full bg-[#1ed760] text-[#005721] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg translate-y-2 group-hover:translate-y-0">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-                  </button>
-                </div>
-              </div>
+              )}
             </section>
 
             {/* Bagian: Dibuat untuk Kamu */}
@@ -259,7 +243,7 @@ export default function HomePage() {
             {/* Bagian: Trending Musik Indonesia */}
             <section className="mt-4 mb-8">
               <div className="flex items-end justify-between mb-4">
-                <h3 className="text-[24px] font-bold tracking-tight text-white hover:underline cursor-pointer">Trending Musik Indonesia</h3>
+                <h3 className="text-[24px] font-bold tracking-tight text-white hover:underline cursor-pointer">Trending Musik</h3>
                 <a className="text-[12px] font-bold text-[#b3b3b3] hover:text-white uppercase tracking-wider" href="#">Tampilkan semua</a>
               </div>
               
@@ -269,8 +253,13 @@ export default function HomePage() {
                 </div>
               ) : trendingSongs && trendingSongs.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                  {trendingSongs.map((song) => (
-                    <MusicCard key={song.musicId} song={song} />
+                  {trendingSongs.map((song, index) => (
+                    <MusicCard
+                      key={song.musicId}
+                      song={song}
+                      playQueue={trendingSongs}
+                      queueIndex={index}
+                    />
                   ))}
                 </div>
               ) : (

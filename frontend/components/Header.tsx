@@ -1,24 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 import { useMusic } from '@/hooks/useMusic';
-import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   title?: string;
 }
 
 export const Header = ({ title = 'SoundWave' }: HeaderProps) => {
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const { searchMusic, searchQuery, setSearchQuery } = useMusic();
+  const [pendingQuery, setPendingQuery] = useState<string | null>(null);
+  const { searchMusic, searchQuery, setSearchQuery, clearSearch } = useMusic();
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
-    if (value.trim()) {
-      searchMusic(value);
+
+    if (!value.trim()) {
+      setPendingQuery(null);
+      clearSearch();
+      return;
     }
+
+    setPendingQuery(value);
   };
+
+  useEffect(() => {
+    if (pendingQuery === null) return;
+
+    const timeoutId = window.setTimeout(() => {
+      searchMusic(pendingQuery);
+    }, 400);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [pendingQuery, searchMusic]);
 
   return (
     <header className="sticky top-0 z-40 px-6 py-4 flex items-center justify-between w-full bg-background/80 backdrop-blur-md">

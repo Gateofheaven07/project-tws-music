@@ -40,6 +40,8 @@ const router = (0, express_1.Router)();
 // Route publik (bisa diakses tanpa login)
 router.get('/search', musicController.search);
 router.get('/trending', musicController.trending);
+router.get('/genres', musicController.genres);
+router.get('/genres/:id/songs', musicController.genreSongs);
 // Route musik lainnya butuh login biar aman
 router.use(auth_middleware_1.authMiddleware);
 router.get('/stream-id', musicController.getStreamId);

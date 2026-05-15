@@ -59,6 +59,63 @@ export const trending = async (req: Request, res: Response) => {
 };
 
 /**
+ * Ngambil kategori musik dari Deezer.
+ */
+export const genres = async (req: Request, res: Response) => {
+  try {
+    const results = await musicService.getGenres();
+
+    return res.status(HTTP_STATUS.OK).json(
+      createSuccessResponse(HTTP_STATUS.OK, 'Daftar kategori musik berhasil diambil.', results, {
+        total: results.length,
+        provider: {
+          metadata: "deezer",
+          playback: "youtube"
+        }
+      })
+    );
+  } catch (error: any) {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      createErrorResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message)
+    );
+  }
+};
+
+/**
+ * Ngambil lagu yang mewakili satu genre Deezer.
+ */
+export const genreSongs = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const name = typeof req.query.name === 'string' ? req.query.name : undefined;
+
+    if (!id) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json(
+        createErrorResponse(HTTP_STATUS.BAD_REQUEST, 'Genre yang mau dibuka belum dipilih.')
+      );
+    }
+
+    const genreSongs = await musicService.getSongsByGenre(id, name);
+
+    return res.status(HTTP_STATUS.OK).json(
+      createSuccessResponse(HTTP_STATUS.OK, `Genre songs for ${name || id}`, genreSongs.results, {
+        query: genreSongs.query,
+        total: genreSongs.results.length,
+        provider: {
+          metadata: "deezer",
+          playback: "youtube"
+        },
+        playbackStatus: genreSongs.playbackStatus
+      })
+    );
+  } catch (error: any) {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      createErrorResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message)
+    );
+  }
+};
+
+/**
  * Ngambil video ID YouTube buat diputer.
  */
 export const getStreamId = async (req: Request, res: Response) => {
@@ -71,7 +128,8 @@ export const getStreamId = async (req: Request, res: Response) => {
       );
     }
 
-    const videoId = await musicService.getYouTubeId(artist as string, title as string);
+    const playbackLookup = await musicService.getYouTubeId(artist as string, title as string);
+    const { videoId } = playbackLookup;
 
     if (!videoId) {
       return res.status(HTTP_STATUS.NOT_FOUND).json(

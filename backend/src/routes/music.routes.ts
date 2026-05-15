@@ -7,6 +7,8 @@ const router = Router();
 // Route publik (bisa diakses tanpa login)
 router.get('/search', musicController.search);
 router.get('/trending', musicController.trending);
+router.get('/genres', musicController.genres);
+router.get('/genres/:id/songs', musicController.genreSongs);
 
 // Route musik lainnya butuh login biar aman
 router.use(authMiddleware);

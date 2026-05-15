@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import { useMusicStore } from '@/store/musicStore';
+import type { Genre } from '@/store/musicStore';
 import { useAuthStore } from '@/store/authStore';
 import api from '@/lib/api';
 import type { Song } from '@/store/playerStore';
@@ -16,6 +17,9 @@ export const useMusic = () => {
     isSearching,
     trendingSongs,
     isTrendingLoading,
+    genres,
+    isGenresLoading,
+    genresError,
     favoriteSongs,
     isFavoritesLoading,
     recentSongs,
@@ -24,6 +28,9 @@ export const useMusic = () => {
     setSearching,
     setTrendingSongs,
     setTrendingLoading,
+    setGenres,
+    setGenresLoading,
+    setGenresError,
     setFavoriteSongs,
     setFavoritesLoading,
     toggleFavorite,
@@ -71,6 +78,42 @@ export const useMusic = () => {
       setTrendingLoading(false);
     }
   }, [setTrendingSongs, setTrendingLoading]);
+
+  const getGenres = useCallback(async () => {
+    setGenresLoading(true);
+    setGenresError(null);
+
+    try {
+      const response = await api.get('/music/genres');
+      setGenres(response.data.results || []);
+    } catch (error) {
+      console.error('Gagal ngambil kategori musik:', error);
+      setGenres([]);
+      setGenresError('Kategori musik belum bisa dimuat.');
+    } finally {
+      setGenresLoading(false);
+    }
+  }, [setGenres, setGenresLoading, setGenresError]);
+
+  const getSongsByGenre = useCallback(
+    async (genre: Pick<Genre, 'id' | 'name'>) => {
+      setSearchQuery(genre.name);
+      setSearching(true);
+
+      try {
+        const response = await api.get(`/music/genres/${genre.id}/songs`, {
+          params: { name: genre.name },
+        });
+        setSearchResults(response.data.results || []);
+      } catch (error) {
+        console.error('Gagal ngambil lagu berdasarkan genre:', error);
+        setSearchResults([]);
+      } finally {
+        setSearching(false);
+      }
+    },
+    [setSearchQuery, setSearching, setSearchResults]
+  );
 
   const getFavorites = useCallback(async () => {
     if (!accessToken) return;
@@ -120,7 +163,7 @@ export const useMusic = () => {
   );
 
   return {
-    // Search
+    // Pencarian
     searchResults,
     searchQuery,
     isSearching,
@@ -128,19 +171,26 @@ export const useMusic = () => {
     setSearchQuery,
     clearSearch,
 
-    // Trending
+    // Lagu trending
     trendingSongs,
     isTrendingLoading,
     getTrendingSongs,
 
-    // Favorites
+    // Kategori musik
+    genres,
+    isGenresLoading,
+    genresError,
+    getGenres,
+    getSongsByGenre,
+
+    // Lagu favorit
     favoriteSongs,
     isFavoritesLoading,
     getFavorites,
     addFavorite,
     removeFavorite,
 
-    // Recent
+    // Riwayat lagu terbaru
     recentSongs,
     addToRecent,
   };

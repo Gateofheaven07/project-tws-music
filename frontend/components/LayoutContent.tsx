@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { PlayerBar } from '@/components/PlayerBar';
 import { YouTubePlayer } from '@/components/YouTubePlayer';
+import { NowPlayingModal } from '@/components/NowPlayingModal';
 import { useAuth } from '@/hooks/useAuth';
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
@@ -22,9 +23,14 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
       {/*
         YouTubePlayer ada di sini, di level layout global, bukan di dalam PlayerBar.
         Tujuannya supaya player tidak pernah di-unmount meski kondisi UI berubah.
-        Kalau dinaruh di PlayerBar yang bersyarat, player akan hancur tiap lagu ganti.
       */}
       <YouTubePlayer />
+
+      {/*
+        NowPlayingModal — full screen player ala Spotify.
+        Diletakkan di sini biar selalu tersedia dan tidak ter-unmount saat navigasi.
+      */}
+      <NowPlayingModal />
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar Global */}

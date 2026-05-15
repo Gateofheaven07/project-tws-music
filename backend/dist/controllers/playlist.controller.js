@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeSongFromPlaylist = exports.deletePlaylist = exports.getPlaylistDetail = exports.addSongToPlaylist = exports.createPlaylist = exports.getMyPlaylists = void 0;
+exports.removeSongFromPlaylist = exports.deletePlaylist = exports.updatePlaylist = exports.getPlaylistDetail = exports.addSongToPlaylist = exports.createPlaylist = exports.getMyPlaylists = void 0;
 const prisma_1 = require("../lib/prisma");
 const constants_1 = require("../utils/constants");
 const response_1 = require("../utils/response");
@@ -57,9 +57,16 @@ exports.createPlaylist = createPlaylist;
 const addSongToPlaylist = async (req, res) => {
     try {
         const playlistId = (req.params.playlistId || req.params.id); // Support both params based on route
+        const userId = req.user.userId;
         const { musicId, title, artist, cover, duration, videoId } = req.body;
         if (!musicId) {
             return res.status(constants_1.HTTP_STATUS.BAD_REQUEST).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.BAD_REQUEST, 'ID Lagunya mana?'));
+        }
+        const playlist = await prisma_1.prisma.playlist.findFirst({
+            where: { id: playlistId, userId }
+        });
+        if (!playlist) {
+            return res.status(constants_1.HTTP_STATUS.NOT_FOUND).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.NOT_FOUND, 'Playlist nggak ketemu atau kamu nggak punya akses.'));
         }
         const playlistSong = await prisma_1.prisma.playlistSong.upsert({
             where: {
@@ -89,8 +96,9 @@ exports.addSongToPlaylist = addSongToPlaylist;
 const getPlaylistDetail = async (req, res) => {
     try {
         const id = req.params.id;
-        const playlist = await prisma_1.prisma.playlist.findUnique({
-            where: { id },
+        const userId = req.user.userId;
+        const playlist = await prisma_1.prisma.playlist.findFirst({
+            where: { id, userId },
             include: {
                 songs: {
                     orderBy: {
@@ -147,6 +155,44 @@ const getPlaylistDetail = async (req, res) => {
     }
 };
 exports.getPlaylistDetail = getPlaylistDetail;
+/**
+ * Edit nama dan deskripsi playlist.
+ */
+const updatePlaylist = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const userId = req.user.userId;
+        const { name, description } = req.body;
+        const cleanName = typeof name === 'string' ? name.trim() : '';
+        const cleanDescription = typeof description === 'string' ? description.trim() : '';
+        if (!cleanName) {
+            return res.status(constants_1.HTTP_STATUS.BAD_REQUEST).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.BAD_REQUEST, 'Nama playlist wajib diisi.'));
+        }
+        const playlist = await prisma_1.prisma.playlist.findFirst({
+            where: { id, userId }
+        });
+        if (!playlist) {
+            return res.status(constants_1.HTTP_STATUS.NOT_FOUND).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.NOT_FOUND, 'Playlist nggak ketemu atau kamu nggak punya akses.'));
+        }
+        const updatedPlaylist = await prisma_1.prisma.playlist.update({
+            where: { id },
+            data: {
+                name: cleanName,
+                description: cleanDescription || null,
+            },
+            include: {
+                _count: {
+                    select: { songs: true }
+                }
+            }
+        });
+        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Playlist berhasil diperbarui.', updatedPlaylist));
+    }
+    catch (error) {
+        return res.status(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Gagal memperbarui playlist.'));
+    }
+};
+exports.updatePlaylist = updatePlaylist;
 /**
  * Hapus playlist.
  */

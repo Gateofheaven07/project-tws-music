@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAlbum = exports.getArtist = exports.getStreamId = exports.trending = exports.search = void 0;
+exports.getAlbum = exports.getArtist = exports.getStreamId = exports.genreSongs = exports.genres = exports.trending = exports.search = void 0;
 const musicService = __importStar(require("../services/music.service"));
 const constants_1 = require("../utils/constants");
 const response_1 = require("../utils/response");
@@ -81,6 +81,51 @@ const trending = async (req, res) => {
 };
 exports.trending = trending;
 /**
+ * Ngambil kategori musik dari Deezer.
+ */
+const genres = async (req, res) => {
+    try {
+        const results = await musicService.getGenres();
+        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Daftar kategori musik berhasil diambil.', results, {
+            total: results.length,
+            provider: {
+                metadata: "deezer",
+                playback: "youtube"
+            }
+        }));
+    }
+    catch (error) {
+        return res.status(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message));
+    }
+};
+exports.genres = genres;
+/**
+ * Ngambil lagu yang mewakili satu genre Deezer.
+ */
+const genreSongs = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const name = typeof req.query.name === 'string' ? req.query.name : undefined;
+        if (!id) {
+            return res.status(constants_1.HTTP_STATUS.BAD_REQUEST).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.BAD_REQUEST, 'Genre yang mau dibuka belum dipilih.'));
+        }
+        const genreSongs = await musicService.getSongsByGenre(id, name);
+        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, `Genre songs for ${name || id}`, genreSongs.results, {
+            query: genreSongs.query,
+            total: genreSongs.results.length,
+            provider: {
+                metadata: "deezer",
+                playback: "youtube"
+            },
+            playbackStatus: genreSongs.playbackStatus
+        }));
+    }
+    catch (error) {
+        return res.status(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message));
+    }
+};
+exports.genreSongs = genreSongs;
+/**
  * Ngambil video ID YouTube buat diputer.
  */
 const getStreamId = async (req, res) => {
@@ -89,7 +134,8 @@ const getStreamId = async (req, res) => {
         if (!artist || !title) {
             return res.status(constants_1.HTTP_STATUS.BAD_REQUEST).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.BAD_REQUEST, 'Artist sama judul lagunya jangan lupa ya.'));
         }
-        const videoId = await musicService.getYouTubeId(artist, title);
+        const playbackLookup = await musicService.getYouTubeId(artist, title);
+        const { videoId } = playbackLookup;
         if (!videoId) {
             return res.status(constants_1.HTTP_STATUS.NOT_FOUND).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.NOT_FOUND, 'Duh, sumber audio lagunya nggak ketemu di YouTube.'));
         }

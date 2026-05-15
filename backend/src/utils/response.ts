@@ -9,6 +9,7 @@ export interface ApiResponse<T = any> {
       metadata: string;
       playback: string;
     };
+    playbackStatus?: string;
   };
   data?: T;
   results?: T extends Array<any> ? T : never;

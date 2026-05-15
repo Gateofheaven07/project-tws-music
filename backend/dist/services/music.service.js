@@ -3,12 +3,83 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAlbumDetails = exports.getArtistDetails = exports.getYouTubeId = exports.getTrendingSongs = exports.searchSongs = void 0;
+exports.getAlbumDetails = exports.getArtistDetails = exports.getYouTubeId = exports.getTrendingSongs = exports.getSongsByGenre = exports.getGenres = exports.searchSongs = void 0;
 const axios_1 = __importDefault(require("axios"));
 const prisma_1 = require("../lib/prisma");
 const DEEZER_API_URL = 'https://api.deezer.com';
 const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3';
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+const mapTrackToSong = async (track, genreName) => {
+    const playbackLookup = await (0, exports.getYouTubeId)(track.artist.name, track.title);
+    const { videoId } = playbackLookup;
+    return {
+        musicId: `music_dz_${track.id}`,
+        title: track.title,
+        artist: {
+            id: `artist_dz_${track.artist.id}`,
+            name: track.artist.name
+        },
+        album: {
+            id: `album_dz_${track.album.id}`,
+            name: track.album.title,
+            cover: {
+                small: track.album.cover_small,
+                medium: track.album.cover_medium,
+                big: track.album.cover_big,
+                xl: track.album.cover_xl
+            }
+        },
+        duration: track.duration,
+        genres: genreName ? [genreName] : [],
+        releaseDate: "",
+        playback: {
+            provider: "youtube",
+            type: "iframe",
+            status: videoId ? "ready" : "unavailable",
+            videoId,
+            embedUrl: videoId ? `https://www.youtube.com/embed/${videoId}` : null,
+            youtubeUrl: videoId ? `https://www.youtube.com/watch?v=${videoId}` : null,
+            errorReason: videoId ? null : playbackLookup.errorReason
+        },
+        statistics: {
+            popularity: track.rank || 0
+        }
+    };
+};
+const GENRE_SEARCH_TERMS = {
+    'rap/hip hop': 'rap',
+    'pop': 'pop',
+    'rock': 'rock',
+    'dance': 'dance',
+    'r&b': 'rnb',
+    'alternative': 'alternative',
+    'soul & funk': 'soul',
+    'film/games': 'soundtrack',
+    'asian music': 'asian music',
+    'kids': 'kids music',
+    'electro': 'electronic',
+};
+const normalizeGenreSearchTerm = (genreName) => {
+    const normalizedName = genreName.trim().toLowerCase();
+    const mappedTerm = GENRE_SEARCH_TERMS[normalizedName];
+    if (mappedTerm)
+        return mappedTerm;
+    const firstGenreName = normalizedName
+        .split(/[\/,&]/)
+        .map((part) => part.trim())
+        .find(Boolean);
+    return (firstGenreName || normalizedName)
+        .replace(/[^\w\s-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+};
+const resolveGenreName = async (genreId, genreName) => {
+    if (genreName?.trim())
+        return genreName.trim();
+    const genres = await (0, exports.getGenres)();
+    const selectedGenre = genres.find((genre) => String(genre.id) === String(genreId));
+    return selectedGenre?.name || genreId;
+};
 /**
  * Service buat urusan musik-musikan.
  * Di sini kita nanganin komunikasi ke Deezer API (metadata) dan YouTube API (playback).
@@ -19,44 +90,7 @@ const searchSongs = async (query) => {
         // Cari lagu di Deezer
         const response = await axios_1.default.get(`${DEEZER_API_URL}/search?q=${encodeURIComponent(query)}`);
         const tracks = response.data.data;
-        // Mapping hasilnya dan tambahin field videoId (Aggregation)
-        const rawResults = await Promise.all(tracks.slice(0, 20).map(async (track) => {
-            // Panggil fungsi getYouTubeId yang sudah di-cache
-            const videoId = await (0, exports.getYouTubeId)(track.artist.name, track.title);
-            if (!videoId)
-                return null;
-            return {
-                musicId: `music_dz_${track.id}`,
-                title: track.title,
-                artist: {
-                    id: `artist_dz_${track.artist.id}`,
-                    name: track.artist.name
-                },
-                album: {
-                    id: `album_dz_${track.album.id}`,
-                    name: track.album.title,
-                    cover: {
-                        small: track.album.cover_small,
-                        medium: track.album.cover_medium,
-                        big: track.album.cover_big,
-                        xl: track.album.cover_xl
-                    }
-                },
-                duration: track.duration,
-                genres: [], // Deezer search doesn't give genres directly, would need extra call
-                releaseDate: "", // Would need extra call
-                playback: {
-                    provider: "youtube",
-                    type: "iframe",
-                    videoId: videoId,
-                    embedUrl: `https://www.youtube.com/embed/${videoId}`,
-                    youtubeUrl: `https://www.youtube.com/watch?v=${videoId}`
-                },
-                statistics: {
-                    popularity: track.rank || 0
-                }
-            };
-        }));
+        const rawResults = await Promise.all(tracks.slice(0, 20).map((track) => mapTrackToSong(track)));
         const results = rawResults.filter(Boolean);
         return results;
     }
@@ -67,48 +101,74 @@ const searchSongs = async (query) => {
 };
 exports.searchSongs = searchSongs;
 /**
+ * Ngambil kategori musik dari Deezer.
+ * Genre "All" kita skip karena terlalu umum untuk ditampilkan sebagai kartu.
+ */
+const getGenres = async () => {
+    try {
+        const response = await axios_1.default.get(`${DEEZER_API_URL}/genre`);
+        const genres = response.data.data || [];
+        return genres
+            .filter((genre) => genre.id !== 0 && genre.name?.toLowerCase() !== 'all')
+            .map((genre) => ({
+            id: genre.id,
+            name: genre.name,
+            picture: genre.picture_medium,
+            pictureSmall: genre.picture_medium,
+            pictureMedium: genre.picture_medium,
+            pictureBig: genre.picture_medium,
+            pictureXl: genre.picture_medium,
+        }));
+    }
+    catch (error) {
+        console.error('Deezer Genre Error:', error);
+        throw new Error('Gagal ngambil kategori musik dari Deezer.');
+    }
+};
+exports.getGenres = getGenres;
+/**
+ * Ngambil lagu berdasarkan genre Deezer.
+ * Genre dipakai sebagai kata kunci Deezer Search, lalu hasilnya tetap dimatch ke YouTube.
+ */
+const getSongsByGenre = async (genreId, genreName) => {
+    try {
+        const resolvedGenreName = await resolveGenreName(genreId, genreName);
+        const searchTerm = normalizeGenreSearchTerm(resolvedGenreName);
+        const response = await axios_1.default.get(`${DEEZER_API_URL}/search?q=${encodeURIComponent(searchTerm)}`);
+        const tracks = (response.data.data || []);
+        const rawResults = await Promise.all(tracks.slice(0, 24).map((track) => mapTrackToSong(track, resolvedGenreName)));
+        const results = rawResults.slice(0, 20);
+        const hasUnavailablePlayback = results.some((song) => song.playback.status === "unavailable");
+        return {
+            query: searchTerm,
+            playbackStatus: hasUnavailablePlayback ? "partial" : "ready",
+            results
+        };
+    }
+    catch (error) {
+        console.error('Deezer Genre Songs Error:', error);
+        if (genreName) {
+            const query = normalizeGenreSearchTerm(genreName);
+            const results = await (0, exports.searchSongs)(query);
+            const hasUnavailablePlayback = results.some((song) => song.playback.status === "unavailable");
+            return {
+                query,
+                playbackStatus: hasUnavailablePlayback ? "partial" : "ready",
+                results
+            };
+        }
+        throw new Error('Gagal ngambil lagu berdasarkan genre.');
+    }
+};
+exports.getSongsByGenre = getSongsByGenre;
+/**
  * Ngambil daftar lagu yang lagi ngetren sekarang.
  */
 const getTrendingSongs = async () => {
     try {
         const response = await axios_1.default.get(`${DEEZER_API_URL}/chart`);
         const tracks = response.data.tracks.data;
-        const rawResults = await Promise.all(tracks.slice(0, 20).map(async (track) => {
-            const videoId = await (0, exports.getYouTubeId)(track.artist.name, track.title);
-            if (!videoId)
-                return null;
-            return {
-                musicId: `music_dz_${track.id}`,
-                title: track.title,
-                artist: {
-                    id: `artist_dz_${track.artist.id}`,
-                    name: track.artist.name
-                },
-                album: {
-                    id: `album_dz_${track.album.id}`,
-                    name: track.album.title,
-                    cover: {
-                        small: track.album.cover_small,
-                        medium: track.album.cover_medium,
-                        big: track.album.cover_big,
-                        xl: track.album.cover_xl
-                    }
-                },
-                duration: track.duration,
-                genres: [],
-                releaseDate: "",
-                playback: {
-                    provider: "youtube",
-                    type: "iframe",
-                    videoId: videoId,
-                    embedUrl: `https://www.youtube.com/embed/${videoId}`,
-                    youtubeUrl: `https://www.youtube.com/watch?v=${videoId}`
-                },
-                statistics: {
-                    popularity: track.rank || 0
-                }
-            };
-        }));
+        const rawResults = await Promise.all(tracks.slice(0, 20).map((track) => mapTrackToSong(track)));
         const results = rawResults.filter(Boolean);
         return results;
     }
@@ -132,11 +192,17 @@ const getYouTubeId = async (artist, title) => {
             },
         });
         if (cache?.youtubeUrl) {
-            return cache.youtubeUrl;
+            return {
+                videoId: cache.youtubeUrl,
+                errorReason: null
+            };
         }
         if (!YOUTUBE_API_KEY) {
             console.warn('YOUTUBE_API_KEY nggak ada, playback mungkin bermasalah.');
-            return null;
+            return {
+                videoId: null,
+                errorReason: 'youtube_api_key_missing'
+            };
         }
         const query = `${title} ${artist} official audio`;
         const response = await axios_1.default.get(`${YOUTUBE_API_URL}/search`, {
@@ -151,27 +217,49 @@ const getYouTubeId = async (artist, title) => {
         });
         const videoId = response.data.items[0]?.id?.videoId;
         if (videoId) {
-            // Simpen ke cache (Upsert)
-            await prisma_1.prisma.song.upsert({
-                where: { id: `deezer_${artist}_${title}` }, // Dummy ID or use Deezer ID if available
-                update: { youtubeUrl: videoId },
-                create: {
-                    id: `deezer_${artist}_${title}`,
-                    title,
-                    artist,
-                    youtubeUrl: videoId,
-                    duration: 0, // Placeholder
-                },
-            });
+            try {
+                // Cache boleh gagal, tapi video yang sudah ketemu tetap bisa dipakai.
+                await prisma_1.prisma.song.upsert({
+                    where: { id: `deezer_${artist}_${title}` },
+                    update: { youtubeUrl: videoId },
+                    create: {
+                        id: `deezer_${artist}_${title}`,
+                        title,
+                        artist,
+                        youtubeUrl: videoId,
+                        duration: 0,
+                    },
+                });
+            }
+            catch (cacheError) {
+                console.warn('Gagal menyimpan cache YouTube:', cacheError);
+            }
         }
-        return videoId;
+        return {
+            videoId: videoId || null,
+            errorReason: videoId ? null : 'youtube_video_not_found'
+        };
     }
     catch (error) {
         console.error('YouTube Search Error:', error);
-        return null;
+        return {
+            videoId: null,
+            errorReason: getYouTubeErrorReason(error)
+        };
     }
 };
 exports.getYouTubeId = getYouTubeId;
+const getYouTubeErrorReason = (error) => {
+    if (!axios_1.default.isAxiosError(error))
+        return 'youtube_lookup_failed';
+    const responseData = error.response?.data;
+    const firstError = responseData?.error?.errors?.[0];
+    const reason = firstError?.reason || responseData?.error?.status || responseData?.error?.message;
+    if (reason === 'quotaExceeded' || reason === 'dailyLimitExceeded' || reason === 'RATE_LIMIT_EXCEEDED') {
+        return 'youtube_quota_exceeded';
+    }
+    return 'youtube_lookup_failed';
+};
 /**
  * Ngambil detail artis.
  */

@@ -17,7 +17,7 @@ export default function FavoritesPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { favoriteSongs, isFavoritesLoading, getFavorites } = useMusic();
-  const { setQueue, setCurrentSongIndex, play, isPlaying } = usePlayerStore();
+  const { startPlayback, isPlaying } = usePlayerStore();
 
   // Pastikan user login, kalau nggak langsung balikin ke login page
   useEffect(() => {
@@ -31,9 +31,7 @@ export default function FavoritesPage() {
   // Handler buat play semua lagu favorit sekaligus
   const handlePlayAll = () => {
     if (favoriteSongs.length > 0) {
-      setQueue(favoriteSongs);
-      setCurrentSongIndex(0);
-      play();
+      startPlayback(favoriteSongs, 0);
     }
   };
 

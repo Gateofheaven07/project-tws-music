@@ -23,9 +23,11 @@ export interface Song {
   playback: {
     provider: string;
     type: string;
+    status?: 'ready' | 'unavailable';
     videoId: string | null;
     embedUrl: string | null;
     youtubeUrl: string | null;
+    errorReason?: string | null;
   };
   statistics: {
     popularity: number;
@@ -35,23 +37,27 @@ export interface Song {
 type RepeatMode = 'off' | 'all' | 'one';
 
 interface PlayerStore {
-  // Queue & Current Song
+  // Antrian dan lagu aktif
   queue: Song[];
   currentSongIndex: number;
   currentSong: Song | null;
 
-  // Playback State
+  // Status pemutaran
   isPlaying: boolean;
   currentTime: number;
   duration: number;
 
-  // Preferences
+  // Preferensi player
   volume: number;
   isMuted: boolean;
   repeatMode: RepeatMode;
   isShuffle: boolean;
 
-  // Actions
+  // Status tampilan player
+  showNowPlaying: boolean;
+
+  // Aksi player
+  startPlayback: (songs: Song[], index?: number) => void;
   setQueue: (songs: Song[]) => void;
   addToQueue: (song: Song) => void;
   removeFromQueue: (index: number) => void;
@@ -59,6 +65,7 @@ interface PlayerStore {
   setCurrentSongIndex: (index: number) => void;
   play: () => void;
   pause: () => void;
+  stop: () => void;
   togglePlayPause: () => void;
   setCurrentTime: (time: number) => void;
   setDuration: (duration: number) => void;
@@ -68,9 +75,10 @@ interface PlayerStore {
   previous: () => void;
   setRepeatMode: (mode: RepeatMode) => void;
   toggleShuffle: () => void;
+  setShowNowPlaying: (show: boolean) => void;
 }
 
-export const usePlayerStore = create<PlayerStore>((set, get) => ({
+export const usePlayerStore = create<PlayerStore>((set) => ({
   queue: [],
   currentSongIndex: 0,
   currentSong: null,
@@ -81,6 +89,21 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   isMuted: false,
   repeatMode: 'off',
   isShuffle: false,
+  showNowPlaying: false,
+
+  startPlayback: (songs, index = 0) => {
+    const safeIndex = Math.min(Math.max(index, 0), Math.max(songs.length - 1, 0));
+
+    set({
+      queue: songs,
+      currentSongIndex: safeIndex,
+      currentSong: songs[safeIndex] || null,
+      isPlaying: songs.length > 0,
+      currentTime: 0,
+      duration: 0,
+      showNowPlaying: songs.length > 0,
+    });
+  },
 
   setQueue: (songs) => {
     set({ queue: songs, currentSongIndex: 0, currentSong: songs[0] || null });
@@ -112,6 +135,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
 
   play: () => set({ isPlaying: true }),
   pause: () => set({ isPlaying: false }),
+  stop: () => set({ queue: [], currentSongIndex: 0, currentSong: null, isPlaying: false, currentTime: 0, duration: 0, showNowPlaying: false }),
 
   togglePlayPause: () => {
     set((state) => ({ isPlaying: !state.isPlaying }));
@@ -157,4 +181,5 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   toggleShuffle: () => {
     set((state) => ({ isShuffle: !state.isShuffle }));
   },
+  setShowNowPlaying: (show) => set({ showNowPlaying: show }),
 }));
