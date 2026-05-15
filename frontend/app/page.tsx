@@ -146,11 +146,11 @@ export default function HomePage() {
               <span className="text-[18px] font-bold text-white">Soundwave</span>
             </div>
             <h2 className="hidden md:block text-[24px] font-bold tracking-tight text-white">Selamat Malam</h2>
-            <div className="flex items-center gap-3 ml-auto md:ml-0">
-              <div className="w-8 h-8 rounded-full overflow-hidden bg-[#252525] flex items-center justify-center">
-                <img alt="Profil Pengguna" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDF8rrz4oS26EkUUchSlTVtsCR0sKAR9yBXsMyMINrzcqLFYSMhXxz9p-ZQVLVfaAEkxfABauLPs5rzd7YlLbJvLGcb5RCjPD6_MCVIIrWa_BFtaSsGKb2bRHI1AopmCYhsZoDYoKIxHRcCJafEsUybfve2U6H4m7DKUylBD231-O35d-FGE3eMD6TfXirxuBvNoSZc4FbSanCBqj1WhIkYsbbfVrdJJ0ppGTSjt8Ssz96ny9j-zvcZ7iTn_WlGjDC3iNLrEQFJRsM" />
-              </div>
-            </div>
+
+
+
+
+
           </header>
 
           {/* Konten Utama Beranda */}
