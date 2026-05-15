@@ -46,31 +46,17 @@ export const register = async (req: Request, res: Response) => {
       },
     });
 
-    // Buat token akses biar user langsung login pas abis daftar
-    const accessToken = createAccessToken({
-      userId: user.id,
-      email: user.email,
-      username: user.username,
-    });
-
-    const refreshToken = createRefreshToken({
-      userId: user.id,
-      email: user.email,
-      username: user.username,
-    });
+    // Kita hapus bagian pembuatan token otomatis di sini. 
+    // Jadi user harus login manual setelah akunnya berhasil dibuat.
 
     return res.status(HTTP_STATUS.CREATED).json(
-      createSuccessResponse(HTTP_STATUS.CREATED, 'Yeay! Akun kamu berhasil dibuat.', {
+      createSuccessResponse(HTTP_STATUS.CREATED, 'Yeay! Akun kamu berhasil dibuat. Silakan login ya.', {
         user: {
           id: user.id,
           email: user.email,
           username: user.username,
           avatar: user.avatar,
-        },
-        tokens: {
-          accessToken,
-          refreshToken,
-        },
+        }
       })
     );
   } catch (error) {

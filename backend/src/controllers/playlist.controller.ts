@@ -68,27 +68,28 @@ export const createPlaylist = async (req: Request, res: Response) => {
  */
 export const addSongToPlaylist = async (req: Request, res: Response) => {
   try {
-    const playlistId = req.params.playlistId as string;
-    const { songId, title, artist, album, thumbnail, duration } = req.body;
+    const playlistId = (req.params.playlistId || req.params.id) as string; // Support both params based on route
+    const { musicId, title, artist, cover, duration, videoId } = req.body;
 
-    // Pastiin lagunya ada di cache
-    await prisma.song.upsert({
-      where: { id: songId },
+    if (!musicId) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json(
+        createErrorResponse(HTTP_STATUS.BAD_REQUEST, 'ID Lagunya mana?')
+      );
+    }
+
+    const playlistSong = await prisma.playlistSong.upsert({
+      where: {
+        playlistId_musicId: { playlistId, musicId },
+      },
       update: {},
       create: {
-        id: songId,
+        playlistId,
+        musicId,
         title: title || 'Unknown',
         artist: artist || 'Unknown',
-        album: album || '',
-        thumbnail: thumbnail || '',
+        cover: cover || '',
         duration: duration || 0,
-      },
-    });
-
-    const playlistSong = await prisma.playlistSong.create({
-      data: {
-        playlistId,
-        songId,
+        videoId: videoId || null,
       }
     });
 
@@ -113,8 +114,8 @@ export const getPlaylistDetail = async (req: Request, res: Response) => {
       where: { id },
       include: {
         songs: {
-          include: {
-            song: true
+          orderBy: {
+            addedAt: 'desc'
           }
         }
       }
@@ -126,8 +127,47 @@ export const getPlaylistDetail = async (req: Request, res: Response) => {
       );
     }
 
+    // Mapping songs to unified format
+    const songs = playlist.songs.map(ps => ({
+      musicId: ps.musicId,
+      title: ps.title,
+      artist: {
+        id: `artist_unknown`,
+        name: ps.artist
+      },
+      album: {
+        id: `album_unknown`,
+        name: "",
+        cover: {
+          small: ps.cover,
+          medium: ps.cover,
+          big: ps.cover,
+          xl: ps.cover
+        }
+      },
+      duration: ps.duration,
+      genres: [],
+      releaseDate: "",
+      playback: {
+        provider: "youtube",
+        type: "iframe",
+        videoId: ps.videoId,
+        embedUrl: ps.videoId ? `https://www.youtube.com/embed/${ps.videoId}` : null,
+        youtubeUrl: ps.videoId ? `https://www.youtube.com/watch?v=${ps.videoId}` : null
+      },
+      statistics: {
+        popularity: 0
+      }
+    }));
+
     return res.status(HTTP_STATUS.OK).json(
-      createSuccessResponse(HTTP_STATUS.OK, 'Detail playlist.', playlist)
+      createSuccessResponse(HTTP_STATUS.OK, 'Detail playlist.', { ...playlist, songs }, {
+        total: songs.length,
+        provider: {
+          metadata: "database",
+          playback: "youtube"
+        }
+      })
     );
   } catch (error) {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
@@ -165,6 +205,42 @@ export const deletePlaylist = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
       createErrorResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Gagal ngehapus playlist.')
+    );
+  }
+};
+
+/**
+ * Hapus lagu dari playlist.
+ */
+export const removeSongFromPlaylist = async (req: Request, res: Response) => {
+  try {
+    const playlistId = req.params.id as string;
+    const musicId = req.params.musicId as string;
+    const userId = (req as any).user.userId;
+
+    // Pastiin playlist milik user yang request
+    const playlist = await prisma.playlist.findFirst({
+      where: { id: playlistId, userId }
+    });
+
+    if (!playlist) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json(
+        createErrorResponse(HTTP_STATUS.NOT_FOUND, 'Playlist nggak ketemu atau kamu nggak punya akses.')
+      );
+    }
+
+    await prisma.playlistSong.delete({
+      where: {
+        playlistId_musicId: { playlistId, musicId },
+      },
+    });
+
+    return res.status(HTTP_STATUS.OK).json(
+      createSuccessResponse(HTTP_STATUS.OK, 'Lagu berhasil dihapus dari playlist.')
+    );
+  } catch (error) {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      createErrorResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Gagal ngehapus lagu dari playlist.')
     );
   }
 };

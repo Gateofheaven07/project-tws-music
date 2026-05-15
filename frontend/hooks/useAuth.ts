@@ -36,9 +36,11 @@ export const useAuth = () => {
       setError(null);
       try {
         const response = await api.post('/auth/register', data);
-        const { user: userData, tokens } = response.data.data;
-        setUser(userData);
-        setTokens(tokens.accessToken, tokens.refreshToken);
+        const { user: userData } = response.data.data;
+        
+        // Kita nggak manggil setUser sama setTokens di sini biar user nggak otomatis login.
+        // Alurnya jadi: Daftar -> Ke halaman Login -> Login manual.
+        
         return { success: true, user: userData };
       } catch (err) {
         const message = (err as any).response?.data?.message || 'Registration failed';
@@ -48,7 +50,7 @@ export const useAuth = () => {
         setLoading(false);
       }
     },
-    [setLoading, setError, setUser, setTokens]
+    [setLoading, setError]
   );
 
   const login = useCallback(

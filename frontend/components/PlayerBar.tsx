@@ -7,8 +7,8 @@ import { usePlayerStore } from '@/store/playerStore';
 import { useMusicStore } from '@/store/musicStore';
 import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
-import { YouTubePlayer } from './YouTubePlayer';
 import api from '@/lib/api';
+import type { Song } from '@/store/playerStore';
 
 /**
  * Bar Player di bagian bawah. Ini pusat kontrol musik kita.
@@ -41,23 +41,51 @@ export const PlayerBar = () => {
 
   const isFavorited = currentSong && favoriteSongs.some((s) => s.musicId === currentSong.musicId);
 
-  // Efek buat nyari Video ID YouTube pas lagu ganti
+  // Efek buat nyari Video ID YouTube tiap kali lagu aktif berganti.
+  // Kita hanya fetch kalau lagu belum punya videoId (artinya belum siap diputar).
   useEffect(() => {
     const fetchVideoId = async () => {
-      if (!currentSong || currentSong.youtubeUrl) return;
+      // Kalau tidak ada lagu, atau videoId sudah ada, langsung skip — tidak perlu fetch lagi.
+      if (!currentSong || currentSong.playback?.videoId) return;
 
       setIsFetchingId(true);
       try {
         const response = await api.get('/music/stream-id', {
           params: {
-            artist: currentSong.artist,
+            // Kirim nama artis sebagai string, bukan objek.
+            // Struktur data lagu kita menyimpan artis dalam `artist.name`.
+            artist: currentSong.artist.name,
             title: currentSong.title,
           },
         });
 
-        if (response.data.data.videoId) {
-          // Update song di store dengan videoId
-          currentSong.playback.videoId = response.data.data.videoId;
+        const videoId = response.data?.data?.videoId;
+        if (videoId) {
+          // Buat objek lagu yang sudah diperbarui dengan videoId baru,
+          // lalu update queue di store supaya perubahannya reaktif dan tidak mutasi state langsung.
+          const updatedSong: Song = {
+            ...currentSong,
+            playback: {
+              ...currentSong.playback,
+              videoId,
+              embedUrl: `https://www.youtube.com/embed/${videoId}`,
+              youtubeUrl: `https://www.youtube.com/watch?v=${videoId}`,
+            },
+          };
+
+          // Update queue dengan lagu yang sudah ada videoId-nya
+          const currentQueue = usePlayerStore.getState().queue;
+          const currentIndex = usePlayerStore.getState().currentSongIndex;
+          const newQueue = [...currentQueue];
+          newQueue[currentIndex] = updatedSong;
+
+          usePlayerStore.setState({
+            queue: newQueue,
+            currentSong: updatedSong,
+            // Pastikan isPlaying tetap true supaya YouTubePlayer langsung memutar
+            // begitu videoId tersedia.
+            isPlaying: true,
+          });
         }
       } catch (error) {
         console.error('Gagal ngambil video ID:', error);
@@ -67,7 +95,7 @@ export const PlayerBar = () => {
     };
 
     fetchVideoId();
-  }, [currentSong]);
+  }, [currentSong?.musicId]); // Hanya re-run kalau lagu yang aktif benar-benar berganti
 
   // Format waktu (detik ke mm:ss)
   const formatTime = (seconds: number) => {
@@ -77,11 +105,12 @@ export const PlayerBar = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // YouTubePlayer dikelola di LayoutContent (level layout global),
+  // bukan di sini, supaya player tidak hancur ketika currentSong null.
   if (!currentSong) return null;
 
   return (
     <>
-      <YouTubePlayer />
 
       <div className="h-[90px] bg-black border-t border-[#121212] px-4 flex items-center justify-between fixed bottom-0 left-0 right-0 z-50 shadow-2xl">
         {/* Left: Now Playing Info (30% width approx) */}

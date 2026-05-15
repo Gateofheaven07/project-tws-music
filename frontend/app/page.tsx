@@ -262,56 +262,20 @@ export default function HomePage() {
                 <h3 className="text-[24px] font-bold tracking-tight text-white hover:underline cursor-pointer">Trending Musik Indonesia</h3>
                 <a className="text-[12px] font-bold text-[#b3b3b3] hover:text-white uppercase tracking-wider" href="#">Tampilkan semua</a>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Item Daftar Lagu 1 */}
-                <div className="group flex items-center gap-4 p-3 rounded-md hover:bg-[#252525] transition-colors duration-200 cursor-pointer">
-                  <div className="relative w-12 h-12 flex-shrink-0">
-                    <img className="w-full h-full object-cover rounded" alt="Sial" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDR539z5G_t5bWeRG2t-CWRiUKPQBJBXSFW0v9oLJlpNAs9nBS9dbNbcjwHe33jWqv1V32DAvKhhiASE2IL65XIB8Mw50ppr_FgT9UihfAEuCEA3Td-sQVgwmJIefaHCZKO5I6YSJKt1LEeB08Tn8u745Nsl5fSFYXDa5_qHKKHuvIR8R8V53OSYXananPIY2sLsAdb2l5n9ic7YTmTXR4ob-uF8ndqaiECNQSUuWHRDyRem-HK1D4zAdeXRyHWy-VOIihkNpfoJZ0" />
-                    <div className="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center rounded">
-                      <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col flex-1 min-w-0">
-                    <h4 className="font-bold text-[16px] text-white truncate">Sial</h4>
-                    <p className="text-[14px] text-[#b3b3b3] truncate">Mahalini</p>
-                  </div>
-                  <button className="text-[#b3b3b3] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="material-symbols-outlined">more_horiz</span>
-                  </button>
+              
+              {isTrendingLoading ? (
+                <div className="flex items-center justify-center h-32">
+                  <Loader className="h-8 w-8 animate-spin text-primary" />
                 </div>
-                {/* Item Daftar Lagu 2 */}
-                <div className="group flex items-center gap-4 p-3 rounded-md hover:bg-[#252525] transition-colors duration-200 cursor-pointer">
-                  <div className="relative w-12 h-12 flex-shrink-0">
-                    <img className="w-full h-full object-cover rounded" alt="Komang" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu2ri02Tzq0BJH_ICF4d7qZGr7gfDqYGcmrayLpMo0fHBSBcOrfNsazO0D_c7ZptRqPTx159p-PTJ4RsI0F778oRCl5ypDMhrlQkH-KXvGhKYxDG-Uh7UbT-5GRFav-kE447XveVm1eJXEXDZIDHD9n19tVhMsrNq7UxonGzcBy-w8lysGIZe2kwBPVot8hRlLm17OnYP9Ob4wVD7y7nLT6kXxCCcmbQSPzwdJvAsCahOkJ4U7ygDm7uiMhKqVWBv0xcdam1CtHOk" />
-                    <div className="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center rounded">
-                      <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col flex-1 min-w-0">
-                    <h4 className="font-bold text-[16px] text-white truncate">Komang</h4>
-                    <p className="text-[14px] text-[#b3b3b3] truncate">Raim Laode</p>
-                  </div>
-                  <button className="text-[#b3b3b3] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="material-symbols-outlined">more_horiz</span>
-                  </button>
+              ) : trendingSongs && trendingSongs.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                  {trendingSongs.map((song) => (
+                    <MusicCard key={song.musicId} song={song} />
+                  ))}
                 </div>
-                {/* Item Daftar Lagu 3 */}
-                <div className="group flex items-center gap-4 p-3 rounded-md hover:bg-[#252525] transition-colors duration-200 cursor-pointer">
-                  <div className="relative w-12 h-12 flex-shrink-0">
-                    <img className="w-full h-full object-cover rounded" alt="Runtuh" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEInmzDy_3ULHJ03drOuNb5fzJ5lq_9HYJqeL8zfMsXqL2eXqM82dYDjfVHZtKyHOzZHVSyr1olRlt1pfoKUrrjtCFYLf6DnAfriEqF59zHn6Ulc6AoSdEVgOUAddtKaCAXEvQysO_2kRiFLudmc6EU9bpcmWPE1zkU24p2HG373BOZtaHJEY2w_1849PNA0PIE-qi6gK2C2iFjI-K1rEFRRPH9CxnpvvHDHtE6rs2MFfRRdfxVM6y6MoXF31ta5gegezqdxqTeuw" />
-                    <div className="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center rounded">
-                      <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col flex-1 min-w-0">
-                    <h4 className="font-bold text-[16px] text-white truncate">Runtuh</h4>
-                    <p className="text-[14px] text-[#b3b3b3] truncate">Feby Putri, Fiersa Besari</p>
-                  </div>
-                  <button className="text-[#b3b3b3] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="material-symbols-outlined">more_horiz</span>
-                  </button>
-                </div>
-              </div>
+              ) : (
+                <p className="text-[#b3b3b3]">Belum ada data trending saat ini.</p>
+              )}
             </section>
           </div>
         </div>

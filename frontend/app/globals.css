@@ -116,12 +116,37 @@
     @apply text-[#cbcbcb];
   }
 
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* Custom scrollbar untuk estetika dark premium */
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #343535;
+    border-radius: 6px;
+    border: 3px solid #121414;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4d4d4d;
+  }
+
+  /* Animasi Overlay Tombol Play pada Kartu */
+  .play-btn-overlay {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.3s ease;
+  }
+  
+  .card-container:hover .play-btn-overlay {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

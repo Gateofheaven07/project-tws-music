@@ -76,7 +76,7 @@ export const useMusic = () => {
     if (!accessToken) return;
     setFavoritesLoading(true);
     try {
-      const response = await api.get('/favorites');
+      const response = await api.get('/liked-songs');
       setFavoriteSongs(response.data.results || []);
     } catch (error) {
       console.error('Gagal ngambil favorit:', error);
@@ -89,13 +89,13 @@ export const useMusic = () => {
     async (song: Song) => {
       if (!accessToken) return;
       try {
-        await api.post('/favorites', {
-          songId: song.musicId,
+        await api.post('/liked-songs', {
+          musicId: song.musicId,
           title: song.title,
-          artist: song.artist.name,
-          album: song.album.name,
-          thumbnail: song.album.cover.medium,
-          duration: song.duration
+          artist: song.artist?.name || 'Unknown',
+          cover: song.album?.cover?.medium || '',
+          duration: song.duration || 0,
+          videoId: song.playback?.videoId || null
         });
         toggleFavorite(song);
       } catch (error) {
@@ -109,7 +109,7 @@ export const useMusic = () => {
     async (musicId: string) => {
       if (!accessToken) return;
       try {
-        await api.delete(`/favorites/${musicId}`);
+        await api.delete(`/liked-songs/${musicId}`);
         const song = favoriteSongs.find((s) => s.musicId === musicId);
         if (song) toggleFavorite(song);
       } catch (error) {

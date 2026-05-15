@@ -37,10 +37,11 @@ const express_1 = require("express");
 const musicController = __importStar(require("../controllers/music.controller"));
 const auth_middleware_1 = require("../middlewares/auth.middleware");
 const router = (0, express_1.Router)();
-// Route musik semuanya butuh login biar aman
-router.use(auth_middleware_1.authMiddleware);
+// Route publik (bisa diakses tanpa login)
 router.get('/search', musicController.search);
 router.get('/trending', musicController.trending);
+// Route musik lainnya butuh login biar aman
+router.use(auth_middleware_1.authMiddleware);
 router.get('/stream-id', musicController.getStreamId);
 router.get('/artist/:id', musicController.getArtist);
 router.get('/album/:id', musicController.getAlbum);

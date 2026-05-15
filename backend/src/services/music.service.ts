@@ -17,14 +17,12 @@ export const searchSongs = async (query: string) => {
     const tracks = response.data.data;
 
     // Mapping hasilnya dan tambahin field videoId (Aggregation)
-    const results = await Promise.all(
-      tracks.slice(0, 10).map(async (track: any) => {
-        // Cek cache dulu
-        const cache = await prisma.song.findUnique({
-          where: { id: String(track.id) }
-        });
+    const rawResults = await Promise.all(
+      tracks.slice(0, 20).map(async (track: any) => {
+        // Panggil fungsi getYouTubeId yang sudah di-cache
+        const videoId = await getYouTubeId(track.artist.name, track.title);
 
-        const videoId = cache?.youtubeUrl || null;
+        if (!videoId) return null;
 
         return {
           musicId: `music_dz_${track.id}`,
@@ -50,8 +48,8 @@ export const searchSongs = async (query: string) => {
             provider: "youtube",
             type: "iframe",
             videoId: videoId,
-            embedUrl: videoId ? `https://www.youtube.com/embed/${videoId}` : null,
-            youtubeUrl: videoId ? `https://www.youtube.com/watch?v=${videoId}` : null
+            embedUrl: `https://www.youtube.com/embed/${videoId}`,
+            youtubeUrl: `https://www.youtube.com/watch?v=${videoId}`
           },
           statistics: {
             popularity: track.rank || 0
@@ -59,6 +57,8 @@ export const searchSongs = async (query: string) => {
         };
       })
     );
+
+    const results = rawResults.filter(Boolean);
 
     return results;
   } catch (error) {
@@ -75,13 +75,11 @@ export const getTrendingSongs = async () => {
     const response = await axios.get(`${DEEZER_API_URL}/chart`);
     const tracks = response.data.tracks.data;
 
-    const results = await Promise.all(
-      tracks.slice(0, 10).map(async (track: any) => {
-        const cache = await prisma.song.findUnique({
-          where: { id: String(track.id) }
-        });
+    const rawResults = await Promise.all(
+      tracks.slice(0, 20).map(async (track: any) => {
+        const videoId = await getYouTubeId(track.artist.name, track.title);
 
-        const videoId = cache?.youtubeUrl || null;
+        if (!videoId) return null;
 
         return {
           musicId: `music_dz_${track.id}`,
@@ -107,8 +105,8 @@ export const getTrendingSongs = async () => {
             provider: "youtube",
             type: "iframe",
             videoId: videoId,
-            embedUrl: videoId ? `https://www.youtube.com/embed/${videoId}` : null,
-            youtubeUrl: videoId ? `https://www.youtube.com/watch?v=${videoId}` : null
+            embedUrl: `https://www.youtube.com/embed/${videoId}`,
+            youtubeUrl: `https://www.youtube.com/watch?v=${videoId}`
           },
           statistics: {
             popularity: track.rank || 0
@@ -116,6 +114,8 @@ export const getTrendingSongs = async () => {
         };
       })
     );
+
+    const results = rawResults.filter(Boolean);
 
     return results;
   } catch (error) {
@@ -147,7 +147,7 @@ export const getYouTubeId = async (artist: string, title: string) => {
       return null;
     }
 
-    const query = `${artist} - ${title}`;
+    const query = `${title} ${artist} official audio`;
     const response = await axios.get(`${YOUTUBE_API_URL}/search`, {
       params: {
         part: 'snippet',

@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/music', musicRoutes);
 app.use('/api/playlists', playlistRoutes);
-app.use('/api/favorites', favoriteRoutes);
+app.use('/api/liked-songs', favoriteRoutes);
 app.use('/api/history', historyRoutes);
 
 app.listen(port, () => {

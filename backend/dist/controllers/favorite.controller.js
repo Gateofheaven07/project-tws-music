@@ -5,47 +5,44 @@ const prisma_1 = require("../lib/prisma");
 const constants_1 = require("../utils/constants");
 const response_1 = require("../utils/response");
 /**
- * Ngambil semua lagu favorit user.
+ * Ngambil semua lagu yang disukai user.
  */
 const getFavorites = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const favorites = await prisma_1.prisma.favorite.findMany({
+        const likedSongs = await prisma_1.prisma.likedSong.findMany({
             where: { userId },
-            include: {
-                song: true,
-            },
             orderBy: {
                 createdAt: 'desc',
             },
         });
         // Kita mapping biar formatnya seragam sama hasil search
-        const results = favorites.map((f) => ({
-            musicId: f.song.id.startsWith('music_') ? f.song.id : `music_dz_${f.song.id}`,
-            title: f.song.title,
+        const results = likedSongs.map((f) => ({
+            musicId: f.musicId,
+            title: f.title,
             artist: {
                 id: `artist_unknown`,
-                name: f.song.artist
+                name: f.artist
             },
             album: {
                 id: `album_unknown`,
-                name: f.song.album,
+                name: "",
                 cover: {
-                    small: f.song.thumbnail,
-                    medium: f.song.thumbnail,
-                    big: f.song.thumbnail,
-                    xl: f.song.thumbnail
+                    small: f.cover,
+                    medium: f.cover,
+                    big: f.cover,
+                    xl: f.cover
                 }
             },
-            duration: f.song.duration,
+            duration: f.duration,
             genres: [],
             releaseDate: "",
             playback: {
                 provider: "youtube",
                 type: "iframe",
-                videoId: f.song.youtubeUrl,
-                embedUrl: f.song.youtubeUrl ? `https://www.youtube.com/embed/${f.song.youtubeUrl}` : null,
-                youtubeUrl: f.song.youtubeUrl ? `https://www.youtube.com/watch?v=${f.song.youtubeUrl}` : null
+                videoId: f.videoId,
+                embedUrl: f.videoId ? `https://www.youtube.com/embed/${f.videoId}` : null,
+                youtubeUrl: f.videoId ? `https://www.youtube.com/watch?v=${f.videoId}` : null
             },
             statistics: {
                 popularity: 0
@@ -70,35 +67,27 @@ exports.getFavorites = getFavorites;
 const addFavorite = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { songId, title, artist, album, thumbnail, duration } = req.body;
-        if (!songId) {
+        const { musicId, title, artist, cover, duration, videoId } = req.body;
+        if (!musicId) {
             return res.status(constants_1.HTTP_STATUS.BAD_REQUEST).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.BAD_REQUEST, 'ID Lagunya mana?'));
         }
-        // Pastiin lagunya ada di cache/table Song dulu
-        await prisma_1.prisma.song.upsert({
-            where: { id: songId },
-            update: {},
-            create: {
-                id: songId,
-                title: title || 'Unknown',
-                artist: artist || 'Unknown',
-                album: album || '',
-                thumbnail: thumbnail || '',
-                duration: duration || 0,
-            },
-        });
-        // Tambah ke favorit
-        const favorite = await prisma_1.prisma.favorite.upsert({
+        // Tambah ke likedSongs
+        const likedSong = await prisma_1.prisma.likedSong.upsert({
             where: {
-                userId_songId: { userId, songId },
+                userId_musicId: { userId, musicId },
             },
             update: {},
             create: {
                 userId,
-                songId,
+                musicId,
+                title: title || 'Unknown',
+                artist: artist || 'Unknown',
+                cover: cover || '',
+                duration: duration || 0,
+                videoId: videoId || null,
             },
         });
-        return res.status(constants_1.HTTP_STATUS.CREATED).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.CREATED, 'Lagu berhasil ditambah ke favorit.', favorite));
+        return res.status(constants_1.HTTP_STATUS.CREATED).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.CREATED, 'Lagu berhasil ditambah ke favorit.', likedSong));
     }
     catch (error) {
         console.error('Add Favorite Error:', error);
@@ -112,10 +101,10 @@ exports.addFavorite = addFavorite;
 const removeFavorite = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const songId = req.params.songId;
-        await prisma_1.prisma.favorite.delete({
+        const musicId = (req.params.musicId || req.params.songId);
+        await prisma_1.prisma.likedSong.delete({
             where: {
-                userId_songId: { userId, songId },
+                userId_musicId: { userId, musicId },
             },
         });
         return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Lagu dihapus dari favorit.'));

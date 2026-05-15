@@ -20,12 +20,11 @@ const searchSongs = async (query) => {
         const response = await axios_1.default.get(`${DEEZER_API_URL}/search?q=${encodeURIComponent(query)}`);
         const tracks = response.data.data;
         // Mapping hasilnya dan tambahin field videoId (Aggregation)
-        const results = await Promise.all(tracks.slice(0, 10).map(async (track) => {
-            // Cek cache dulu
-            const cache = await prisma_1.prisma.song.findUnique({
-                where: { id: String(track.id) }
-            });
-            const videoId = cache?.youtubeUrl || null;
+        const rawResults = await Promise.all(tracks.slice(0, 20).map(async (track) => {
+            // Panggil fungsi getYouTubeId yang sudah di-cache
+            const videoId = await (0, exports.getYouTubeId)(track.artist.name, track.title);
+            if (!videoId)
+                return null;
             return {
                 musicId: `music_dz_${track.id}`,
                 title: track.title,
@@ -50,14 +49,15 @@ const searchSongs = async (query) => {
                     provider: "youtube",
                     type: "iframe",
                     videoId: videoId,
-                    embedUrl: videoId ? `https://www.youtube.com/embed/${videoId}` : null,
-                    youtubeUrl: videoId ? `https://www.youtube.com/watch?v=${videoId}` : null
+                    embedUrl: `https://www.youtube.com/embed/${videoId}`,
+                    youtubeUrl: `https://www.youtube.com/watch?v=${videoId}`
                 },
                 statistics: {
                     popularity: track.rank || 0
                 }
             };
         }));
+        const results = rawResults.filter(Boolean);
         return results;
     }
     catch (error) {
@@ -73,11 +73,10 @@ const getTrendingSongs = async () => {
     try {
         const response = await axios_1.default.get(`${DEEZER_API_URL}/chart`);
         const tracks = response.data.tracks.data;
-        const results = await Promise.all(tracks.slice(0, 10).map(async (track) => {
-            const cache = await prisma_1.prisma.song.findUnique({
-                where: { id: String(track.id) }
-            });
-            const videoId = cache?.youtubeUrl || null;
+        const rawResults = await Promise.all(tracks.slice(0, 20).map(async (track) => {
+            const videoId = await (0, exports.getYouTubeId)(track.artist.name, track.title);
+            if (!videoId)
+                return null;
             return {
                 musicId: `music_dz_${track.id}`,
                 title: track.title,
@@ -102,14 +101,15 @@ const getTrendingSongs = async () => {
                     provider: "youtube",
                     type: "iframe",
                     videoId: videoId,
-                    embedUrl: videoId ? `https://www.youtube.com/embed/${videoId}` : null,
-                    youtubeUrl: videoId ? `https://www.youtube.com/watch?v=${videoId}` : null
+                    embedUrl: `https://www.youtube.com/embed/${videoId}`,
+                    youtubeUrl: `https://www.youtube.com/watch?v=${videoId}`
                 },
                 statistics: {
                     popularity: track.rank || 0
                 }
             };
         }));
+        const results = rawResults.filter(Boolean);
         return results;
     }
     catch (error) {
@@ -138,7 +138,7 @@ const getYouTubeId = async (artist, title) => {
             console.warn('YOUTUBE_API_KEY nggak ada, playback mungkin bermasalah.');
             return null;
         }
-        const query = `${artist} - ${title}`;
+        const query = `${title} ${artist} official audio`;
         const response = await axios_1.default.get(`${YOUTUBE_API_URL}/search`, {
             params: {
                 part: 'snippet',

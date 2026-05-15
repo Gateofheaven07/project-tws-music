@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,19 +8,12 @@ import { Music, Loader } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { user, isLoading, error, register } = useAuth();
+  const { isLoading, error, register } = useAuth();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [formError, setFormError] = useState('');
-
-  // Pastiin kalo udah login, user langsung dilempar ke halaman depan
-  useEffect(() => {
-    if (user) {
-      router.push('/');
-    }
-  }, [user, router]);
 
   // Fungsi buat nangani proses submit pas daftar
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,9 +36,13 @@ export default function RegisterPage() {
     }
 
     const result = await register({ email, username, password });
+
     if (!result.success) {
       setFormError(result.error || 'Registration failed');
+      return;
     }
+
+    router.push('/login');
   };
 
   // Fungsi pura-pura buat handle pendaftaran lewat Google

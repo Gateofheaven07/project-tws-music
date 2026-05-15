@@ -4,49 +4,46 @@ import { HTTP_STATUS } from '../utils/constants';
 import { createSuccessResponse, createErrorResponse } from '../utils/response';
 
 /**
- * Ngambil semua lagu favorit user.
+ * Ngambil semua lagu yang disukai user.
  */
 export const getFavorites = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
 
-    const favorites = await prisma.favorite.findMany({
+    const likedSongs = await prisma.likedSong.findMany({
       where: { userId },
-      include: {
-        song: true,
-      },
       orderBy: {
         createdAt: 'desc',
       },
     });
 
     // Kita mapping biar formatnya seragam sama hasil search
-    const results = favorites.map((f) => ({
-      musicId: f.song.id.startsWith('music_') ? f.song.id : `music_dz_${f.song.id}`,
-      title: f.song.title,
+    const results = likedSongs.map((f) => ({
+      musicId: f.musicId,
+      title: f.title,
       artist: {
         id: `artist_unknown`,
-        name: f.song.artist
+        name: f.artist
       },
       album: {
         id: `album_unknown`,
-        name: f.song.album,
+        name: "",
         cover: {
-          small: f.song.thumbnail,
-          medium: f.song.thumbnail,
-          big: f.song.thumbnail,
-          xl: f.song.thumbnail
+          small: f.cover,
+          medium: f.cover,
+          big: f.cover,
+          xl: f.cover
         }
       },
-      duration: f.song.duration,
+      duration: f.duration,
       genres: [],
       releaseDate: "",
       playback: {
         provider: "youtube",
         type: "iframe",
-        videoId: f.song.youtubeUrl,
-        embedUrl: f.song.youtubeUrl ? `https://www.youtube.com/embed/${f.song.youtubeUrl}` : null,
-        youtubeUrl: f.song.youtubeUrl ? `https://www.youtube.com/watch?v=${f.song.youtubeUrl}` : null
+        videoId: f.videoId,
+        embedUrl: f.videoId ? `https://www.youtube.com/embed/${f.videoId}` : null,
+        youtubeUrl: f.videoId ? `https://www.youtube.com/watch?v=${f.videoId}` : null
       },
       statistics: {
         popularity: 0
@@ -75,42 +72,33 @@ export const getFavorites = async (req: Request, res: Response) => {
 export const addFavorite = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
-    const { songId, title, artist, album, thumbnail, duration } = req.body;
+    const { musicId, title, artist, cover, duration, videoId } = req.body;
 
-    if (!songId) {
+    if (!musicId) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json(
         createErrorResponse(HTTP_STATUS.BAD_REQUEST, 'ID Lagunya mana?')
       );
     }
 
-    // Pastiin lagunya ada di cache/table Song dulu
-    await prisma.song.upsert({
-      where: { id: songId },
-      update: {},
-      create: {
-        id: songId,
-        title: title || 'Unknown',
-        artist: artist || 'Unknown',
-        album: album || '',
-        thumbnail: thumbnail || '',
-        duration: duration || 0,
-      },
-    });
-
-    // Tambah ke favorit
-    const favorite = await prisma.favorite.upsert({
+    // Tambah ke likedSongs
+    const likedSong = await prisma.likedSong.upsert({
       where: {
-        userId_songId: { userId, songId },
+        userId_musicId: { userId, musicId },
       },
       update: {},
       create: {
         userId,
-        songId,
+        musicId,
+        title: title || 'Unknown',
+        artist: artist || 'Unknown',
+        cover: cover || '',
+        duration: duration || 0,
+        videoId: videoId || null,
       },
     });
 
     return res.status(HTTP_STATUS.CREATED).json(
-      createSuccessResponse(HTTP_STATUS.CREATED, 'Lagu berhasil ditambah ke favorit.', favorite)
+      createSuccessResponse(HTTP_STATUS.CREATED, 'Lagu berhasil ditambah ke favorit.', likedSong)
     );
   } catch (error) {
     console.error('Add Favorite Error:', error);
@@ -126,11 +114,11 @@ export const addFavorite = async (req: Request, res: Response) => {
 export const removeFavorite = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
-    const songId = req.params.songId as string;
+    const musicId = (req.params.musicId || req.params.songId) as string;
 
-    await prisma.favorite.delete({
+    await prisma.likedSong.delete({
       where: {
-        userId_songId: { userId, songId },
+        userId_musicId: { userId, musicId },
       },
     });
 

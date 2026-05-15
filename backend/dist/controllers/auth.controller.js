@@ -36,28 +36,15 @@ const register = async (req, res) => {
                 password: hashedPassword,
             },
         });
-        // Buat token akses biar user langsung login pas abis daftar
-        const accessToken = (0, jwt_1.createAccessToken)({
-            userId: user.id,
-            email: user.email,
-            username: user.username,
-        });
-        const refreshToken = (0, jwt_1.createRefreshToken)({
-            userId: user.id,
-            email: user.email,
-            username: user.username,
-        });
-        return res.status(constants_1.HTTP_STATUS.CREATED).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.CREATED, 'Yeay! Akun kamu berhasil dibuat.', {
+        // Kita hapus bagian pembuatan token otomatis di sini. 
+        // Jadi user harus login manual setelah akunnya berhasil dibuat.
+        return res.status(constants_1.HTTP_STATUS.CREATED).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.CREATED, 'Yeay! Akun kamu berhasil dibuat. Silakan login ya.', {
             user: {
                 id: user.id,
                 email: user.email,
                 username: user.username,
                 avatar: user.avatar,
-            },
-            tokens: {
-                accessToken,
-                refreshToken,
-            },
+            }
         }));
     }
     catch (error) {

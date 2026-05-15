@@ -8,6 +8,6 @@ router.use(authMiddleware);
 
 router.get('/', favoriteController.getFavorites);
 router.post('/', favoriteController.addFavorite);
-router.delete('/:songId', favoriteController.removeFavorite);
+router.delete('/:musicId', favoriteController.removeFavorite);
 
 export default router;

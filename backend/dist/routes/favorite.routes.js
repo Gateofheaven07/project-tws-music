@@ -40,5 +40,5 @@ const router = (0, express_1.Router)();
 router.use(auth_middleware_1.authMiddleware);
 router.get('/', favoriteController.getFavorites);
 router.post('/', favoriteController.addFavorite);
-router.delete('/:songId', favoriteController.removeFavorite);
+router.delete('/:musicId', favoriteController.removeFavorite);
 exports.default = router;

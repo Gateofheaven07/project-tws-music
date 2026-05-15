@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletePlaylist = exports.getPlaylistDetail = exports.addSongToPlaylist = exports.createPlaylist = exports.getMyPlaylists = void 0;
+exports.removeSongFromPlaylist = exports.deletePlaylist = exports.getPlaylistDetail = exports.addSongToPlaylist = exports.createPlaylist = exports.getMyPlaylists = void 0;
 const prisma_1 = require("../lib/prisma");
 const constants_1 = require("../utils/constants");
 const response_1 = require("../utils/response");
@@ -56,25 +56,24 @@ exports.createPlaylist = createPlaylist;
  */
 const addSongToPlaylist = async (req, res) => {
     try {
-        const playlistId = req.params.playlistId;
-        const { songId, title, artist, album, thumbnail, duration } = req.body;
-        // Pastiin lagunya ada di cache
-        await prisma_1.prisma.song.upsert({
-            where: { id: songId },
+        const playlistId = (req.params.playlistId || req.params.id); // Support both params based on route
+        const { musicId, title, artist, cover, duration, videoId } = req.body;
+        if (!musicId) {
+            return res.status(constants_1.HTTP_STATUS.BAD_REQUEST).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.BAD_REQUEST, 'ID Lagunya mana?'));
+        }
+        const playlistSong = await prisma_1.prisma.playlistSong.upsert({
+            where: {
+                playlistId_musicId: { playlistId, musicId },
+            },
             update: {},
             create: {
-                id: songId,
+                playlistId,
+                musicId,
                 title: title || 'Unknown',
                 artist: artist || 'Unknown',
-                album: album || '',
-                thumbnail: thumbnail || '',
+                cover: cover || '',
                 duration: duration || 0,
-            },
-        });
-        const playlistSong = await prisma_1.prisma.playlistSong.create({
-            data: {
-                playlistId,
-                songId,
+                videoId: videoId || null,
             }
         });
         return res.status(constants_1.HTTP_STATUS.CREATED).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.CREATED, 'Lagu berhasil ditambah ke playlist.', playlistSong));
@@ -94,8 +93,8 @@ const getPlaylistDetail = async (req, res) => {
             where: { id },
             include: {
                 songs: {
-                    include: {
-                        song: true
+                    orderBy: {
+                        addedAt: 'desc'
                     }
                 }
             }
@@ -103,7 +102,45 @@ const getPlaylistDetail = async (req, res) => {
         if (!playlist) {
             return res.status(constants_1.HTTP_STATUS.NOT_FOUND).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.NOT_FOUND, 'Playlist nggak ketemu.'));
         }
-        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Detail playlist.', playlist));
+        // Mapping songs to unified format
+        const songs = playlist.songs.map(ps => ({
+            musicId: ps.musicId,
+            title: ps.title,
+            artist: {
+                id: `artist_unknown`,
+                name: ps.artist
+            },
+            album: {
+                id: `album_unknown`,
+                name: "",
+                cover: {
+                    small: ps.cover,
+                    medium: ps.cover,
+                    big: ps.cover,
+                    xl: ps.cover
+                }
+            },
+            duration: ps.duration,
+            genres: [],
+            releaseDate: "",
+            playback: {
+                provider: "youtube",
+                type: "iframe",
+                videoId: ps.videoId,
+                embedUrl: ps.videoId ? `https://www.youtube.com/embed/${ps.videoId}` : null,
+                youtubeUrl: ps.videoId ? `https://www.youtube.com/watch?v=${ps.videoId}` : null
+            },
+            statistics: {
+                popularity: 0
+            }
+        }));
+        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Detail playlist.', { ...playlist, songs }, {
+            total: songs.length,
+            provider: {
+                metadata: "database",
+                playback: "youtube"
+            }
+        }));
     }
     catch (error) {
         return res.status(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Gagal ngambil detail playlist.'));
@@ -134,3 +171,30 @@ const deletePlaylist = async (req, res) => {
     }
 };
 exports.deletePlaylist = deletePlaylist;
+/**
+ * Hapus lagu dari playlist.
+ */
+const removeSongFromPlaylist = async (req, res) => {
+    try {
+        const playlistId = req.params.id;
+        const musicId = req.params.musicId;
+        const userId = req.user.userId;
+        // Pastiin playlist milik user yang request
+        const playlist = await prisma_1.prisma.playlist.findFirst({
+            where: { id: playlistId, userId }
+        });
+        if (!playlist) {
+            return res.status(constants_1.HTTP_STATUS.NOT_FOUND).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.NOT_FOUND, 'Playlist nggak ketemu atau kamu nggak punya akses.'));
+        }
+        await prisma_1.prisma.playlistSong.delete({
+            where: {
+                playlistId_musicId: { playlistId, musicId },
+            },
+        });
+        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Lagu berhasil dihapus dari playlist.'));
+    }
+    catch (error) {
+        return res.status(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Gagal ngehapus lagu dari playlist.'));
+    }
+};
+exports.removeSongFromPlaylist = removeSongFromPlaylist;
