@@ -6,6 +6,7 @@ export interface User {
   email: string;
   username: string;
   avatar?: string;
+  createdAt?: string;
 }
 
 interface AuthStore {
