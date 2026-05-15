@@ -442,13 +442,7 @@ export default function PlaylistsPage() {
                     className="absolute inset-0 z-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-wait"
                   />
 
-                  <div className="pointer-events-none absolute left-4 top-4 flex h-11 w-11 translate-y-2 items-center justify-center rounded-full bg-primary text-black opacity-0 shadow-xl transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-active:scale-95">
-                    {openingPlaylistId === playlist.id ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <ListMusic className="h-5 w-5" />
-                    )}
-                  </div>
+
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
