@@ -9,6 +9,19 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
 });
 
+export const getApiErrorMessage = (error: unknown, fallback = 'Permintaan belum berhasil diproses.') => {
+  if (axios.isAxiosError(error)) {
+    if (!error.response) {
+      return 'Server API belum bisa dihubungi. Pastikan backend berjalan di port 5000.';
+    }
+
+    const message = error.response.data?.message;
+    return typeof message === 'string' && message.trim() ? message : fallback;
+  }
+
+  return fallback;
+};
+
 // Interceptor buat nambahin token ke setiap request
 api.interceptors.request.use(
   (config) => {

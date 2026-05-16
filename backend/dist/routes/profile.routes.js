@@ -34,18 +34,38 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const musicController = __importStar(require("../controllers/music.controller"));
+const profileController = __importStar(require("../controllers/profile.controller"));
 const auth_middleware_1 = require("../middlewares/auth.middleware");
+const upload_middleware_1 = require("../middlewares/upload.middleware");
+const constants_1 = require("../utils/constants");
+const response_1 = require("../utils/response");
 const router = (0, express_1.Router)();
-// Route publik (bisa diakses tanpa login)
-router.get('/search', musicController.search);
-router.get('/trending', musicController.trending);
-router.get('/genres', musicController.genres);
-router.get('/genres/:id/songs', musicController.genreSongs);
-// Route musik lainnya butuh login biar aman
+// Semua route di bawah ini wajib pake JWT — user harus sudah login
 router.use(auth_middleware_1.authMiddleware);
-router.get('/recommendations', musicController.recommendations);
-router.get('/stream-id', musicController.getStreamId);
-router.get('/artist/:id', musicController.getArtist);
-router.get('/album/:id', musicController.getAlbum);
+// Ambil data profil user yang sedang login
+router.get('/me', profileController.getProfile);
+// Update username
+router.patch('/username', profileController.updateUsername);
+// Update password (dengan verifikasi password lama)
+router.patch('/password', profileController.updatePassword);
+// Upload dan update foto profil (avatar)
+// Kita wrap uploadAvatarMiddleware biar error multer bisa ditangani dengan response JSON yang rapi
+router.patch('/avatar', (req, res, next) => {
+    (0, upload_middleware_1.uploadAvatarMiddleware)(req, res, (err) => {
+        if (err) {
+            // Error dari multer (misal: tipe file salah, ukuran terlalu besar)
+            let message = 'Gagal upload avatar.';
+            if (err.message === 'Only image files are allowed') {
+                message = 'Only image files are allowed';
+            }
+            else if (err.code === 'LIMIT_FILE_SIZE') {
+                message = 'Ukuran file terlalu besar, maksimal 5MB.';
+            }
+            return res.status(constants_1.HTTP_STATUS.BAD_REQUEST).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.BAD_REQUEST, message));
+        }
+        next();
+    });
+}, profileController.updateAvatar);
+// Ambil riwayat lagu yang pernah diputar
+router.get('/history', profileController.getProfileHistory);
 exports.default = router;

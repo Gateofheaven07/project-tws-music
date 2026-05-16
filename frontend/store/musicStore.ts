@@ -11,6 +11,12 @@ export interface Genre {
   pictureXl: string;
 }
 
+export interface RecommendationMeta {
+  favoriteGenre?: string;
+  source?: 'liked_songs' | 'fallback' | string;
+  query?: string;
+}
+
 interface MusicStore {
   // Pencarian
   searchResults: Song[];
@@ -20,6 +26,11 @@ interface MusicStore {
   // Lagu trending
   trendingSongs: Song[];
   isTrendingLoading: boolean;
+
+  // Rekomendasi personal
+  recommendedSongs: Song[];
+  recommendationMeta: RecommendationMeta | null;
+  isRecommendationsLoading: boolean;
 
   // Kategori musik
   genres: Genre[];
@@ -39,6 +50,9 @@ interface MusicStore {
   setSearching: (loading: boolean) => void;
   setTrendingSongs: (songs: Song[]) => void;
   setTrendingLoading: (loading: boolean) => void;
+  setRecommendedSongs: (songs: Song[]) => void;
+  setRecommendationMeta: (meta: RecommendationMeta | null) => void;
+  setRecommendationsLoading: (loading: boolean) => void;
   setGenres: (genres: Genre[]) => void;
   setGenresLoading: (loading: boolean) => void;
   setGenresError: (message: string | null) => void;
@@ -55,6 +69,9 @@ export const useMusicStore = create<MusicStore>((set) => ({
   isSearching: false,
   trendingSongs: [],
   isTrendingLoading: false,
+  recommendedSongs: [],
+  recommendationMeta: null,
+  isRecommendationsLoading: false,
   genres: [],
   isGenresLoading: false,
   genresError: null,
@@ -67,6 +84,9 @@ export const useMusicStore = create<MusicStore>((set) => ({
   setSearching: (loading) => set({ isSearching: loading }),
   setTrendingSongs: (songs) => set({ trendingSongs: songs }),
   setTrendingLoading: (loading) => set({ isTrendingLoading: loading }),
+  setRecommendedSongs: (songs) => set({ recommendedSongs: songs }),
+  setRecommendationMeta: (meta) => set({ recommendationMeta: meta }),
+  setRecommendationsLoading: (loading) => set({ isRecommendationsLoading: loading }),
   setGenres: (genres) => set({ genres }),
   setGenresLoading: (loading) => set({ isGenresLoading: loading }),
   setGenresError: (message) => set({ genresError: message }),

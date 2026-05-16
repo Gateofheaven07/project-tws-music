@@ -15,11 +15,11 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
   const isLandingPage = pathname === '/' && !user;
 
   if (isAuthPage || isLandingPage) {
-    return <div className="flex-1 overflow-auto">{children}</div>;
+    return <div className="min-h-dvh overflow-x-hidden">{children}</div>;
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex h-dvh min-h-dvh flex-col overflow-hidden">
       {/*
         YouTubePlayer ada di sini, di level layout global, bukan di dalam PlayerBar.
         Tujuannya supaya player tidak pernah di-unmount meski kondisi UI berubah.
@@ -32,14 +32,14 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
       */}
       <NowPlayingModal />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Sidebar Global */}
-        <div className="w-64 flex-shrink-0 hidden md:block">
+        <div className="hidden w-64 flex-shrink-0 md:block">
           <Sidebar />
         </div>
         
         {/* Area Konten Utama */}
-        <main className="flex-1 overflow-hidden flex flex-col">
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
           {children}
         </main>
       </div>

@@ -10,6 +10,9 @@ export interface ApiResponse<T = any> {
       playback: string;
     };
     playbackStatus?: string;
+    favoriteGenre?: string;
+    source?: string;
+    averageRating?: number;
   };
   data?: T;
   results?: T extends Array<any> ? T : never;

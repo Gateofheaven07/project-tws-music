@@ -76,12 +76,12 @@ function DiscoverContent() {
     <div className="flex flex-col h-full overflow-hidden">
       <Header title="Cari" />
 
-      <main className="flex-1 overflow-y-auto no-scrollbar">
-        <div className="p-8">
+      <main className="flex-1 overflow-y-auto pb-36 md:pb-28 no-scrollbar">
+        <div className="px-4 py-6 sm:px-5 md:p-8">
           {hasResultsContext ? (
             <section>
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-foreground">
+                <h2 className="break-words text-xl font-bold text-foreground sm:text-2xl">
                   {activeGenreName ? `Lagu ${activeGenreName}` : `Hasil untuk "${searchQuery}"`}
                 </h2>
                 <p className="text-muted-foreground">{searchResults.length} lagu ditemukan</p>
@@ -92,7 +92,7 @@ function DiscoverContent() {
                   <Loader className="h-8 w-8 animate-spin text-primary" />
                 </div>
               ) : searchResults.length > 0 ? (
-                <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                   {searchResults.map((song, index) => (
                     <MusicCard
                       key={song.musicId}
@@ -103,7 +103,7 @@ function DiscoverContent() {
                   ))}
                 </div>
               ) : (
-                <div className="rounded-lg border-2 border-dashed border-border p-12 text-center">
+                <div className="rounded-lg border-2 border-dashed border-border p-6 text-center sm:p-12">
                   <p className="text-muted-foreground">
                     {activeGenreName
                       ? `Belum ada lagu untuk genre ${activeGenreName}.`
@@ -122,7 +122,7 @@ function DiscoverContent() {
               </h2>
 
               {isGenresLoading ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-6">
                   {Array.from({ length: 10 }).map((_, index) => (
                     <div
                       key={index}
@@ -135,7 +135,7 @@ function DiscoverContent() {
                   {genresError}
                 </div>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-6">
                   {genres.map((genre) => (
                     <GenreCard key={genre.id} genre={genre} onClick={handleGenreClick} />
                   ))}

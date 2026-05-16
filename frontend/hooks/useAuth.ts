@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import api from '@/lib/api';
+import api, { getApiErrorMessage } from '@/lib/api';
 
 export interface RegisterData {
   email: string;
@@ -85,7 +85,7 @@ export const useAuth = () => {
       const response = await api.get('/auth/me');
       return response.data.data;
     } catch (err) {
-      console.error('Gagal ngambil data user:', err);
+      console.warn(getApiErrorMessage(err, 'Data user belum bisa dimuat.'));
       return null;
     }
   }, [accessToken]);

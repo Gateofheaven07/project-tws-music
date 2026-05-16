@@ -13,6 +13,7 @@ router.get('/genres/:id/songs', musicController.genreSongs);
 // Route musik lainnya butuh login biar aman
 router.use(authMiddleware);
 
+router.get('/recommendations', musicController.recommendations);
 router.get('/stream-id', musicController.getStreamId);
 router.get('/artist/:id', musicController.getArtist);
 router.get('/album/:id', musicController.getAlbum);

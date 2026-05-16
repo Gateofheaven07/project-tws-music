@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState('');
 
-  // Kalo user udah login, langsung aja kita lempar ke halaman utama
+  // Kalo user udah login, langsung arahkan ke beranda aplikasi.
   useEffect(() => {
     if (user) {
       router.push('/');
@@ -33,6 +33,8 @@ export default function LoginPage() {
     const result = await login({ email, password });
     if (!result.success) {
       setFormError(result.error || 'Login failed');
+    } else {
+      router.push('/');
     }
   };
 

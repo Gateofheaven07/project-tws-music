@@ -59,6 +59,39 @@ export const trending = async (req: Request, res: Response) => {
 };
 
 /**
+ * Ngambil rekomendasi berdasarkan genre yang paling sering disukai user.
+ */
+export const recommendations = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.userId as string;
+    const recommendations = await musicService.getRecommendationsForUser(userId);
+
+    return res.status(HTTP_STATUS.OK).json(
+      createSuccessResponse(
+        HTTP_STATUS.OK,
+        `Rekomendasi berdasarkan genre ${recommendations.favoriteGenre}.`,
+        recommendations.results,
+        {
+          query: recommendations.query,
+          total: recommendations.results.length,
+          favoriteGenre: recommendations.favoriteGenre,
+          source: recommendations.source,
+          provider: {
+            metadata: "deezer",
+            playback: "youtube"
+          },
+          playbackStatus: recommendations.playbackStatus
+        }
+      )
+    );
+  } catch (error: any) {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      createErrorResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message)
+    );
+  }
+};
+
+/**
  * Ngambil kategori musik dari Deezer.
  */
 export const genres = async (req: Request, res: Response) => {

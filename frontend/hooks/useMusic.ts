@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { useMusicStore } from '@/store/musicStore';
 import type { Genre } from '@/store/musicStore';
 import { useAuthStore } from '@/store/authStore';
-import api from '@/lib/api';
+import api, { getApiErrorMessage } from '@/lib/api';
 import type { Song } from '@/store/playerStore';
 
 /**
@@ -17,6 +17,9 @@ export const useMusic = () => {
     isSearching,
     trendingSongs,
     isTrendingLoading,
+    recommendedSongs,
+    recommendationMeta,
+    isRecommendationsLoading,
     genres,
     isGenresLoading,
     genresError,
@@ -28,6 +31,9 @@ export const useMusic = () => {
     setSearching,
     setTrendingSongs,
     setTrendingLoading,
+    setRecommendedSongs,
+    setRecommendationMeta,
+    setRecommendationsLoading,
     setGenres,
     setGenresLoading,
     setGenresError,
@@ -57,7 +63,7 @@ export const useMusic = () => {
         // Pake results sesuai arsitektur baru
         setSearchResults(response.data.results || []);
       } catch (error) {
-        console.error('Gagal nyari musik:', error);
+        console.warn(getApiErrorMessage(error, 'Musik belum bisa dicari saat ini.'));
         setSearchResults([]);
       } finally {
         setSearching(false);
@@ -72,12 +78,29 @@ export const useMusic = () => {
       const response = await api.get('/music/trending');
       setTrendingSongs(response.data.results || []);
     } catch (error) {
-      console.error('Gagal ngambil lagu trending:', error);
+      console.warn(getApiErrorMessage(error, 'Lagu trending belum bisa dimuat.'));
       setTrendingSongs([]);
     } finally {
       setTrendingLoading(false);
     }
   }, [setTrendingSongs, setTrendingLoading]);
+
+  const getRecommendations = useCallback(async () => {
+    if (!accessToken) return;
+
+    setRecommendationsLoading(true);
+    try {
+      const response = await api.get('/music/recommendations');
+      setRecommendedSongs(response.data.results || []);
+      setRecommendationMeta(response.data.meta || null);
+    } catch (error) {
+      console.warn(getApiErrorMessage(error, 'Rekomendasi musik belum bisa dimuat.'));
+      setRecommendedSongs([]);
+      setRecommendationMeta(null);
+    } finally {
+      setRecommendationsLoading(false);
+    }
+  }, [accessToken, setRecommendedSongs, setRecommendationMeta, setRecommendationsLoading]);
 
   const getGenres = useCallback(async () => {
     setGenresLoading(true);
@@ -87,9 +110,10 @@ export const useMusic = () => {
       const response = await api.get('/music/genres');
       setGenres(response.data.results || []);
     } catch (error) {
-      console.error('Gagal ngambil kategori musik:', error);
+      const message = getApiErrorMessage(error, 'Kategori musik belum bisa dimuat.');
+      console.warn(message);
       setGenres([]);
-      setGenresError('Kategori musik belum bisa dimuat.');
+      setGenresError(message);
     } finally {
       setGenresLoading(false);
     }
@@ -106,7 +130,7 @@ export const useMusic = () => {
         });
         setSearchResults(response.data.results || []);
       } catch (error) {
-        console.error('Gagal ngambil lagu berdasarkan genre:', error);
+        console.warn(getApiErrorMessage(error, 'Lagu berdasarkan genre belum bisa dimuat.'));
         setSearchResults([]);
       } finally {
         setSearching(false);
@@ -122,7 +146,7 @@ export const useMusic = () => {
       const response = await api.get('/liked-songs');
       setFavoriteSongs(response.data.results || []);
     } catch (error) {
-      console.error('Gagal ngambil favorit:', error);
+      console.warn(getApiErrorMessage(error, 'Lagu favorit belum bisa dimuat.'));
     } finally {
       setFavoritesLoading(false);
     }
@@ -138,11 +162,12 @@ export const useMusic = () => {
           artist: song.artist?.name || 'Unknown',
           cover: song.album?.cover?.medium || '',
           duration: song.duration || 0,
-          videoId: song.playback?.videoId || null
+          videoId: song.playback?.videoId || null,
+          genre: song.genres?.[0] || null
         });
         toggleFavorite(song);
       } catch (error) {
-        console.error('Gagal nambah favorit:', error);
+        console.warn(getApiErrorMessage(error, 'Lagu belum bisa ditambahkan ke favorit.'));
       }
     },
     [accessToken, toggleFavorite]
@@ -156,7 +181,7 @@ export const useMusic = () => {
         const song = favoriteSongs.find((s) => s.musicId === musicId);
         if (song) toggleFavorite(song);
       } catch (error) {
-        console.error('Gagal hapus favorit:', error);
+        console.warn(getApiErrorMessage(error, 'Lagu belum bisa dihapus dari favorit.'));
       }
     },
     [accessToken, favoriteSongs, toggleFavorite]
@@ -175,6 +200,12 @@ export const useMusic = () => {
     trendingSongs,
     isTrendingLoading,
     getTrendingSongs,
+
+    // Rekomendasi personal
+    recommendedSongs,
+    recommendationMeta,
+    isRecommendationsLoading,
+    getRecommendations,
 
     // Kategori musik
     genres,

@@ -9,6 +9,7 @@ import { usePlayerStore } from '@/store/playerStore';
 import type { Song } from '@/store/playerStore';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
+import { MobileSidebarButton } from '@/components/Sidebar';
 import {
   Camera, User, Lock, History, Loader2,
   Pencil, CheckCircle2, XCircle, Play, Clock,
@@ -101,10 +102,10 @@ export default function ProfilePage() {
 
     const result = await updateUsername(newUsername.trim());
     if (result.success) {
-      toast({ title: '✅ Username berhasil diperbarui!' });
+      toast({ title: 'Username berhasil diperbarui.' });
       setIsEditingUsername(false);
     } else {
-      toast({ title: '❌ Gagal', description: result.error, variant: 'destructive' });
+      toast({ title: 'Gagal', description: result.error, variant: 'destructive' });
     }
   };
 
@@ -113,24 +114,24 @@ export default function ProfilePage() {
     e.preventDefault();
 
     if (newPassword !== confirmPassword) {
-      toast({ title: '❌ Password baru tidak cocok', variant: 'destructive' });
+      toast({ title: 'Password baru tidak cocok', variant: 'destructive' });
       return;
     }
 
     if (newPassword.length < 6) {
-      toast({ title: '❌ Password minimal 6 karakter', variant: 'destructive' });
+      toast({ title: 'Password minimal 6 karakter', variant: 'destructive' });
       return;
     }
 
     const result = await updatePassword(currentPassword, newPassword);
     if (result.success) {
-      toast({ title: '✅ Password berhasil diperbarui!' });
+      toast({ title: 'Password berhasil diperbarui.' });
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
       setIsEditingPassword(false);
     } else {
-      toast({ title: '❌ Gagal', description: result.error, variant: 'destructive' });
+      toast({ title: 'Gagal', description: result.error, variant: 'destructive' });
     }
   };
 
@@ -142,13 +143,13 @@ export default function ProfilePage() {
     // Validasi tipe file di sisi client
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      toast({ title: '❌ Hanya file JPG, PNG, atau WebP yang diizinkan', variant: 'destructive' });
+      toast({ title: 'Hanya file JPG, PNG, atau WebP yang diizinkan', variant: 'destructive' });
       return;
     }
 
     // Validasi ukuran file (maks 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: '❌ Ukuran file maksimal 5MB', variant: 'destructive' });
+      toast({ title: 'Ukuran file maksimal 5MB', variant: 'destructive' });
       return;
     }
 
@@ -159,9 +160,9 @@ export default function ProfilePage() {
     // Langsung upload ke server
     const result = await uploadAvatar(file);
     if (result.success) {
-      toast({ title: '✅ Foto profil berhasil diperbarui!' });
+      toast({ title: 'Foto profil berhasil diperbarui.' });
     } else {
-      toast({ title: '❌ Gagal upload foto', description: result.error, variant: 'destructive' });
+      toast({ title: 'Gagal upload foto', description: result.error, variant: 'destructive' });
       setAvatarPreview(null);
     }
 
@@ -172,7 +173,7 @@ export default function ProfilePage() {
   // ── Handler: Putar Ulang Lagu dari History ────────────────────────────────
   const handlePlayFromHistory = (item: typeof history[0]) => {
     if (!item.videoId) {
-      toast({ title: '⚠️ Lagu ini tidak tersedia untuk diputar', variant: 'destructive' });
+      toast({ title: 'Lagu ini tidak tersedia untuk diputar', variant: 'destructive' });
       return;
     }
 
@@ -200,7 +201,7 @@ export default function ProfilePage() {
     };
 
     startPlayback([song], 0);
-    toast({ title: `▶ Memutar ${item.title}` });
+    toast({ title: `Memutar ${item.title}` });
   };
 
   // URL avatar yang ditampilkan: preview > profil > null
@@ -210,18 +211,21 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto bg-background no-scrollbar">
+    <div className="flex h-full flex-col overflow-y-auto bg-background no-scrollbar">
       <Toaster />
 
       {/* ── Header Gradient ────────────────────────────────────────────────── */}
-      <div className="relative h-48 bg-gradient-to-b from-indigo-900/60 via-purple-900/40 to-background shrink-0">
+      <div className="relative h-44 shrink-0 bg-gradient-to-b from-indigo-900/60 via-purple-900/40 to-background sm:h-48">
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10" />
+        <div className="absolute left-4 top-4 z-20 md:hidden">
+          <MobileSidebarButton />
+        </div>
       </div>
 
-      <div className="px-4 md:px-8 pb-32 -mt-24 relative z-10 max-w-4xl mx-auto w-full">
+      <div className="relative z-10 mx-auto -mt-24 w-full max-w-4xl px-4 pb-36 sm:px-6 md:px-8 md:pb-32">
 
         {/* ── Profil Header Card ─────────────────────────────────────────────── */}
-        <div className="flex flex-col md:flex-row items-center md:items-end gap-6 mb-8">
+        <div className="mb-8 flex flex-col items-center gap-6 md:flex-row md:items-end">
           {/* Avatar + tombol upload */}
           <div className="relative group shrink-0">
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden ring-4 ring-background shadow-2xl bg-[#282828]">
@@ -269,12 +273,12 @@ export default function ProfilePage() {
           </div>
 
           {/* Info user */}
-          <div className="flex flex-col items-center md:items-start gap-1 pb-2">
+          <div className="flex min-w-0 flex-col items-center gap-1 pb-2 text-center md:items-start md:text-left">
             <span className="text-xs font-bold uppercase tracking-widest text-[#b3b3b3]">Profil</span>
-            <h1 className="text-3xl md:text-5xl font-black text-white leading-tight">
+            <h1 className="max-w-full break-words text-3xl font-black leading-tight text-white md:text-5xl">
               {profile?.username || user.username}
             </h1>
-            <p className="text-[#b3b3b3] text-sm">{profile?.email || user.email}</p>
+            <p className="max-w-full truncate text-sm text-[#b3b3b3]">{profile?.email || user.email}</p>
             {profile?.createdAt && (
               <p className="text-[#6a6a6a] text-xs mt-1">
                 Bergabung sejak {formatDate(profile.createdAt)}
@@ -284,10 +288,10 @@ export default function ProfilePage() {
         </div>
 
         {/* ── Grid Dua Kolom (Edit Forms) ─────────────────────────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
 
           {/* Card: Edit Username */}
-          <div className="bg-[#181818] border border-white/5 rounded-xl p-6 hover:bg-[#1e1e1e] transition-colors">
+          <div className="rounded-lg border border-white/5 bg-[#181818] p-4 transition-colors hover:bg-[#1e1e1e] sm:p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 rounded-full bg-indigo-500/20 flex items-center justify-center">
                 <User className="w-4 h-4 text-indigo-400" />
@@ -306,7 +310,7 @@ export default function ProfilePage() {
                   onKeyDown={(e) => e.key === 'Enter' && handleUpdateUsername()}
                   autoFocus
                 />
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <button
                     onClick={handleUpdateUsername}
                     disabled={isUpdating}
@@ -325,10 +329,10 @@ export default function ProfilePage() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
                   <p className="text-xs text-[#6a6a6a] mb-1">Username saat ini</p>
-                  <p className="text-white font-medium">{profile?.username || user.username}</p>
+                  <p className="truncate font-medium text-white">{profile?.username || user.username}</p>
                 </div>
                 <button
                   onClick={() => setIsEditingUsername(true)}
@@ -342,7 +346,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Card: Edit Password */}
-          <div className="bg-[#181818] border border-white/5 rounded-xl p-6 hover:bg-[#1e1e1e] transition-colors">
+          <div className="rounded-lg border border-white/5 bg-[#181818] p-4 transition-colors hover:bg-[#1e1e1e] sm:p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 rounded-full bg-purple-500/20 flex items-center justify-center">
                 <Lock className="w-4 h-4 text-purple-400" />
@@ -376,7 +380,7 @@ export default function ProfilePage() {
                   placeholder="Konfirmasi password baru"
                   required
                 />
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <button
                     type="submit"
                     disabled={isUpdating}
@@ -396,7 +400,7 @@ export default function ProfilePage() {
                 </div>
               </form>
             ) : (
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-xs text-[#6a6a6a] mb-1">Password</p>
                   <p className="text-white font-medium tracking-widest">••••••••</p>
@@ -414,7 +418,7 @@ export default function ProfilePage() {
         </div>
 
         {/* ── Seksi: Riwayat Putar ────────────────────────────────────────────── */}
-        <div className="bg-[#181818] border border-white/5 rounded-xl p-6">
+        <div className="rounded-lg border border-white/5 bg-[#181818] p-4 sm:p-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-9 h-9 rounded-full bg-green-500/20 flex items-center justify-center">
               <History className="w-4 h-4 text-green-400" />
@@ -452,7 +456,7 @@ export default function ProfilePage() {
                 <div
                   key={item.id}
                   onClick={() => handlePlayFromHistory(item)}
-                  className="group flex items-center gap-4 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+                  className="group flex min-w-0 cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-white/5 sm:gap-4 sm:p-3"
                 >
                   {/* Nomor urut / tombol play */}
                   <div className="w-6 shrink-0 text-center">

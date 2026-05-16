@@ -4,9 +4,10 @@ import { type FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Edit3, ListMusic, Loader2, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import api from '@/lib/api';
+import api, { getApiErrorMessage } from '@/lib/api';
 import type { Song } from '@/store/playerStore';
 import { SongTable } from '@/components/SongTable';
+import { MobileSidebarButton } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -135,7 +136,7 @@ export default function PlaylistsPage() {
         const response = await api.get('/playlists');
         setPlaylists(normalizePlaylistList(response.data));
       } catch (error) {
-        console.error('Gagal mengambil playlist:', error);
+        console.warn(getApiErrorMessage(error, 'Playlist belum bisa dimuat.'));
       } finally {
         setIsLoading(false);
       }
@@ -168,8 +169,9 @@ export default function PlaylistsPage() {
         setDetailError('Detail playlist belum bisa dibaca.');
       }
     } catch (error) {
-      console.error('Gagal membuka playlist:', error);
-      setDetailError('Playlist belum bisa dibuka. Coba lagi nanti.');
+      const message = getApiErrorMessage(error, 'Playlist belum bisa dibuka. Coba lagi nanti.');
+      console.warn(message);
+      setDetailError(message);
     } finally {
       setIsDetailLoading(false);
       setOpeningPlaylistId(null);
@@ -205,8 +207,9 @@ export default function PlaylistsPage() {
         }
       }
     } catch (error) {
-      console.error('Gagal bikin playlist baru:', error);
-      setCreateError('Maaf, playlist belum bisa dibuat. Coba lagi nanti.');
+      const message = getApiErrorMessage(error, 'Maaf, playlist belum bisa dibuat. Coba lagi nanti.');
+      console.warn(message);
+      setCreateError(message);
     } finally {
       setIsCreatingPlaylist(false);
     }
@@ -263,8 +266,9 @@ export default function PlaylistsPage() {
         setIsEditDialogOpen(false);
       }
     } catch (error) {
-      console.error('Gagal memperbarui playlist:', error);
-      setEditError('Playlist belum bisa diperbarui. Coba lagi nanti.');
+      const message = getApiErrorMessage(error, 'Playlist belum bisa diperbarui. Coba lagi nanti.');
+      console.warn(message);
+      setEditError(message);
     } finally {
       setIsUpdatingPlaylist(false);
     }
@@ -287,7 +291,7 @@ export default function PlaylistsPage() {
       setPlaylistActionTarget(null);
       setIsDeleteDialogOpen(false);
     } catch (error) {
-      console.error('Gagal menghapus playlist:', error);
+      console.warn(getApiErrorMessage(error, 'Playlist belum bisa dihapus.'));
     } finally {
       setIsDeletingPlaylist(false);
     }
@@ -301,8 +305,8 @@ export default function PlaylistsPage() {
   const dialogPlaylist = playlistActionTarget ?? selectedPlaylist;
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 relative bg-background h-full overflow-y-auto pb-[140px] md:pb-[90px] animate-fade-in">
-      <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-xl pt-8 pb-4 px-6 md:px-10 border-b border-transparent shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+    <div className="relative flex h-full min-w-0 flex-1 flex-col overflow-y-auto bg-background pb-36 md:pb-24 animate-fade-in">
+      <header className="sticky top-0 z-30 border-b border-transparent bg-background/90 px-4 pb-4 pt-4 shadow-[0_4px_30px_rgba(0,0,0,0.3)] backdrop-blur-xl sm:px-6 md:px-10 md:pt-8">
         <div className="flex justify-between items-center w-full gap-4">
           <div className="flex min-w-0 items-center gap-3">
             {selectedPlaylist ? (
@@ -320,9 +324,7 @@ export default function PlaylistsPage() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             ) : (
-              <div className="w-8 h-8 rounded-full bg-surface-interactive flex items-center justify-center text-text-secondary hover:text-text-primary cursor-pointer transition-colors md:hidden">
-                <span className="material-symbols-outlined">menu</span>
-              </div>
+              <MobileSidebarButton />
             )}
             <h2 className="truncate font-bold text-2xl md:text-3xl tracking-tight">
               {selectedPlaylist ? selectedPlaylist.name : 'Koleksi Kamu'}
@@ -357,15 +359,15 @@ export default function PlaylistsPage() {
         </div>
       </header>
 
-      <main className="px-6 md:px-10 py-8 flex-1">
+      <main className="flex-1 px-4 py-6 sm:px-6 md:px-10 md:py-8">
         {selectedPlaylist ? (
           <section className="space-y-8">
-            <div className="flex flex-col gap-5 rounded-xl border border-white/10 bg-surface-container/25 p-5 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col gap-5 rounded-lg border border-white/10 bg-surface-container/25 p-4 sm:flex-row sm:items-end sm:justify-between sm:p-5">
               <div className="min-w-0">
                 <p className="mb-2 text-xs font-bold uppercase tracking-widest text-text-secondary">
                   Playlist
                 </p>
-                <h1 className="truncate text-3xl font-bold text-text-primary md:text-5xl">
+                <h1 className="break-words text-2xl font-bold text-text-primary sm:text-3xl md:text-5xl">
                   {selectedPlaylist.name}
                 </h1>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-text-secondary">
@@ -387,7 +389,7 @@ export default function PlaylistsPage() {
                 {detailError}
               </div>
             ) : selectedSongs.length > 0 ? (
-              <div className="overflow-x-auto rounded-lg border border-white/5 bg-black/10 p-2">
+              <div className="rounded-lg border border-white/5 bg-black/10 p-2">
                 <SongTable songs={selectedSongs} />
               </div>
             ) : (
@@ -405,11 +407,11 @@ export default function PlaylistsPage() {
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin shadow-[0_0_15px_rgba(30,215,96,0.2)]" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-5 lg:gap-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-6 xl:grid-cols-5 2xl:grid-cols-6">
             <button
               type="button"
               onClick={handleOpenCreateDialog}
-              className="group relative flex aspect-square min-h-[170px] w-full flex-col justify-between overflow-hidden rounded-2xl border-2 border-dashed border-border/40 bg-surface-container/20 p-4 text-center transition-all duration-300 hover:border-primary/60 hover:bg-surface-container/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="group relative flex aspect-square min-h-[150px] w-full flex-col justify-between overflow-hidden rounded-lg border-2 border-dashed border-border/40 bg-surface-container/20 p-3 text-center transition-all duration-300 hover:border-primary/60 hover:bg-surface-container/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:min-h-[170px] sm:p-4"
             >
               <div className="flex flex-1 items-center justify-center">
                 <div className="w-16 h-16 rounded-full bg-surface-interactive flex items-center justify-center text-text-secondary group-hover:bg-primary group-hover:text-black transition-all duration-500 shadow-xl group-hover:scale-110 group-hover:rotate-90">
@@ -432,7 +434,7 @@ export default function PlaylistsPage() {
               return (
                 <div
                   key={playlist.id}
-                  className="group relative flex aspect-square min-h-[170px] w-full flex-col justify-between overflow-hidden rounded-2xl border border-white/5 bg-surface-container/35 p-4 text-left transition-all duration-300 hover:border-white/12 hover:bg-surface-elevated"
+                  className="group relative flex aspect-square min-h-[150px] w-full flex-col justify-between overflow-hidden rounded-lg border border-white/5 bg-surface-container/35 p-3 text-left transition-all duration-300 hover:border-white/12 hover:bg-surface-elevated sm:min-h-[170px] sm:p-4"
                 >
                   <button
                     type="button"

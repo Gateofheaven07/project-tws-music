@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import axios from 'axios';
+import api, { getApiErrorMessage } from '@/lib/api';
 
 export interface Playlist {
   id: string;
@@ -23,16 +23,10 @@ export const usePlaylist = () => {
     async (name: string, description?: string) => {
       if (!accessToken) return null;
       try {
-        const response = await axios.post(
-          '/api/playlists',
-          { name, description },
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        );
+        const response = await api.post('/playlists', { name, description });
         return response.data.data;
       } catch (error) {
-        console.error('[v0] Create playlist error:', error);
+        console.warn(getApiErrorMessage(error, 'Playlist belum bisa dibuat.'));
         return null;
       }
     },
@@ -42,12 +36,10 @@ export const usePlaylist = () => {
   const getPlaylists = useCallback(async () => {
     if (!accessToken) return [];
     try {
-      const response = await axios.get('/api/playlists', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      const response = await api.get('/playlists');
       return response.data.data;
     } catch (error) {
-      console.error('[v0] Get playlists error:', error);
+      console.warn(getApiErrorMessage(error, 'Playlist belum bisa dimuat.'));
       return [];
     }
   }, [accessToken]);
@@ -56,12 +48,10 @@ export const usePlaylist = () => {
     async (id: string) => {
       if (!accessToken) return null;
       try {
-        const response = await axios.get(`/api/playlists/${id}`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const response = await api.get(`/playlists/${id}`);
         return response.data.data;
       } catch (error) {
-        console.error('[v0] Get playlist error:', error);
+        console.warn(getApiErrorMessage(error, 'Playlist belum bisa dibuka.'));
         return null;
       }
     },
@@ -72,16 +62,10 @@ export const usePlaylist = () => {
     async (id: string, name: string, description?: string) => {
       if (!accessToken) return null;
       try {
-        const response = await axios.put(
-          `/api/playlists/${id}`,
-          { name, description },
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        );
+        const response = await api.put(`/playlists/${id}`, { name, description });
         return response.data.data;
       } catch (error) {
-        console.error('[v0] Update playlist error:', error);
+        console.warn(getApiErrorMessage(error, 'Playlist belum bisa diperbarui.'));
         return null;
       }
     },
@@ -92,12 +76,10 @@ export const usePlaylist = () => {
     async (id: string) => {
       if (!accessToken) return false;
       try {
-        await axios.delete(`/api/playlists/${id}`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        await api.delete(`/playlists/${id}`);
         return true;
       } catch (error) {
-        console.error('[v0] Delete playlist error:', error);
+        console.warn(getApiErrorMessage(error, 'Playlist belum bisa dihapus.'));
         return false;
       }
     },
@@ -108,16 +90,10 @@ export const usePlaylist = () => {
     async (playlistId: string, songId: string) => {
       if (!accessToken) return null;
       try {
-        const response = await axios.post(
-          `/api/playlists/${playlistId}/songs`,
-          { songId },
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        );
+        const response = await api.post(`/playlists/${playlistId}/songs`, { songId });
         return response.data.data;
       } catch (error) {
-        console.error('[v0] Add song to playlist error:', error);
+        console.warn(getApiErrorMessage(error, 'Lagu belum bisa ditambahkan ke playlist.'));
         return null;
       }
     },
@@ -128,12 +104,10 @@ export const usePlaylist = () => {
     async (playlistId: string, songId: string) => {
       if (!accessToken) return false;
       try {
-        await axios.delete(`/api/playlists/${playlistId}/songs/${songId}`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        await api.delete(`/playlists/${playlistId}/songs/${songId}`);
         return true;
       } catch (error) {
-        console.error('[v0] Remove song from playlist error:', error);
+        console.warn(getApiErrorMessage(error, 'Lagu belum bisa dihapus dari playlist.'));
         return false;
       }
     },

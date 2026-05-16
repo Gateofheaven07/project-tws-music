@@ -6,8 +6,8 @@ import { useMusicStore } from '@/store/musicStore';
 import { useMusic } from '@/hooks/useMusic';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
-import api from '@/lib/api';
-import type { Song } from '@/store/playerStore';
+import api, { getApiErrorMessage } from '@/lib/api';
+import { usePlayerStore, type Song } from '@/store/playerStore';
 
 interface SongContextMenuProps {
   song: Song;
@@ -23,11 +23,12 @@ interface Playlist {
 
 /**
  * SongContextMenu - Menu popup yang muncul saat ikon 3 titik diklik.
- * Menyediakan opsi: Like/Unlike lagu dan Tambah ke Playlist.
+ * Menyediakan aksi cepat untuk lagu tanpa memaksa user pindah halaman.
  */
 export const SongContextMenu = ({ song, position, onClose }: SongContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const { addToQueue } = usePlayerStore();
   const { favoriteSongs } = useMusicStore();
   const { addFavorite, removeFavorite } = useMusic();
 
@@ -38,6 +39,10 @@ export const SongContextMenu = ({ song, position, onClose }: SongContextMenuProp
   const [addedToPlaylistId, setAddedToPlaylistId] = useState<string | null>(null);
 
   const isFavorited = favoriteSongs.some((s) => s.musicId === song.musicId);
+  const isPlaybackUnavailable = song.playback?.status === 'unavailable';
+  const unavailableMessage = song.playback?.errorReason === 'youtube_quota_exceeded'
+    ? 'Playback belum tersedia karena quota YouTube habis.'
+    : 'Playback belum tersedia.';
 
   // Tutup menu kalau klik di luar
   useEffect(() => {
@@ -62,7 +67,7 @@ export const SongContextMenu = ({ song, position, onClose }: SongContextMenuProp
   // Hitung posisi menu supaya tidak keluar dari layar
   const getMenuStyle = () => {
     const menuWidth = 220;
-    const menuHeight = 120;
+    const menuHeight = 168;
     const padding = 8;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -84,7 +89,7 @@ export const SongContextMenu = ({ song, position, onClose }: SongContextMenuProp
       const res = await api.get('/playlists');
       setPlaylists(res.data.results || []);
     } catch (err) {
-      console.error('Gagal ngambil playlist:', err);
+      console.warn(getApiErrorMessage(err, 'Playlist belum bisa dimuat.'));
     } finally {
       setIsLoadingPlaylists(false);
     }
@@ -96,6 +101,13 @@ export const SongContextMenu = ({ song, position, onClose }: SongContextMenuProp
     } else {
       addFavorite(song);
     }
+    onClose();
+  };
+
+  const handleAddToQueue = () => {
+    if (isPlaybackUnavailable) return;
+
+    addToQueue(song);
     onClose();
   };
 
@@ -121,22 +133,30 @@ export const SongContextMenu = ({ song, position, onClose }: SongContextMenuProp
         onClose();
       }, 800);
     } catch (err) {
-      console.error('Gagal tambahin ke playlist:', err);
+      console.warn(getApiErrorMessage(err, 'Lagu belum bisa ditambahkan ke playlist.'));
     }
   };
 
-  const menuStyle = getMenuStyle();
+  const isMobileViewport = typeof window !== 'undefined' && window.innerWidth < 640;
+  const menuStyle = isMobileViewport ? null : getMenuStyle();
 
   return (
     <div
       ref={menuRef}
-      className="fixed z-[200] rounded-xl overflow-hidden shadow-2xl border border-white/10"
+      className={cn(
+        'fixed z-[200] overflow-hidden border border-white/10 shadow-2xl',
+        isMobileViewport
+          ? 'inset-x-0 bottom-0 rounded-t-2xl'
+          : 'rounded-xl'
+      )}
       style={{
-        left: menuStyle.left,
-        top: menuStyle.top,
+        left: menuStyle?.left,
+        top: menuStyle?.top,
         background: 'rgba(24, 24, 27, 0.97)',
         backdropFilter: 'blur(20px)',
-        minWidth: 220,
+        minWidth: isMobileViewport ? undefined : 220,
+        width: isMobileViewport ? '100%' : undefined,
+        paddingBottom: isMobileViewport ? 'env(safe-area-inset-bottom)' : undefined,
         animation: 'contextMenuIn 0.15s ease-out',
       }}
     >
@@ -147,7 +167,7 @@ export const SongContextMenu = ({ song, position, onClose }: SongContextMenuProp
           <button
             onClick={handleToggleFavorite}
             className={cn(
-              'w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors',
+              'flex min-h-11 w-full items-center gap-3 px-4 py-3 text-sm font-medium transition-colors',
               isFavorited
                 ? 'text-[#1ed760] hover:bg-white/5'
                 : 'text-white/80 hover:bg-white/5 hover:text-white'
@@ -159,11 +179,21 @@ export const SongContextMenu = ({ song, position, onClose }: SongContextMenuProp
             {isFavorited ? 'Hapus dari Liked Songs' : 'Tambah ke Liked Songs'}
           </button>
 
+          <button
+            onClick={handleAddToQueue}
+            disabled={isPlaybackUnavailable}
+            className="flex min-h-11 w-full items-center gap-3 px-4 py-3 text-sm font-medium text-white/80 transition-colors hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:text-white/35 disabled:hover:bg-transparent"
+            title={isPlaybackUnavailable ? unavailableMessage : 'Masukkan ke daftar antrean'}
+          >
+            <ListPlus className="h-4 w-4 flex-shrink-0" />
+            Masukkan ke Daftar Antrean
+          </button>
+
           {/* Tombol Tambah ke Playlist */}
           {user && (
             <button
               onClick={handleShowPlaylistMenu}
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/5 hover:text-white transition-colors"
+              className="flex min-h-11 w-full items-center gap-3 px-4 py-3 text-sm font-medium text-white/80 transition-colors hover:bg-white/5 hover:text-white"
             >
               <ListPlus className="h-4 w-4 flex-shrink-0" />
               Tambahkan ke Playlist
@@ -176,7 +206,7 @@ export const SongContextMenu = ({ song, position, onClose }: SongContextMenuProp
           <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
             <button
               onClick={() => setShowPlaylistMenu(false)}
-              className="text-white/40 hover:text-white transition-colors"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/10 hover:text-white"
             >
               <X className="h-4 w-4" />
             </button>
@@ -198,7 +228,7 @@ export const SongContextMenu = ({ song, position, onClose }: SongContextMenuProp
                   key={pl.id}
                   onClick={() => handleAddToPlaylist(pl.id)}
                   className={cn(
-                    'w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors',
+                    'flex min-h-11 w-full items-center justify-between px-4 py-2.5 text-sm transition-colors',
                     addedToPlaylistId === pl.id
                       ? 'text-[#1ed760] bg-white/5'
                       : 'text-white/80 hover:bg-white/5 hover:text-white'

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAlbumDetails = exports.getArtistDetails = exports.getYouTubeId = exports.getTrendingSongs = exports.getSongsByGenre = exports.getGenres = exports.searchSongs = void 0;
+exports.getAlbumDetails = exports.getArtistDetails = exports.getYouTubeId = exports.getRecommendationsForUser = exports.getTrendingSongs = exports.getSongsByGenre = exports.getGenres = exports.searchSongs = void 0;
 const axios_1 = __importDefault(require("axios"));
 const prisma_1 = require("../lib/prisma");
 const DEEZER_API_URL = 'https://api.deezer.com';
@@ -178,6 +178,52 @@ const getTrendingSongs = async () => {
     }
 };
 exports.getTrendingSongs = getTrendingSongs;
+/**
+ * Rekomendasi diambil dari genre yang paling sering muncul di lagu favorit user.
+ * Kalau user belum punya data genre, kita tetap kasih hasil dari query default.
+ */
+const getRecommendationsForUser = async (userId) => {
+    try {
+        const likedSongs = await prisma_1.prisma.likedSong.findMany({
+            where: {
+                userId,
+                genre: {
+                    not: null,
+                },
+            },
+            select: {
+                genre: true,
+            },
+        });
+        const genreCount = likedSongs.reduce((count, song) => {
+            const genre = song.genre?.trim();
+            if (!genre)
+                return count;
+            count[genre] = (count[genre] || 0) + 1;
+            return count;
+        }, {});
+        const favoriteGenre = Object.entries(genreCount)
+            .sort(([, countA], [, countB]) => countB - countA)[0]?.[0] || 'pop';
+        const source = likedSongs.length > 0 ? 'liked_songs' : 'fallback';
+        const query = normalizeGenreSearchTerm(favoriteGenre);
+        const response = await axios_1.default.get(`${DEEZER_API_URL}/search?q=${encodeURIComponent(query)}`);
+        const tracks = (response.data.data || []);
+        const results = await Promise.all(tracks.slice(0, 20).map((track) => mapTrackToSong(track, favoriteGenre)));
+        const hasUnavailablePlayback = results.some((song) => song.playback.status === 'unavailable');
+        return {
+            query,
+            favoriteGenre,
+            source,
+            playbackStatus: hasUnavailablePlayback ? 'partial' : 'ready',
+            results,
+        };
+    }
+    catch (error) {
+        console.error('Deezer Recommendation Error:', error);
+        throw new Error('Gagal ngambil rekomendasi musik.');
+    }
+};
+exports.getRecommendationsForUser = getRecommendationsForUser;
 /**
  * Cari video ID YouTube buat diputer audionya.
  * Kita cari berdasarkan "Artist - Title".

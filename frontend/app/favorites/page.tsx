@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SongTable } from '@/components/SongTable';
+import { MobileSidebarButton } from '@/components/Sidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { useMusic } from '@/hooks/useMusic';
 import { usePlayerStore } from '@/store/playerStore';
@@ -39,22 +40,25 @@ export default function FavoritesPage() {
   if (!user) return null;
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 relative bg-background h-full overflow-y-auto pb-[140px] md:pb-[90px] no-scrollbar animate-fade-in">
+    <div className="relative flex h-full min-w-0 flex-1 flex-col overflow-y-auto bg-background pb-36 md:pb-24 no-scrollbar animate-fade-in">
       
       {/* 
         Hero Header: Diperbarui agar identik dengan Google Stitch 
         Menggunakan gradien glow ungu halus di bagian atas.
       */}
-      <header className="relative w-full min-h-[340px] md:min-h-[400px] flex items-end p-6 md:p-10 pb-8 overflow-hidden">
+      <header className="relative flex min-h-[300px] w-full items-end overflow-hidden p-4 pb-8 sm:p-6 md:min-h-[400px] md:p-10">
         {/* Glow ungu halus dari atas menyatu ke background hitam */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#450af54d] via-[#121212] to-background z-0"></div>
+        <div className="absolute left-4 top-4 z-20 md:hidden">
+          <MobileSidebarButton />
+        </div>
         
         {/* Konten Header: Row flexbox yang responsif */}
-        <div className="relative z-10 flex flex-col md:flex-row items-center md:items-end gap-6 w-full">
+        <div className="relative z-10 flex w-full flex-col items-center gap-5 pt-12 md:flex-row md:items-end md:gap-6 md:pt-0">
           
           {/* Kotak Ikon Playlist - Indigo ke Ungu Muda (135deg) */}
-          <div className="w-48 h-48 md:w-60 md:h-60 flex-shrink-0 bg-gradient-to-br from-[#450af5] to-[#8e8cf7] shadow-[0_30px_60px_rgba(0,0,0,0.5)] rounded-sm flex items-center justify-center group overflow-hidden">
-            <span className="material-symbols-outlined text-[100px] md:text-[140px] text-white opacity-90" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}>
+          <div className="flex h-36 w-36 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm bg-gradient-to-br from-[#450af5] to-[#8e8cf7] shadow-[0_30px_60px_rgba(0,0,0,0.5)] group sm:h-44 sm:w-44 md:h-60 md:w-60">
+            <span className="material-symbols-outlined text-[82px] text-white opacity-90 sm:text-[100px] md:text-[140px]" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}>
               favorite
             </span>
           </div>
@@ -62,10 +66,10 @@ export default function FavoritesPage() {
           {/* Info Detail Playlist */}
           <div className="flex flex-col gap-2 md:mb-1 text-center md:text-left">
             <span className="text-[12px] font-black uppercase tracking-[0.1em] text-white">Playlist</span>
-            <h1 className="text-6xl md:text-[96px] font-extrabold text-white tracking-tighter leading-[0.95] drop-shadow-2xl">
+            <h1 className="max-w-full break-words text-4xl font-extrabold leading-tight text-white drop-shadow-2xl sm:text-5xl md:text-[96px] md:leading-[0.95]">
               Lagu yang Disukai
             </h1>
-            <div className="flex items-center justify-center md:justify-start gap-2 mt-6 text-white text-sm font-bold">
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm font-bold text-white md:mt-6 md:justify-start">
               <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-[10px] text-black">
                 {user.username[0].toUpperCase()}
               </div>
@@ -78,27 +82,27 @@ export default function FavoritesPage() {
       </header>
 
       {/* Bagian Aksi Utama: Tombol Play & Kontrol lainnya */}
-      <section className="px-6 md:px-10 py-6 flex items-center gap-8 relative z-10">
+      <section className="relative z-10 flex items-center gap-4 px-4 py-5 sm:px-6 md:px-10 md:py-6">
         <button 
           onClick={handlePlayAll}
-          className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#1ed760] flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all group"
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-[#1ed760] shadow-lg transition-all hover:scale-105 active:scale-95 md:h-16 md:w-16 group"
         >
           <span className="material-symbols-outlined text-black text-3xl md:text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
             {isPlaying ? 'pause' : 'play_arrow'}
           </span>
         </button>
         
-        <button className="text-text-secondary hover:text-white transition-colors">
+        <button className="flex h-11 w-11 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-white/10 hover:text-white">
           <span className="material-symbols-outlined text-3xl">add_circle</span>
         </button>
         
-        <button className="text-text-secondary hover:text-white transition-colors">
+        <button className="flex h-11 w-11 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-white/10 hover:text-white">
           <span className="material-symbols-outlined text-3xl">more_horiz</span>
         </button>
       </section>
 
       {/* Konten Utama: Tabel Daftar Lagu */}
-      <main className="px-2 md:px-6 py-4 flex-1">
+      <main className="flex-1 px-3 py-4 sm:px-4 md:px-6">
         {isFavoritesLoading ? (
           // Loading state yang estetik
           <div className="flex items-center justify-center h-64">
@@ -111,11 +115,11 @@ export default function FavoritesPage() {
         ) : (
           // Empty State kalau belum ada lagu yang disuka
           <div className="flex flex-col items-center justify-center py-20 text-center gap-6 opacity-60">
-            <div className="w-32 h-32 rounded-full bg-surface-container flex items-center justify-center">
+            <div className="w-28 h-28 rounded-full bg-surface-container flex items-center justify-center sm:h-32 sm:w-32">
               <span className="material-symbols-outlined text-7xl text-text-secondary/20">library_music</span>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-white">Koleksi favoritmu masih kosong</h3>
+              <h3 className="text-xl font-bold text-white sm:text-2xl">Koleksi favoritmu masih kosong</h3>
               <p className="text-text-secondary mt-2 max-w-sm mx-auto">
                 Lagu-lagu yang kamu sukai akan muncul di sini secara otomatis. 
                 Ayo cari musik baru dan klik ikon hati!

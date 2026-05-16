@@ -19,7 +19,6 @@ export const viewport: Viewport = {
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
     { media: '(prefers-color-scheme: dark)', color: '#121212' },
   ],
-  userScalable: false,
   initialScale: 1,
   width: 'device-width',
 }
@@ -34,7 +33,10 @@ export default function RootLayout({
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
-      <body className={`${hankenGrotesk.className} antialiased bg-background text-foreground flex flex-col h-screen overflow-hidden`}>
+      <body
+        suppressHydrationWarning
+        className={`${hankenGrotesk.className} antialiased bg-background text-foreground min-h-dvh overflow-x-hidden`}
+      >
         <QueryProvider>
           <LayoutContent>{children}</LayoutContent>
         </QueryProvider>
@@ -43,4 +45,3 @@ export default function RootLayout({
     </html>
   )
 }
-

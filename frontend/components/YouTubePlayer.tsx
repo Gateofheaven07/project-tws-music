@@ -5,7 +5,7 @@ import { usePlayerStore } from '@/store/playerStore';
 
 declare global {
   interface Window {
-    onYouTubeIframeAPIReady: () => void;
+    onYouTubeIframeAPIReady?: () => void;
     YT: any;
   }
 }
@@ -22,6 +22,9 @@ declare global {
  *    eksekusi saat onReady terpanggil.
  */
 export const YouTubePlayer = () => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const targetIdRef = useRef(`yt-hidden-player-${Math.random().toString(36).slice(2)}`);
+
   // Referensi ke instance YouTube Player — disimpan di ref agar tidak trigger re-render.
   const playerRef = useRef<any>(null);
 
@@ -48,8 +51,13 @@ export const YouTubePlayer = () => {
     const createPlayer = (initialVideoId?: string) => {
       // Hindari membuat player ganda.
       if (playerRef.current) return;
+      if (!containerRef.current) return;
 
-      playerRef.current = new window.YT.Player('yt-hidden-player', {
+      const target = document.createElement('div');
+      target.id = targetIdRef.current;
+      containerRef.current.replaceChildren(target);
+
+      playerRef.current = new window.YT.Player(target, {
         height: '1',
         width: '1',
         // Kalau ada videoId yang sudah siap, langsung isi dari awal.
@@ -112,22 +120,31 @@ export const YouTubePlayer = () => {
       } else {
         // API belum ada — inject script dan pasang callback.
         const prevCallback = window.onYouTubeIframeAPIReady;
-        window.onYouTubeIframeAPIReady = () => {
+        const handleYouTubeIframeAPIReady = () => {
           prevCallback?.();
           createPlayer(initialVideoId);
         };
+        window.onYouTubeIframeAPIReady = handleYouTubeIframeAPIReady;
 
         if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
           const tag = document.createElement('script');
           tag.src = 'https://www.youtube.com/iframe_api';
           document.head.appendChild(tag);
         }
+
+        return () => {
+          if (window.onYouTubeIframeAPIReady === handleYouTubeIframeAPIReady) {
+            window.onYouTubeIframeAPIReady = prevCallback;
+          }
+        };
       }
     };
 
-    initApi();
+    const cleanupApiCallback = initApi();
 
     return () => {
+      cleanupApiCallback?.();
+
       if (playerRef.current) {
         try {
           playerRef.current.destroy();
@@ -137,6 +154,8 @@ export const YouTubePlayer = () => {
         playerRef.current = null;
         isReadyRef.current = false;
       }
+
+      containerRef.current?.replaceChildren();
     };
   }, []);
 
@@ -207,7 +226,7 @@ export const YouTubePlayer = () => {
   // Div target untuk player YouTube — ukuran 1x1 px, tidak terlihat tapi harus ada di DOM.
   return (
     <div
-      id="yt-hidden-player"
+      ref={containerRef}
       aria-hidden="true"
       style={{
         position: 'fixed',

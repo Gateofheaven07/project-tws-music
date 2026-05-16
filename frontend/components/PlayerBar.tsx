@@ -19,7 +19,7 @@ import { usePlayerStore } from '@/store/playerStore';
 import { useMusicStore } from '@/store/musicStore';
 import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
-import api from '@/lib/api';
+import api, { getApiErrorMessage } from '@/lib/api';
 import type { Song } from '@/store/playerStore';
 
 /**
@@ -110,7 +110,7 @@ export const PlayerBar = () => {
           });
         }
       } catch (error) {
-        console.error('Gagal ngambil video ID:', error);
+        console.warn(getApiErrorMessage(error, 'Video ID belum bisa diambil.'));
       } finally {
         setIsFetchingId(false);
       }
@@ -135,16 +135,19 @@ export const PlayerBar = () => {
   const isPlaybackUnavailable = currentSong.playback?.status === 'unavailable';
 
   return (
-    <div className="h-[90px] bg-black border-t border-[#282828] px-4 flex items-center justify-between fixed bottom-0 left-0 right-0 z-50 shadow-2xl">
+    <div
+      className="fixed bottom-0 left-0 right-0 z-50 flex min-h-[112px] flex-col gap-2 border-t border-[#282828] bg-black px-3 py-2 shadow-2xl sm:px-4 md:h-[90px] md:min-h-0 md:flex-row md:items-center md:justify-between md:gap-4 md:py-0"
+      style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
+    >
 
       {/* ── Kiri: Info Lagu (klik untuk buka full player) ─── */}
       <div
-        className="flex items-center gap-4 w-[30%] min-w-[180px] cursor-pointer group"
+        className="group flex w-full min-w-0 cursor-pointer items-center gap-3 md:w-[30%] md:min-w-[180px] md:gap-4"
         onClick={() => setShowNowPlaying(true)}
         title="Buka player penuh"
       >
         {/* Album Cover */}
-        <div className="relative h-14 w-14 flex-shrink-0 rounded-[4px] bg-[#181818] overflow-hidden shadow-lg">
+        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-[4px] bg-[#181818] shadow-lg md:h-14 md:w-14">
           {currentSong.album.cover.small ? (
             <Image
               src={currentSong.album.cover.small}
@@ -161,7 +164,7 @@ export const PlayerBar = () => {
         </div>
 
         {/* Judul & Artis */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="truncate font-bold text-[14px] text-white group-hover:underline underline-offset-2 transition-colors">
             {currentSong.title}
           </p>
@@ -181,24 +184,36 @@ export const PlayerBar = () => {
             }
           }}
           className={cn(
-            'transition-colors p-2 flex-shrink-0',
+            'flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full transition-colors',
             isFavorited ? 'text-[#1ed760]' : 'text-[#b3b3b3] hover:text-white'
           )}
           title={isFavorited ? 'Hapus dari Liked Songs' : 'Tambah ke Liked Songs'}
         >
           <Heart className={cn('h-5 w-5', isFavorited && 'fill-current')} />
         </button>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            stop();
+          }}
+          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-[#b3b3b3] transition-all hover:bg-white/10 hover:text-white md:hidden"
+          title="Tutup musik"
+          aria-label="Tutup musik"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
 
       {/* ── Tengah: Kontrol & Progress Bar ──────────────── */}
-      <div className="flex flex-col items-center max-w-[40%] w-full gap-2">
+      <div className="flex w-full flex-col items-center gap-2 md:max-w-[40%]">
         {/* Tombol Kontrol */}
-        <div className="flex items-center gap-5">
+        <div className="flex w-full items-center justify-center gap-2 sm:gap-4 md:gap-5">
           {/* Shuffle */}
           <button
             onClick={toggleShuffle}
             className={cn(
-              'transition-colors relative',
+              'relative flex h-11 w-11 items-center justify-center rounded-full transition-colors',
               isShuffle
                 ? 'text-[#1ed760] after:content-["•"] after:absolute after:-bottom-2 after:left-1/2 after:-translate-x-1/2 after:text-[8px]'
                 : 'text-[#b3b3b3] hover:text-white'
@@ -211,7 +226,7 @@ export const PlayerBar = () => {
           {/* Previous */}
           <button
             onClick={previous}
-            className="text-[#b3b3b3] hover:text-white transition-colors hover:scale-110 active:scale-95"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-[#b3b3b3] transition-colors hover:scale-110 hover:text-white active:scale-95"
             title="Lagu sebelumnya"
           >
             <SkipBack className="h-5 w-5 fill-current" />
@@ -221,7 +236,7 @@ export const PlayerBar = () => {
           <button
             onClick={togglePlayPause}
             disabled={isFetchingId || isPlaybackUnavailable}
-            className="h-8 w-8 rounded-full bg-white flex items-center justify-center text-black hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-black transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 md:h-9 md:w-9"
             title={isPlaybackUnavailable ? 'Playback belum tersedia' : isPlaying ? 'Pause' : 'Play'}
           >
             {isFetchingId ? (
@@ -236,7 +251,7 @@ export const PlayerBar = () => {
           {/* Next */}
           <button
             onClick={next}
-            className="text-[#b3b3b3] hover:text-white transition-colors hover:scale-110 active:scale-95"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-[#b3b3b3] transition-colors hover:scale-110 hover:text-white active:scale-95"
             title="Lagu berikutnya"
           >
             <SkipForward className="h-5 w-5 fill-current" />
@@ -250,7 +265,7 @@ export const PlayerBar = () => {
               )
             }
             className={cn(
-              'transition-colors relative',
+              'relative flex h-11 w-11 items-center justify-center rounded-full transition-colors',
               repeatMode !== 'off'
                 ? 'text-[#1ed760] after:content-["•"] after:absolute after:-bottom-2 after:left-1/2 after:-translate-x-1/2 after:text-[8px]'
                 : 'text-[#b3b3b3] hover:text-white'
@@ -266,13 +281,14 @@ export const PlayerBar = () => {
         </div>
 
         {/* Progress Bar */}
-        <div className="flex items-center gap-2 w-full max-w-[450px]">
-          <span className="text-[11px] text-[#b3b3b3] w-8 text-right font-medium tabular-nums">
+        <div className="flex w-full max-w-[520px] items-center gap-2">
+          <span className="hidden w-8 text-right text-[11px] font-medium tabular-nums text-[#b3b3b3] sm:block">
             {formatTime(currentTime)}
           </span>
-          <div className="relative flex-1 h-1 bg-[#4d4d4d] rounded-full group cursor-pointer overflow-hidden">
+          <div className="group relative h-3 flex-1 cursor-pointer overflow-hidden rounded-full py-1">
+            <div className="absolute left-0 right-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-[#4d4d4d]" />
             <div
-              className="absolute top-0 left-0 h-full bg-white group-hover:bg-[#1ed760] rounded-full transition-colors"
+              className="absolute left-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-white transition-colors group-hover:bg-[#1ed760]"
               style={{ width: `${progressPercent}%` }}
             />
             <input
@@ -288,14 +304,14 @@ export const PlayerBar = () => {
               style={{ margin: 0 }}
             />
           </div>
-          <span className="text-[11px] text-[#b3b3b3] w-8 font-medium tabular-nums">
+          <span className="hidden w-8 text-[11px] font-medium tabular-nums text-[#b3b3b3] sm:block">
             {formatTime(duration)}
           </span>
         </div>
       </div>
 
       {/* ── Kanan: Volume + Tombol X ─────────────────────── */}
-      <div className="flex items-center justify-end gap-3 w-[30%]">
+      <div className="hidden w-[30%] items-center justify-end gap-3 md:flex">
         {/* Volume */}
         <div className="flex items-center gap-2 w-28">
           <Volume2 className="h-4 w-4 text-[#b3b3b3] flex-shrink-0" />
@@ -329,6 +345,7 @@ export const PlayerBar = () => {
           }}
           className="w-7 h-7 flex items-center justify-center rounded-full text-[#b3b3b3] hover:text-white hover:bg-white/10 transition-all"
           title="Tutup musik"
+          aria-label="Tutup musik"
         >
           <X className="h-4 w-4" />
         </button>

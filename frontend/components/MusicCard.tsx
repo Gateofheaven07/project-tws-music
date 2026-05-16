@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Heart, Play, MoreHorizontal } from 'lucide-react';
+import { Heart, ListPlus, Play, MoreHorizontal } from 'lucide-react';
 import { usePlayerStore } from '@/store/playerStore';
 import { useMusicStore } from '@/store/musicStore';
 import { useAuth } from '@/hooks/useAuth';
@@ -19,7 +19,7 @@ interface MusicCardProps {
 }
 
 export const MusicCard = ({ song, isCompact = false, playQueue, queueIndex }: MusicCardProps) => {
-  const { startPlayback } = usePlayerStore();
+  const { startPlayback, addToQueue } = usePlayerStore();
   const { favoriteSongs } = useMusicStore();
   const { user } = useAuth();
   const { addFavorite, removeFavorite } = useMusic();
@@ -56,6 +56,13 @@ export const MusicCard = ({ song, isCompact = false, playQueue, queueIndex }: Mu
     } else {
       addFavorite(song);
     }
+  };
+
+  const handleAddToQueueClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isPlaybackUnavailable) return;
+
+    addToQueue(song);
   };
 
   // Buka menu tepat di bawah tombol yang diklik.
@@ -113,11 +120,22 @@ export const MusicCard = ({ song, isCompact = false, playQueue, queueIndex }: Mu
             )}
           </div>
 
+          <button
+            onClick={handleAddToQueueClick}
+            disabled={isPlaybackUnavailable}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-text-secondary opacity-100 transition-all hover:bg-white/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100"
+            title={isPlaybackUnavailable ? unavailableMessage : 'Masukkan ke daftar antrean'}
+            aria-label="Masukkan ke daftar antrean"
+          >
+            <ListPlus className="h-4 w-4" />
+          </button>
+
           {/* Ikon 3 titik */}
           <button
             onClick={handleMoreClick}
-            className="p-1.5 opacity-0 group-hover:opacity-100 transition-all text-text-secondary hover:text-foreground rounded-full hover:bg-white/10"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-text-secondary opacity-100 transition-all hover:bg-white/10 hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100"
             title="Opsi lainnya"
+            aria-label="Opsi lainnya"
           >
             <MoreHorizontal className="h-4 w-4" />
           </button>
@@ -125,9 +143,10 @@ export const MusicCard = ({ song, isCompact = false, playQueue, queueIndex }: Mu
           <button
             onClick={handleFavoriteClick}
             className={cn(
-              'p-2 opacity-0 group-hover:opacity-100 transition-all',
+              'flex h-10 w-10 items-center justify-center rounded-full opacity-100 transition-all sm:opacity-0 sm:group-hover:opacity-100',
               isFavorited ? 'opacity-100 text-spotify-green' : 'text-text-secondary hover:text-foreground'
             )}
+            aria-label={isFavorited ? 'Hapus dari lagu yang disukai' : 'Tambahkan ke lagu yang disukai'}
           >
             <Heart className={cn('h-4 w-4', isFavorited && 'fill-current')} />
           </button>
@@ -193,20 +212,31 @@ export const MusicCard = ({ song, isCompact = false, playQueue, queueIndex }: Mu
               {song.title}
             </p>
             <div className="flex items-center gap-1 flex-shrink-0">
+              <button
+                onClick={handleAddToQueueClick}
+                disabled={isPlaybackUnavailable}
+                className="flex h-9 w-9 items-center justify-center rounded-full text-text-secondary opacity-100 transition-all hover:bg-white/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100"
+                title={isPlaybackUnavailable ? unavailableMessage : 'Masukkan ke daftar antrean'}
+                aria-label="Masukkan ke daftar antrean"
+              >
+                <ListPlus className="h-4 w-4" />
+              </button>
               {/* Ikon tiga titik */}
               <button
                 onClick={handleMoreClick}
-                className="p-1 opacity-0 group-hover:opacity-100 transition-all text-text-secondary hover:text-foreground rounded-full hover:bg-white/10"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-text-secondary opacity-100 transition-all hover:bg-white/10 hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100"
                 title="Opsi lainnya"
+                aria-label="Opsi lainnya"
               >
                 <MoreHorizontal className="h-4 w-4" />
               </button>
               <button
                 onClick={handleFavoriteClick}
                 className={cn(
-                  'transition-colors p-1',
+                  'flex h-9 w-9 items-center justify-center rounded-full transition-colors',
                   isFavorited ? 'text-spotify-green' : 'text-text-secondary hover:text-foreground'
                 )}
+                aria-label={isFavorited ? 'Hapus dari lagu yang disukai' : 'Tambahkan ke lagu yang disukai'}
               >
                 <Heart className={cn('h-4 w-4', isFavorited && 'fill-current')} />
               </button>

@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAlbum = exports.getArtist = exports.getStreamId = exports.genreSongs = exports.genres = exports.trending = exports.search = void 0;
+exports.getAlbum = exports.getArtist = exports.getStreamId = exports.genreSongs = exports.genres = exports.recommendations = exports.trending = exports.search = void 0;
 const musicService = __importStar(require("../services/music.service"));
 const constants_1 = require("../utils/constants");
 const response_1 = require("../utils/response");
@@ -80,6 +80,30 @@ const trending = async (req, res) => {
     }
 };
 exports.trending = trending;
+/**
+ * Ngambil rekomendasi berdasarkan genre yang paling sering disukai user.
+ */
+const recommendations = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const recommendations = await musicService.getRecommendationsForUser(userId);
+        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, `Rekomendasi berdasarkan genre ${recommendations.favoriteGenre}.`, recommendations.results, {
+            query: recommendations.query,
+            total: recommendations.results.length,
+            favoriteGenre: recommendations.favoriteGenre,
+            source: recommendations.source,
+            provider: {
+                metadata: "deezer",
+                playback: "youtube"
+            },
+            playbackStatus: recommendations.playbackStatus
+        }));
+    }
+    catch (error) {
+        return res.status(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message));
+    }
+};
+exports.recommendations = recommendations;
 /**
  * Ngambil kategori musik dari Deezer.
  */

@@ -20,6 +20,7 @@ model User {
   playlists   Playlist[]
   likedSongs  LikedSong[]
   playHistory PlayHistory[]
+  appReview   AppReview?
   
   @@map("users")
 }
@@ -93,6 +94,7 @@ model LikedSong {
   cover     String
   duration  Int
   videoId   String?
+  genre     String?
   createdAt DateTime @default(now())
 
   user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -115,4 +117,19 @@ model PlayHistory {
   @@index([userId])
   @@index([songId])
   @@map("play_history")
+}
+
+// Ulasan aplikasi dari user. Satu user cuma punya satu ulasan aktif.
+model AppReview {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  rating    Int
+  review    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@map("app_reviews")
 }

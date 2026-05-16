@@ -50,7 +50,62 @@ export const SongTable: React.FC<SongTableProps> = ({ songs }) => {
 
   return (
     <>
-      <div className="w-full text-left border-collapse select-none">
+      <div className="flex flex-col gap-2 md:hidden">
+        {songs.map((song, index) => {
+          const isCurrent = currentSong?.musicId === song.musicId;
+          const isPlaybackUnavailable = song.playback?.status === 'unavailable';
+
+          return (
+            <div
+              key={song.musicId}
+              onClick={() => handlePlaySong(index)}
+              className={`group flex min-w-0 items-center gap-3 rounded-lg p-2 transition-colors ${
+                isCurrent ? 'bg-white/10' : 'hover:bg-[#2a2a2a]'
+              } ${isPlaybackUnavailable ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
+              aria-disabled={isPlaybackUnavailable}
+            >
+              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded bg-[#1f1f1f] shadow-md">
+                <Image
+                  src={song.album.cover.medium}
+                  alt={song.title}
+                  fill
+                  className="object-cover"
+                  sizes="48px"
+                />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <p className={`truncate text-sm font-bold ${isCurrent ? 'text-primary' : 'text-white'}`}>
+                  {song.title}
+                </p>
+                <p className="truncate text-xs text-[#b3b3b3]">{song.artist.name}</p>
+                {isPlaybackUnavailable ? (
+                  <p className="truncate text-[11px] text-amber-300/90">
+                    {getUnavailableMessage(song)}
+                  </p>
+                ) : (
+                  <p className="truncate text-[11px] text-[#6a6a6a]">{song.album.name}</p>
+                )}
+              </div>
+
+              <span className="w-10 shrink-0 text-right text-xs tabular-nums text-[#b3b3b3]">
+                {formatDuration(song.duration)}
+              </span>
+
+              <button
+                onClick={(e) => handleMoreClick(e, song)}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#b3b3b3] transition-all hover:bg-white/10 hover:text-white"
+                title="Opsi lainnya"
+                aria-label={`Opsi untuk ${song.title}`}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="hidden w-full select-none border-collapse text-left md:block">
         <div className="grid grid-cols-[48px_1fr_1fr_120px_60px_40px] md:grid-cols-[48px_2fr_1.5fr_1fr_80px_40px] px-4 py-2 border-b border-white/5 text-[12px] font-bold text-text-secondary tracking-widest uppercase mb-4">
           <div className="flex justify-center">#</div>
           <div>JUDUL</div>

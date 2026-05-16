@@ -12,6 +12,7 @@ import playlistRoutes from './routes/playlist.routes';
 import favoriteRoutes from './routes/favorite.routes';
 import historyRoutes from './routes/history.routes';
 import profileRoutes from './routes/profile.routes';
+import reviewRoutes from './routes/review.routes';
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.use('/api/playlists', playlistRoutes);
 app.use('/api/liked-songs', favoriteRoutes);
 app.use('/api/history', historyRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

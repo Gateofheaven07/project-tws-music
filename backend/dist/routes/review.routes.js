@@ -34,18 +34,11 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const musicController = __importStar(require("../controllers/music.controller"));
+const reviewController = __importStar(require("../controllers/review.controller"));
 const auth_middleware_1 = require("../middlewares/auth.middleware");
 const router = (0, express_1.Router)();
-// Route publik (bisa diakses tanpa login)
-router.get('/search', musicController.search);
-router.get('/trending', musicController.trending);
-router.get('/genres', musicController.genres);
-router.get('/genres/:id/songs', musicController.genreSongs);
-// Route musik lainnya butuh login biar aman
+router.get('/', reviewController.getReviews);
 router.use(auth_middleware_1.authMiddleware);
-router.get('/recommendations', musicController.recommendations);
-router.get('/stream-id', musicController.getStreamId);
-router.get('/artist/:id', musicController.getArtist);
-router.get('/album/:id', musicController.getAlbum);
+router.get('/me', reviewController.getMyReview);
+router.put('/me', reviewController.upsertMyReview);
 exports.default = router;

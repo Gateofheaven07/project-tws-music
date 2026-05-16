@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import api from '@/lib/api';
+import api, { getApiErrorMessage } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 
 // Tipe data untuk riwayat putar yang dikembalikan dari backend
@@ -47,7 +47,7 @@ export const useProfile = () => {
       setProfile(data);
       return data;
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Gagal memuat profil.';
+      const msg = getApiErrorMessage(err, 'Gagal memuat profil.');
       setError(msg);
       return null;
     } finally {
@@ -74,7 +74,7 @@ export const useProfile = () => {
 
       return { success: true };
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Gagal update username.';
+      const msg = getApiErrorMessage(err, 'Gagal update username.');
       return { success: false, error: msg };
     } finally {
       setIsUpdating(false);
@@ -90,7 +90,7 @@ export const useProfile = () => {
       await api.patch('/profile/password', { currentPassword, newPassword });
       return { success: true };
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Gagal update password.';
+      const msg = getApiErrorMessage(err, 'Gagal update password.');
       return { success: false, error: msg };
     } finally {
       setIsUpdating(false);
@@ -124,7 +124,7 @@ export const useProfile = () => {
 
       return { success: true, avatar: newAvatar };
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Gagal upload avatar.';
+      const msg = getApiErrorMessage(err, 'Gagal upload avatar.');
       return { success: false, error: msg };
     } finally {
       setIsUpdating(false);
@@ -143,7 +143,7 @@ export const useProfile = () => {
       setHistory(data);
       return data;
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Gagal memuat riwayat.';
+      const msg = getApiErrorMessage(err, 'Gagal memuat riwayat.');
       setError(msg);
       return [];
     } finally {

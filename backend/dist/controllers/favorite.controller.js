@@ -16,7 +16,7 @@ const getFavorites = async (req, res) => {
                 createdAt: 'desc',
             },
         });
-        // Kita mapping biar formatnya seragam sama hasil search
+        // Format favorit disamakan dengan hasil pencarian supaya komponen UI tidak perlu tahu sumber datanya.
         const results = likedSongs.map((f) => ({
             musicId: f.musicId,
             title: f.title,
@@ -35,7 +35,7 @@ const getFavorites = async (req, res) => {
                 }
             },
             duration: f.duration,
-            genres: [],
+            genres: f.genre ? [f.genre] : [],
             releaseDate: "",
             playback: {
                 provider: "youtube",
@@ -67,16 +67,19 @@ exports.getFavorites = getFavorites;
 const addFavorite = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { musicId, title, artist, cover, duration, videoId } = req.body;
+        const { musicId, title, artist, cover, duration, videoId, genre } = req.body;
         if (!musicId) {
             return res.status(constants_1.HTTP_STATUS.BAD_REQUEST).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.BAD_REQUEST, 'ID Lagunya mana?'));
         }
-        // Tambah ke likedSongs
+        const cleanGenre = typeof genre === 'string' && genre.trim() ? genre.trim() : null;
+        // Genre ikut disimpan supaya rekomendasi tetap ada setelah user reload aplikasi.
         const likedSong = await prisma_1.prisma.likedSong.upsert({
             where: {
                 userId_musicId: { userId, musicId },
             },
-            update: {},
+            update: {
+                genre: cleanGenre,
+            },
             create: {
                 userId,
                 musicId,
@@ -85,6 +88,7 @@ const addFavorite = async (req, res) => {
                 cover: cover || '',
                 duration: duration || 0,
                 videoId: videoId || null,
+                genre: cleanGenre,
             },
         });
         return res.status(constants_1.HTTP_STATUS.CREATED).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.CREATED, 'Lagu berhasil ditambah ke favorit.', likedSong));

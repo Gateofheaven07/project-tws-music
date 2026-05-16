@@ -61,6 +61,7 @@ interface PlayerStore {
   setQueue: (songs: Song[]) => void;
   addToQueue: (song: Song) => void;
   removeFromQueue: (index: number) => void;
+  moveInQueue: (fromIndex: number, toIndex: number) => void;
   clearQueue: () => void;
   setCurrentSongIndex: (index: number) => void;
   play: () => void;
@@ -116,9 +117,77 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
   },
 
   removeFromQueue: (index) => {
-    set((state) => ({
-      queue: state.queue.filter((_, i) => i !== index),
-    }));
+    set((state) => {
+      if (index < 0 || index >= state.queue.length) return state;
+
+      const newQueue = state.queue.filter((_, i) => i !== index);
+
+      if (newQueue.length === 0) {
+        return {
+          queue: [],
+          currentSongIndex: 0,
+          currentSong: null,
+          isPlaying: false,
+          currentTime: 0,
+          duration: 0,
+          showNowPlaying: false,
+        };
+      }
+
+      let nextCurrentIndex = state.currentSongIndex;
+      const removedCurrentSong = index === state.currentSongIndex;
+
+      if (index < state.currentSongIndex) {
+        nextCurrentIndex = state.currentSongIndex - 1;
+      }
+
+      if (removedCurrentSong) {
+        nextCurrentIndex = Math.min(index, newQueue.length - 1);
+      }
+
+      return {
+        queue: newQueue,
+        currentSongIndex: nextCurrentIndex,
+        currentSong: newQueue[nextCurrentIndex] || null,
+        currentTime: removedCurrentSong ? 0 : state.currentTime,
+        duration: removedCurrentSong ? 0 : state.duration,
+      };
+    });
+  },
+
+  moveInQueue: (fromIndex, toIndex) => {
+    set((state) => {
+      const lastIndex = state.queue.length - 1;
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex > lastIndex ||
+        toIndex > lastIndex ||
+        fromIndex === toIndex
+      ) {
+        return state;
+      }
+
+      const newQueue = [...state.queue];
+      const [movedSong] = newQueue.splice(fromIndex, 1);
+      newQueue.splice(toIndex, 0, movedSong);
+
+      let nextCurrentIndex = state.currentSongIndex;
+
+      if (state.currentSongIndex === fromIndex) {
+        nextCurrentIndex = toIndex;
+      } else if (fromIndex < state.currentSongIndex && toIndex >= state.currentSongIndex) {
+        nextCurrentIndex = state.currentSongIndex - 1;
+      } else if (fromIndex > state.currentSongIndex && toIndex <= state.currentSongIndex) {
+        nextCurrentIndex = state.currentSongIndex + 1;
+      }
+
+      return {
+        queue: newQueue,
+        currentSongIndex: nextCurrentIndex,
+        currentSong: newQueue[nextCurrentIndex] || null,
+      };
+    });
   },
 
   clearQueue: () => {

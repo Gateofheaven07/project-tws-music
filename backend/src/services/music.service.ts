@@ -35,6 +35,8 @@ type YouTubeLookupResult = {
   errorReason: string | null;
 };
 
+type RecommendationSource = 'liked_songs' | 'fallback';
+
 const mapTrackToSong = async (track: DeezerTrack, genreName?: string) => {
   const playbackLookup = await getYouTubeId(track.artist.name, track.title);
   const { videoId } = playbackLookup;
@@ -223,6 +225,57 @@ export const getTrendingSongs = async () => {
   } catch (error) {
     console.error('Deezer Chart Error:', error);
     throw new Error('Gagal ngambil daftar lagu trending.');
+  }
+};
+
+/**
+ * Rekomendasi diambil dari genre yang paling sering muncul di lagu favorit user.
+ * Kalau user belum punya data genre, kita tetap kasih hasil dari query default.
+ */
+export const getRecommendationsForUser = async (userId: string) => {
+  try {
+    const likedSongs = await prisma.likedSong.findMany({
+      where: {
+        userId,
+        genre: {
+          not: null,
+        },
+      },
+      select: {
+        genre: true,
+      },
+    });
+
+    const genreCount = likedSongs.reduce<Record<string, number>>((count, song) => {
+      const genre = song.genre?.trim();
+      if (!genre) return count;
+
+      count[genre] = (count[genre] || 0) + 1;
+      return count;
+    }, {});
+
+    const favoriteGenre = Object.entries(genreCount)
+      .sort(([, countA], [, countB]) => countB - countA)[0]?.[0] || 'pop';
+    const source: RecommendationSource = likedSongs.length > 0 ? 'liked_songs' : 'fallback';
+    const query = normalizeGenreSearchTerm(favoriteGenre);
+    const response = await axios.get(`${DEEZER_API_URL}/search?q=${encodeURIComponent(query)}`);
+    const tracks = (response.data.data || []) as DeezerTrack[];
+
+    const results = await Promise.all(
+      tracks.slice(0, 20).map((track) => mapTrackToSong(track, favoriteGenre))
+    );
+    const hasUnavailablePlayback = results.some((song) => song.playback.status === 'unavailable');
+
+    return {
+      query,
+      favoriteGenre,
+      source,
+      playbackStatus: hasUnavailablePlayback ? 'partial' : 'ready',
+      results,
+    };
+  } catch (error) {
+    console.error('Deezer Recommendation Error:', error);
+    throw new Error('Gagal ngambil rekomendasi musik.');
   }
 };
 

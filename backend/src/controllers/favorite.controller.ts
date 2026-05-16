@@ -17,7 +17,7 @@ export const getFavorites = async (req: Request, res: Response) => {
       },
     });
 
-    // Kita mapping biar formatnya seragam sama hasil search
+    // Format favorit disamakan dengan hasil pencarian supaya komponen UI tidak perlu tahu sumber datanya.
     const results = likedSongs.map((f) => ({
       musicId: f.musicId,
       title: f.title,
@@ -36,7 +36,7 @@ export const getFavorites = async (req: Request, res: Response) => {
         }
       },
       duration: f.duration,
-      genres: [],
+      genres: f.genre ? [f.genre] : [],
       releaseDate: "",
       playback: {
         provider: "youtube",
@@ -72,7 +72,7 @@ export const getFavorites = async (req: Request, res: Response) => {
 export const addFavorite = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
-    const { musicId, title, artist, cover, duration, videoId } = req.body;
+    const { musicId, title, artist, cover, duration, videoId, genre } = req.body;
 
     if (!musicId) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json(
@@ -80,12 +80,16 @@ export const addFavorite = async (req: Request, res: Response) => {
       );
     }
 
-    // Tambah ke likedSongs
+    const cleanGenre = typeof genre === 'string' && genre.trim() ? genre.trim() : null;
+
+    // Genre ikut disimpan supaya rekomendasi tetap ada setelah user reload aplikasi.
     const likedSong = await prisma.likedSong.upsert({
       where: {
         userId_musicId: { userId, musicId },
       },
-      update: {},
+      update: {
+        genre: cleanGenre,
+      },
       create: {
         userId,
         musicId,
@@ -94,6 +98,7 @@ export const addFavorite = async (req: Request, res: Response) => {
         cover: cover || '',
         duration: duration || 0,
         videoId: videoId || null,
+        genre: cleanGenre,
       },
     });
 

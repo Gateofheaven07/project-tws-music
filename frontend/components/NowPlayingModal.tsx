@@ -171,7 +171,7 @@ export const NowPlayingModal = () => {
             <section className="space-y-6">
               <div className="flex items-end justify-between gap-5">
                 <div className="min-w-0">
-                  <h1 className="truncate text-4xl font-black leading-none text-white drop-shadow-2xl sm:text-5xl md:text-6xl">
+                  <h1 className="truncate text-3xl font-black leading-none text-white drop-shadow-2xl sm:text-5xl md:text-6xl">
                     {currentSong.title}
                   </h1>
                   <p className="mt-2 truncate text-xl font-semibold text-white/75 drop-shadow-lg">
@@ -183,14 +183,14 @@ export const NowPlayingModal = () => {
                   type="button"
                   onClick={handleToggleFavorite}
                   className={cn(
-                    'flex h-14 w-14 shrink-0 items-center justify-center rounded-full transition active:scale-95',
+                    'flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition active:scale-95 sm:h-14 sm:w-14',
                     isFavorited ? 'text-[#1ed760]' : 'text-white/80 hover:text-white'
                   )}
                   aria-label={
                     isFavorited ? 'Hapus dari lagu yang disukai' : 'Tambahkan ke lagu yang disukai'
                   }
                 >
-                  <Heart className={cn('h-9 w-9', isFavorited && 'fill-current')} aria-hidden="true" />
+                  <Heart className={cn('h-7 w-7 sm:h-9 sm:w-9', isFavorited && 'fill-current')} aria-hidden="true" />
                 </button>
               </div>
 
@@ -225,58 +225,58 @@ export const NowPlayingModal = () => {
                   type="button"
                   onClick={toggleShuffle}
                   className={cn(
-                    'flex h-12 w-12 items-center justify-center rounded-full transition active:scale-95',
+                    'flex h-10 w-10 items-center justify-center rounded-full transition active:scale-95 sm:h-12 sm:w-12',
                     isShuffle ? 'text-[#1ed760]' : 'text-white/75 hover:text-white'
                   )}
                   aria-label="Acak lagu"
                 >
-                  <Shuffle className="h-7 w-7" aria-hidden="true" />
+                  <Shuffle className="h-6 w-6 sm:h-7 sm:w-7" aria-hidden="true" />
                 </button>
 
                 <button
                   type="button"
                   onClick={previous}
-                  className="flex h-14 w-14 items-center justify-center rounded-full text-white transition hover:bg-white/10 active:scale-95"
+                  className="flex h-12 w-12 items-center justify-center rounded-full text-white transition hover:bg-white/10 active:scale-95 sm:h-14 sm:w-14"
                   aria-label="Lagu sebelumnya"
                 >
-                  <SkipBack className="h-10 w-10 fill-current" aria-hidden="true" />
+                  <SkipBack className="h-8 w-8 fill-current sm:h-10 sm:w-10" aria-hidden="true" />
                 </button>
 
                 <button
                   type="button"
                   onClick={togglePlayPause}
-                  className="flex h-20 w-20 items-center justify-center rounded-full bg-white text-black shadow-[0_16px_40px_rgba(0,0,0,0.45)] transition hover:scale-105 active:scale-95"
+                  className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-black shadow-[0_16px_40px_rgba(0,0,0,0.45)] transition hover:scale-105 active:scale-95 sm:h-20 sm:w-20"
                   aria-label={isPlaying ? 'Jeda lagu' : 'Putar lagu'}
                 >
                   {isPlaying ? (
-                    <Pause className="h-9 w-9 fill-black" aria-hidden="true" />
+                    <Pause className="h-8 w-8 fill-black sm:h-9 sm:w-9" aria-hidden="true" />
                   ) : (
-                    <Play className="ml-1 h-9 w-9 fill-black" aria-hidden="true" />
+                    <Play className="ml-1 h-8 w-8 fill-black sm:h-9 sm:w-9" aria-hidden="true" />
                   )}
                 </button>
 
                 <button
                   type="button"
                   onClick={next}
-                  className="flex h-14 w-14 items-center justify-center rounded-full text-white transition hover:bg-white/10 active:scale-95"
+                  className="flex h-12 w-12 items-center justify-center rounded-full text-white transition hover:bg-white/10 active:scale-95 sm:h-14 sm:w-14"
                   aria-label="Lagu berikutnya"
                 >
-                  <SkipForward className="h-10 w-10 fill-current" aria-hidden="true" />
+                  <SkipForward className="h-8 w-8 fill-current sm:h-10 sm:w-10" aria-hidden="true" />
                 </button>
 
                 <button
                   type="button"
                   onClick={cycleRepeatMode}
                   className={cn(
-                    'flex h-12 w-12 items-center justify-center rounded-full transition active:scale-95',
+                    'flex h-10 w-10 items-center justify-center rounded-full transition active:scale-95 sm:h-12 sm:w-12',
                     repeatMode !== 'off' ? 'text-[#1ed760]' : 'text-white/75 hover:text-white'
                   )}
                   aria-label="Ulangi lagu"
                 >
                   {repeatMode === 'one' ? (
-                    <Repeat1 className="h-7 w-7" aria-hidden="true" />
+                    <Repeat1 className="h-6 w-6 sm:h-7 sm:w-7" aria-hidden="true" />
                   ) : (
-                    <Repeat className="h-7 w-7" aria-hidden="true" />
+                    <Repeat className="h-6 w-6 sm:h-7 sm:w-7" aria-hidden="true" />
                   )}
                 </button>
               </div>
