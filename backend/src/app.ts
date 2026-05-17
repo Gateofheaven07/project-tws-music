@@ -6,7 +6,6 @@ import cors from 'cors';
 import { createErrorResponse, createSuccessResponse } from './utils/response';
 import { logger, serializeError } from './lib/logger';
 import { prisma } from './lib/prisma';
-import { ensureUploadDirs, uploadsStaticDir } from './lib/upload-paths';
 
 // Import routes
 import authRoutes from './routes/auth.routes';
@@ -55,8 +54,6 @@ if (missingOptionalEnv.length > 0) {
   logger.warn('Missing optional environment variables', { missingOptionalEnv });
 }
 
-ensureUploadDirs();
-
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 
@@ -87,10 +84,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
   next();
 });
-
-// Serve file statis dari folder uploads/ agar URL avatar bisa diakses langsung
-// Contoh: http://localhost:5000/uploads/avatar/user123-1234567890.png
-app.use('/uploads', express.static(uploadsStaticDir));
 
 // Basic route
 app.get('/', (req, res) => {

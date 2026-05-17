@@ -1,26 +1,7 @@
 import multer from 'multer';
-import path from 'path';
 import { Request } from 'express';
-import { avatarUploadDir, ensureUploadDirs } from '../lib/upload-paths';
 
-// Konfigurasi cara file disimpan ke disk
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    try {
-      ensureUploadDirs();
-      cb(null, avatarUploadDir);
-    } catch (error) {
-      cb(error as Error, avatarUploadDir);
-    }
-  },
-  filename: (req, file, cb) => {
-    // Format nama file: userId-timestamp.ext, biar unik dan nggak bentrok
-    const userId = (req as any).user?.userId || 'unknown';
-    const ext = path.extname(file.originalname).toLowerCase();
-    const filename = `${userId}-${Date.now()}${ext}`;
-    cb(null, filename);
-  },
-});
+const storage = multer.memoryStorage();
 
 // Filter tipe file, cuma izinin gambar saja
 const fileFilter = (

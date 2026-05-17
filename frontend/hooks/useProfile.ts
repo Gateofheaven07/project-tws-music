@@ -45,6 +45,24 @@ export const useProfile = () => {
       const res = await api.get('/profile/me');
       const data: ProfileData = res.data.data;
       setProfile(data);
+
+      const nextAvatar = data.avatar ?? undefined;
+      if (
+        currentUser &&
+        (
+          currentUser.username !== data.username ||
+          currentUser.email !== data.email ||
+          currentUser.avatar !== nextAvatar
+        )
+      ) {
+        setUser({
+          ...currentUser,
+          username: data.username,
+          email: data.email,
+          avatar: nextAvatar,
+        });
+      }
+
       return data;
     } catch (err: any) {
       const msg = getApiErrorMessage(err, 'Gagal memuat profil.');
@@ -53,7 +71,7 @@ export const useProfile = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [currentUser, setUser]);
 
   /**
    * Update username user dan perbarui state global (authStore).

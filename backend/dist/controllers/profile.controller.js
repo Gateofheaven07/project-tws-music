@@ -1,19 +1,11 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProfileHistory = exports.updateAvatar = exports.updatePassword = exports.updateUsername = exports.getProfile = void 0;
-const fs_1 = __importDefault(require("fs"));
 const prisma_1 = require("../lib/prisma");
 const password_1 = require("../lib/auth/password");
-const upload_paths_1 = require("../lib/upload-paths");
+const avatar_1 = require("../lib/avatar");
 const constants_1 = require("../utils/constants");
 const response_1 = require("../utils/response");
-// Helper untuk dapetin base URL server (buat bikin URL avatar yang lengkap)
-const getBaseUrl = (req) => {
-    return `${req.protocol}://${req.get('host')}`;
-};
 /**
  * Ambil data profil user yang sedang login.
  * Hanya kembalikan field yang aman, password hash jangan sampai bocor ke frontend.
@@ -38,7 +30,7 @@ const getProfile = async (req, res) => {
             id: user.id,
             username: user.username,
             email: user.email,
-            avatar: user.avatar,
+            avatar: (0, avatar_1.normalizeAvatar)(user.avatar),
             createdAt: user.createdAt,
         }));
     }
@@ -84,7 +76,7 @@ const updateUsername = async (req, res) => {
             id: updatedUser.id,
             username: updatedUser.username,
             email: updatedUser.email,
-            avatar: updatedUser.avatar,
+            avatar: (0, avatar_1.normalizeAvatar)(updatedUser.avatar),
         }));
     }
     catch (error) {
@@ -146,34 +138,16 @@ const updateAvatar = async (req, res) => {
         if (!req.file) {
             return res.status(constants_1.HTTP_STATUS.BAD_REQUEST).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.BAD_REQUEST, 'Tidak ada file yang diupload.'));
         }
-        const baseUrl = getBaseUrl(req);
-        const avatarUrl = `${baseUrl}/uploads/avatar/${req.file.filename}`;
-        // Ambil avatar lama dari DB untuk dihapus dari disk
-        const currentUser = await prisma_1.prisma.user.findUnique({
-            where: { id: userId },
-            select: { avatar: true },
-        });
-        // Hapus file avatar lama dari disk kalau ada dan bukan URL eksternal
-        if (currentUser?.avatar) {
-            const oldAvatarUrl = currentUser.avatar;
-            // Cek apakah avatar lama adalah file lokal (bukan URL eksternal)
-            if (oldAvatarUrl.includes('/uploads/avatar/')) {
-                const filename = oldAvatarUrl.split('/uploads/avatar/')[1];
-                const oldFilePath = (0, upload_paths_1.resolveAvatarPath)(filename);
-                if (fs_1.default.existsSync(oldFilePath)) {
-                    fs_1.default.unlinkSync(oldFilePath);
-                }
-            }
-        }
+        const avatarDataUrl = (0, avatar_1.createAvatarDataUrl)(req.file);
         // Simpan URL avatar baru ke database
         const updatedUser = await prisma_1.prisma.user.update({
             where: { id: userId },
-            data: { avatar: avatarUrl },
+            data: { avatar: avatarDataUrl },
             select: { id: true, avatar: true },
         });
         return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Profile avatar updated successfully', {
             id: updatedUser.id,
-            avatar: updatedUser.avatar,
+            avatar: (0, avatar_1.normalizeAvatar)(updatedUser.avatar),
         }));
     }
     catch (error) {

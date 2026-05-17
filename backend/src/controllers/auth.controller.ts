@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { hashPassword, verifyPassword } from '../lib/auth/password';
 import { createAccessToken, createRefreshToken } from '../lib/auth/jwt';
-import { HTTP_STATUS, ERROR_MESSAGES } from '../utils/constants';
+import { normalizeAvatar } from '../lib/avatar';
+import { HTTP_STATUS } from '../utils/constants';
 import { createSuccessResponse, createErrorResponse } from '../utils/response';
 
 /**
@@ -55,7 +56,7 @@ export const register = async (req: Request, res: Response) => {
           id: user.id,
           email: user.email,
           username: user.username,
-          avatar: user.avatar,
+          avatar: normalizeAvatar(user.avatar),
         }
       })
     );
@@ -120,7 +121,7 @@ export const login = async (req: Request, res: Response) => {
           id: user.id,
           email: user.email,
           username: user.username,
-          avatar: user.avatar,
+          avatar: normalizeAvatar(user.avatar),
         },
         tokens: {
           accessToken,
@@ -171,7 +172,12 @@ export const getMe = async (req: Request, res: Response) => {
     }
 
     return res.status(HTTP_STATUS.OK).json(
-      createSuccessResponse(HTTP_STATUS.OK, 'Ini data profil kamu ya.', { user })
+      createSuccessResponse(HTTP_STATUS.OK, 'Ini data profil kamu ya.', {
+        user: {
+          ...user,
+          avatar: normalizeAvatar(user.avatar),
+        },
+      })
     );
   } catch (error) {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(

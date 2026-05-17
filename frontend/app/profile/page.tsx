@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { usePlayerStore } from '@/store/playerStore';
@@ -75,6 +74,7 @@ export default function ProfilePage() {
 
   // State untuk preview avatar sebelum upload
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
 
   // Redirect ke login kalau belum login
   useEffect(() => {
@@ -155,15 +155,20 @@ export default function ProfilePage() {
 
     // Tampilkan preview gambar sebelum upload
     const previewUrl = URL.createObjectURL(file);
+    setAvatarLoadFailed(false);
     setAvatarPreview(previewUrl);
 
     // Langsung upload ke server
     const result = await uploadAvatar(file);
     if (result.success) {
       toast({ title: 'Foto profil berhasil diperbarui.' });
+      setAvatarPreview(null);
+      setAvatarLoadFailed(false);
+      URL.revokeObjectURL(previewUrl);
     } else {
       toast({ title: 'Gagal upload foto', description: result.error, variant: 'destructive' });
       setAvatarPreview(null);
+      URL.revokeObjectURL(previewUrl);
     }
 
     // Reset input agar file yang sama bisa dipilih lagi
@@ -206,6 +211,11 @@ export default function ProfilePage() {
 
   // URL avatar yang ditampilkan: preview > profil > null
   const displayAvatar = avatarPreview || profile?.avatar;
+  const shouldShowAvatar = Boolean(displayAvatar) && !avatarLoadFailed;
+
+  useEffect(() => {
+    setAvatarLoadFailed(false);
+  }, [displayAvatar]);
 
   // ── Tampilan loading awal ─────────────────────────────────────────────────
   if (!user) return null;
@@ -233,11 +243,12 @@ export default function ProfilePage() {
                 <div className="w-full h-full flex items-center justify-center">
                   <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 </div>
-              ) : displayAvatar ? (
+              ) : shouldShowAvatar ? (
                 <img
-                  src={displayAvatar}
+                  src={displayAvatar || ''}
                   alt="Foto profil"
                   className="w-full h-full object-cover"
+                  onError={() => setAvatarLoadFailed(true)}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-700">

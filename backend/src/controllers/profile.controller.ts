@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import fs from 'fs';
 import { prisma } from '../lib/prisma';
 import { hashPassword, verifyPassword } from '../lib/auth/password';
-import { resolveAvatarPath } from '../lib/upload-paths';
+import { createAvatarDataUrl, normalizeAvatar } from '../lib/avatar';
 import { HTTP_STATUS } from '../utils/constants';
 import { createSuccessResponse, createErrorResponse } from '../utils/response';
 
@@ -19,11 +18,6 @@ type PlayHistoryWithSongRow = {
   id: string;
   playedAt: Date;
   song: SongRow;
-};
-
-// Helper untuk dapetin base URL server (buat bikin URL avatar yang lengkap)
-const getBaseUrl = (req: Request) => {
-  return `${req.protocol}://${req.get('host')}`;
 };
 
 /**
@@ -56,7 +50,7 @@ export const getProfile = async (req: Request, res: Response) => {
         id: user.id,
         username: user.username,
         email: user.email,
-        avatar: user.avatar,
+        avatar: normalizeAvatar(user.avatar),
         createdAt: user.createdAt,
       })
     );
@@ -115,7 +109,7 @@ export const updateUsername = async (req: Request, res: Response) => {
         id: updatedUser.id,
         username: updatedUser.username,
         email: updatedUser.email,
-        avatar: updatedUser.avatar,
+        avatar: normalizeAvatar(updatedUser.avatar),
       })
     );
   } catch (error) {
@@ -203,39 +197,19 @@ export const updateAvatar = async (req: Request, res: Response) => {
       );
     }
 
-    const baseUrl = getBaseUrl(req);
-    const avatarUrl = `${baseUrl}/uploads/avatar/${req.file.filename}`;
-
-    // Ambil avatar lama dari DB untuk dihapus dari disk
-    const currentUser = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { avatar: true },
-    });
-
-    // Hapus file avatar lama dari disk kalau ada dan bukan URL eksternal
-    if (currentUser?.avatar) {
-      const oldAvatarUrl = currentUser.avatar;
-      // Cek apakah avatar lama adalah file lokal (bukan URL eksternal)
-      if (oldAvatarUrl.includes('/uploads/avatar/')) {
-        const filename = oldAvatarUrl.split('/uploads/avatar/')[1];
-        const oldFilePath = resolveAvatarPath(filename);
-        if (fs.existsSync(oldFilePath)) {
-          fs.unlinkSync(oldFilePath);
-        }
-      }
-    }
+    const avatarDataUrl = createAvatarDataUrl(req.file);
 
     // Simpan URL avatar baru ke database
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: { avatar: avatarUrl },
+      data: { avatar: avatarDataUrl },
       select: { id: true, avatar: true },
     });
 
     return res.status(HTTP_STATUS.OK).json(
       createSuccessResponse(HTTP_STATUS.OK, 'Profile avatar updated successfully', {
         id: updatedUser.id,
-        avatar: updatedUser.avatar,
+        avatar: normalizeAvatar(updatedUser.avatar),
       })
     );
   } catch (error) {

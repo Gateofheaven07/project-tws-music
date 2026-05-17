@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LogOut, Menu } from 'lucide-react';
@@ -23,6 +24,12 @@ export const Sidebar = ({ className, onNavigate }: SidebarProps) => {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const isQueueBuilderActive = pathname === '/queue-builder';
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
+  const showUserAvatar = Boolean(user?.avatar) && !avatarLoadFailed;
+
+  useEffect(() => {
+    setAvatarLoadFailed(false);
+  }, [user?.avatar]);
 
   // Daftar navigasi utama aplikasi
   const navItems = [
@@ -109,11 +116,12 @@ export const Sidebar = ({ className, onNavigate }: SidebarProps) => {
           >
             {/* Avatar: tampilkan foto profil kalau ada, kalau nggak pakai inisial */}
             <div className="h-10 w-10 rounded-full overflow-hidden bg-spotify-green flex items-center justify-center text-black font-bold shadow-lg shrink-0">
-              {user.avatar ? (
+              {showUserAvatar ? (
                 <img
-                  src={user.avatar}
+                  src={user.avatar || ''}
                   alt={`Foto profil ${user.username}`}
                   className="w-full h-full object-cover"
+                  onError={() => setAvatarLoadFailed(true)}
                 />
               ) : (
                 <span>{user.username[0].toUpperCase()}</span>

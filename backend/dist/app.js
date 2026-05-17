@@ -11,7 +11,6 @@ const cors_1 = __importDefault(require("cors"));
 const response_1 = require("./utils/response");
 const logger_1 = require("./lib/logger");
 const prisma_1 = require("./lib/prisma");
-const upload_paths_1 = require("./lib/upload-paths");
 // Import routes
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const music_routes_1 = __importDefault(require("./routes/music.routes"));
@@ -51,7 +50,6 @@ if (missingRequiredEnv.length > 0) {
 if (missingOptionalEnv.length > 0) {
     logger_1.logger.warn('Missing optional environment variables', { missingOptionalEnv });
 }
-(0, upload_paths_1.ensureUploadDirs)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json({ limit: '1mb' }));
 app.use((req, res, next) => {
@@ -77,9 +75,6 @@ app.use((req, res, next) => {
     });
     next();
 });
-// Serve file statis dari folder uploads/ agar URL avatar bisa diakses langsung
-// Contoh: http://localhost:5000/uploads/avatar/user123-1234567890.png
-app.use('/uploads', express_1.default.static(upload_paths_1.uploadsStaticDir));
 // Basic route
 app.get('/', (req, res) => {
     res.json((0, response_1.createSuccessResponse)(200, 'SoundWave API is running'));

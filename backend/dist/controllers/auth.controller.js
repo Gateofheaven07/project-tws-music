@@ -4,6 +4,7 @@ exports.logout = exports.getMe = exports.login = exports.register = void 0;
 const prisma_1 = require("../lib/prisma");
 const password_1 = require("../lib/auth/password");
 const jwt_1 = require("../lib/auth/jwt");
+const avatar_1 = require("../lib/avatar");
 const constants_1 = require("../utils/constants");
 const response_1 = require("../utils/response");
 /**
@@ -43,7 +44,7 @@ const register = async (req, res) => {
                 id: user.id,
                 email: user.email,
                 username: user.username,
-                avatar: user.avatar,
+                avatar: (0, avatar_1.normalizeAvatar)(user.avatar),
             }
         }));
     }
@@ -87,7 +88,7 @@ const login = async (req, res) => {
                 id: user.id,
                 email: user.email,
                 username: user.username,
-                avatar: user.avatar,
+                avatar: (0, avatar_1.normalizeAvatar)(user.avatar),
             },
             tokens: {
                 accessToken,
@@ -123,7 +124,12 @@ const getMe = async (req, res) => {
         if (!user) {
             return res.status(constants_1.HTTP_STATUS.NOT_FOUND).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.NOT_FOUND, 'User-nya nggak ada di database kita.'));
         }
-        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Ini data profil kamu ya.', { user }));
+        return res.status(constants_1.HTTP_STATUS.OK).json((0, response_1.createSuccessResponse)(constants_1.HTTP_STATUS.OK, 'Ini data profil kamu ya.', {
+            user: {
+                ...user,
+                avatar: (0, avatar_1.normalizeAvatar)(user.avatar),
+            },
+        }));
     }
     catch (error) {
         return res.status(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Gagal ngambil data profil kamu.'));
