@@ -1,8 +1,17 @@
 import { Request, Response } from 'express';
-import type { LikedSong } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { HTTP_STATUS } from '../utils/constants';
 import { createSuccessResponse, createErrorResponse } from '../utils/response';
+
+type FavoriteSongRow = {
+  musicId: string;
+  title: string;
+  artist: string;
+  cover: string;
+  duration: number;
+  videoId: string | null;
+  genre: string | null;
+};
 
 /**
  * Ngambil semua lagu yang disukai user.
@@ -11,7 +20,7 @@ export const getFavorites = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
 
-    const likedSongs: LikedSong[] = await prisma.likedSong.findMany({
+    const likedSongs: FavoriteSongRow[] = await prisma.likedSong.findMany({
       where: { userId },
       orderBy: {
         createdAt: 'desc',
@@ -19,7 +28,7 @@ export const getFavorites = async (req: Request, res: Response) => {
     });
 
     // Format favorit disamakan dengan hasil pencarian supaya komponen UI tidak perlu tahu sumber datanya.
-    const results = likedSongs.map((f: LikedSong) => ({
+    const results = likedSongs.map((f: FavoriteSongRow) => ({
       musicId: f.musicId,
       title: f.title,
       artist: {

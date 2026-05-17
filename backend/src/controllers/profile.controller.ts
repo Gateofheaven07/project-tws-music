@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import type { PlayHistory, Song } from '@prisma/client';
 import path from 'path';
 import fs from 'fs';
 import { prisma } from '../lib/prisma';
@@ -7,7 +6,20 @@ import { hashPassword, verifyPassword } from '../lib/auth/password';
 import { HTTP_STATUS } from '../utils/constants';
 import { createSuccessResponse, createErrorResponse } from '../utils/response';
 
-type PlayHistoryWithSong = PlayHistory & { song: Song };
+type SongRow = {
+  id: string;
+  title: string;
+  artist: string;
+  thumbnail: string | null;
+  duration: number;
+  youtubeUrl: string | null;
+};
+
+type PlayHistoryWithSongRow = {
+  id: string;
+  playedAt: Date;
+  song: SongRow;
+};
 
 // Helper untuk dapetin base URL server (buat bikin URL avatar yang lengkap)
 const getBaseUrl = (req: Request) => {
@@ -242,7 +254,7 @@ export const getProfileHistory = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.userId;
 
-    const history: PlayHistoryWithSong[] = await prisma.playHistory.findMany({
+    const history: PlayHistoryWithSongRow[] = await prisma.playHistory.findMany({
       where: { userId },
       include: {
         song: true,
@@ -253,7 +265,7 @@ export const getProfileHistory = async (req: Request, res: Response) => {
       take: 50,
     });
 
-    const results = history.map((h: PlayHistoryWithSong) => ({
+    const results = history.map((h: PlayHistoryWithSongRow) => ({
       id: h.id,
       musicId: h.song.id.startsWith('music_') ? h.song.id : `music_dz_${h.song.id}`,
       title: h.song.title,
