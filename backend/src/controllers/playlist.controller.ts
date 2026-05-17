@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import type { PlaylistSong } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { HTTP_STATUS } from '../utils/constants';
 import { createSuccessResponse, createErrorResponse } from '../utils/response';
@@ -140,7 +141,7 @@ export const getPlaylistDetail = async (req: Request, res: Response) => {
     }
 
     // Mapping songs to unified format
-    const songs = playlist.songs.map(ps => ({
+    const songs = playlist.songs.map((ps: PlaylistSong) => ({
       musicId: ps.musicId,
       title: ps.title,
       artist: {

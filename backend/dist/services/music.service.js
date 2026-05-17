@@ -202,8 +202,8 @@ const getRecommendationsForUser = async (userId) => {
             count[genre] = (count[genre] || 0) + 1;
             return count;
         }, {});
-        const favoriteGenre = Object.entries(genreCount)
-            .sort(([, countA], [, countB]) => countB - countA)[0]?.[0] || 'pop';
+        const genreEntries = Object.entries(genreCount);
+        const favoriteGenre = genreEntries.sort(([, countA], [, countB]) => countB - countA)[0]?.[0] || 'pop';
         const source = likedSongs.length > 0 ? 'liked_songs' : 'fallback';
         const query = normalizeGenreSearchTerm(favoriteGenre);
         const response = await axios_1.default.get(`${DEEZER_API_URL}/search?q=${encodeURIComponent(query)}`);

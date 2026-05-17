@@ -111,7 +111,7 @@ const getPlaylistDetail = async (req, res) => {
             return res.status(constants_1.HTTP_STATUS.NOT_FOUND).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.NOT_FOUND, 'Playlist nggak ketemu.'));
         }
         // Mapping songs to unified format
-        const songs = playlist.songs.map(ps => ({
+        const songs = playlist.songs.map((ps) => ({
             musicId: ps.musicId,
             title: ps.title,
             artist: {

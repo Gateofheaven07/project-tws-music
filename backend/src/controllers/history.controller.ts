@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
+import type { PlayHistory, Song } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { HTTP_STATUS } from '../utils/constants';
 import { createSuccessResponse, createErrorResponse } from '../utils/response';
+
+type PlayHistoryWithSong = PlayHistory & { song: Song };
 
 /**
  * Ngambil riwayat lagu yang baru diputer.
@@ -10,7 +13,7 @@ export const getHistory = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
 
-    const history = await prisma.playHistory.findMany({
+    const history: PlayHistoryWithSong[] = await prisma.playHistory.findMany({
       where: { userId },
       include: {
         song: true,
@@ -21,7 +24,7 @@ export const getHistory = async (req: Request, res: Response) => {
       take: 50, // Ambil 50 lagu terakhir aja
     });
 
-    const results = history.map((h) => ({
+    const results = history.map((h: PlayHistoryWithSong) => ({
       musicId: h.song.id.startsWith('music_') ? h.song.id : `music_dz_${h.song.id}`,
       title: h.song.title,
       artist: {

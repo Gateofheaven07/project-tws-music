@@ -37,6 +37,10 @@ type YouTubeLookupResult = {
 
 type RecommendationSource = 'liked_songs' | 'fallback';
 
+type LikedSongGenre = {
+  genre: string | null;
+};
+
 const mapTrackToSong = async (track: DeezerTrack, genreName?: string) => {
   const playbackLookup = await getYouTubeId(track.artist.name, track.title);
   const { videoId } = playbackLookup;
@@ -125,7 +129,7 @@ export const searchSongs = async (query: string) => {
   try {
     // Cari lagu di Deezer
     const response = await axios.get(`${DEEZER_API_URL}/search?q=${encodeURIComponent(query)}`);
-    const tracks = response.data.data;
+    const tracks = response.data.data as DeezerTrack[];
 
     const rawResults = await Promise.all(
       tracks.slice(0, 20).map((track: DeezerTrack) => mapTrackToSong(track))
@@ -213,7 +217,7 @@ export const getSongsByGenre = async (genreId: string, genreName?: string) => {
 export const getTrendingSongs = async () => {
   try {
     const response = await axios.get(`${DEEZER_API_URL}/chart`);
-    const tracks = response.data.tracks.data;
+    const tracks = response.data.tracks.data as DeezerTrack[];
 
     const rawResults = await Promise.all(
       tracks.slice(0, 20).map((track: DeezerTrack) => mapTrackToSong(track))
@@ -234,7 +238,7 @@ export const getTrendingSongs = async () => {
  */
 export const getRecommendationsForUser = async (userId: string) => {
   try {
-    const likedSongs = await prisma.likedSong.findMany({
+    const likedSongs: LikedSongGenre[] = await prisma.likedSong.findMany({
       where: {
         userId,
         genre: {
@@ -246,23 +250,26 @@ export const getRecommendationsForUser = async (userId: string) => {
       },
     });
 
-    const genreCount = likedSongs.reduce<Record<string, number>>((count, song) => {
-      const genre = song.genre?.trim();
-      if (!genre) return count;
+    const genreCount: Record<string, number> = likedSongs.reduce(
+      (count: Record<string, number>, song: LikedSongGenre) => {
+        const genre = song.genre?.trim();
+        if (!genre) return count;
 
-      count[genre] = (count[genre] || 0) + 1;
-      return count;
-    }, {});
+        count[genre] = (count[genre] || 0) + 1;
+        return count;
+      },
+      {} as Record<string, number>
+    );
 
-    const favoriteGenre = Object.entries(genreCount)
-      .sort(([, countA], [, countB]) => countB - countA)[0]?.[0] || 'pop';
+    const genreEntries: Array<[string, number]> = Object.entries(genreCount);
+    const favoriteGenre = genreEntries.sort(([, countA], [, countB]) => countB - countA)[0]?.[0] || 'pop';
     const source: RecommendationSource = likedSongs.length > 0 ? 'liked_songs' : 'fallback';
     const query = normalizeGenreSearchTerm(favoriteGenre);
     const response = await axios.get(`${DEEZER_API_URL}/search?q=${encodeURIComponent(query)}`);
     const tracks = (response.data.data || []) as DeezerTrack[];
 
     const results = await Promise.all(
-      tracks.slice(0, 20).map((track) => mapTrackToSong(track, favoriteGenre))
+      tracks.slice(0, 20).map((track: DeezerTrack) => mapTrackToSong(track, favoriteGenre))
     );
     const hasUnavailablePlayback = results.some((song) => song.playback.status === 'unavailable');
 
