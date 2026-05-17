@@ -74,8 +74,8 @@ export function LandingPage() {
         <div className="flex justify-between items-center px-4 py-4 sm:px-6 md:px-8 max-w-[1440px] mx-auto">
           <Link href="/" className="text-2xl font-bold tracking-tighter text-primary">Soundwave</Link>
           <div className="hidden md:flex gap-8 items-center text-sm font-bold">
-            <Link href="#" className="text-foreground hover:text-primary transition-all active:scale-95 duration-200">Tentang Kami</Link>
-            <Link href="#" className="text-foreground hover:text-primary transition-all active:scale-95 duration-200">Dukungan</Link>
+            <Link href="/tentang-kami" className="text-foreground hover:text-primary transition-all active:scale-95 duration-200">Tentang Kami</Link>
+            <Link href="/dukungan" className="text-foreground hover:text-primary transition-all active:scale-95 duration-200">Dukungan</Link>
             <Link href="/discover" className="text-foreground hover:text-primary transition-all active:scale-95 duration-200">Cari Musik</Link>
             <span className="w-px h-6 bg-border mx-3" />
             {user ? (
@@ -269,24 +269,24 @@ export function LandingPage() {
           <div>
             <h4 className="font-bold text-foreground mb-3 text-base">PERUSAHAAN</h4>
             <ul className="flex flex-col gap-1 text-sm">
-              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="#">Tentang</Link></li>
-              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="#">Pekerjaan</Link></li>
-              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="#">For the Record</Link></li>
+              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="/tentang-kami">Tentang</Link></li>
+              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="/tentang-kami#nilai">Pekerjaan</Link></li>
+              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="/tentang-kami#misi">For the Record</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold text-foreground mb-3 text-base">KOMUNITAS</h4>
             <ul className="flex flex-col gap-1 text-sm">
-              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="#">Developer</Link></li>
-              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="#">Investor</Link></li>
-              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="#">Vendor</Link></li>
+              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="/dukungan#komunitas">Developer</Link></li>
+              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="/tentang-kami#nilai">Investor</Link></li>
+              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="/dukungan#kontak">Vendor</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold text-foreground mb-3 text-base">TAUTAN BERGUNA</h4>
             <ul className="flex flex-col gap-1 text-sm">
-              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="#">Dukungan</Link></li>
-              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="#">Aplikasi Mobile</Link></li>
+              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="/dukungan">Dukungan</Link></li>
+              <li><Link className="text-[#B3B3B3] hover:text-foreground hover:underline transition-opacity duration-200" href="/discover">Aplikasi Mobile</Link></li>
             </ul>
           </div>
         </div>

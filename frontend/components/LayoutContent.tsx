@@ -12,9 +12,11 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   
   const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/register');
+  const publicMarketingPaths = ['/landing', '/tentang-kami', '/dukungan'];
+  const isPublicMarketingPage = pathname ? publicMarketingPaths.includes(pathname) : false;
   const isLandingPage = pathname === '/' && !user;
 
-  if (isAuthPage || isLandingPage) {
+  if (isAuthPage || isLandingPage || isPublicMarketingPage) {
     return <div className="min-h-dvh overflow-x-hidden">{children}</div>;
   }
 
