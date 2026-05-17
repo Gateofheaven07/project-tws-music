@@ -1,9 +1,12 @@
 // SoundWave Backend Entry Point
-import express from 'express';
+import 'dotenv/config';
+import crypto from 'crypto';
+import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import path from 'path';
-import fs from 'fs';
+import { createErrorResponse, createSuccessResponse } from './utils/response';
+import { logger, serializeError } from './lib/logger';
+import { prisma } from './lib/prisma';
+import { ensureUploadDirs, uploadsStaticDir } from './lib/upload-paths';
 
 // Import routes
 import authRoutes from './routes/auth.routes';
@@ -14,27 +17,144 @@ import historyRoutes from './routes/history.routes';
 import profileRoutes from './routes/profile.routes';
 import reviewRoutes from './routes/review.routes';
 
-dotenv.config();
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught exception', { error });
+});
+
+process.on('unhandledRejection', (reason) => {
+  logger.error('Unhandled promise rejection', { reason });
+});
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Pastikan folder uploads/avatar sudah ada sebelum server jalan
-const uploadDir = path.join(process.cwd(), 'uploads', 'avatar');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+const requiredEnv = ['DATABASE_URL', 'JWT_SECRET', 'JWT_REFRESH_SECRET'] as const;
+const optionalEnv = ['YOUTUBE_API_KEY'] as const;
+const missingRequiredEnv = requiredEnv.filter((key) => !process.env[key]);
+const missingOptionalEnv = optionalEnv.filter((key) => !process.env[key]);
+
+logger.info('Backend booting', {
+  nodeEnv: process.env.NODE_ENV,
+  nodeVersion: process.version,
+  vercel: process.env.VERCEL === '1',
+  vercelRegion: process.env.VERCEL_REGION,
+  cwd: process.cwd(),
+  envPresent: {
+    DATABASE_URL: Boolean(process.env.DATABASE_URL),
+    JWT_SECRET: Boolean(process.env.JWT_SECRET),
+    JWT_REFRESH_SECRET: Boolean(process.env.JWT_REFRESH_SECRET),
+    YOUTUBE_API_KEY: Boolean(process.env.YOUTUBE_API_KEY),
+  },
+});
+
+if (missingRequiredEnv.length > 0) {
+  logger.error('Missing required environment variables', { missingRequiredEnv });
 }
 
+if (missingOptionalEnv.length > 0) {
+  logger.warn('Missing optional environment variables', { missingOptionalEnv });
+}
+
+ensureUploadDirs();
+
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const requestId = req.get('x-vercel-id') || crypto.randomUUID();
+  const startedAt = Date.now();
+
+  (req as Request & { requestId?: string }).requestId = requestId;
+  res.setHeader('x-request-id', requestId);
+
+  logger.info('HTTP request started', {
+    requestId,
+    method: req.method,
+    path: req.originalUrl,
+    userAgent: req.get('user-agent'),
+    ip: req.ip,
+  });
+
+  res.on('finish', () => {
+    logger.info('HTTP request finished', {
+      requestId,
+      method: req.method,
+      path: req.originalUrl,
+      statusCode: res.statusCode,
+      durationMs: Date.now() - startedAt,
+    });
+  });
+
+  next();
+});
 
 // Serve file statis dari folder uploads/ agar URL avatar bisa diakses langsung
 // Contoh: http://localhost:5000/uploads/avatar/user123-1234567890.png
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+app.use('/uploads', express.static(uploadsStaticDir));
 
 // Basic route
 app.get('/', (req, res) => {
-  res.json({ message: 'SoundWave API is running' });
+  res.json(createSuccessResponse(200, 'SoundWave API is running'));
+});
+
+app.get('/api/health', async (req: Request, res: Response) => {
+  const requestId = (req as Request & { requestId?: string }).requestId;
+  const includeDatabase = req.query.db === '1';
+
+  const health = {
+    ok: true,
+    requestId,
+    runtime: {
+      nodeEnv: process.env.NODE_ENV,
+      nodeVersion: process.version,
+      vercel: process.env.VERCEL === '1',
+      vercelRegion: process.env.VERCEL_REGION,
+    },
+    envPresent: {
+      DATABASE_URL: Boolean(process.env.DATABASE_URL),
+      JWT_SECRET: Boolean(process.env.JWT_SECRET),
+      JWT_REFRESH_SECRET: Boolean(process.env.JWT_REFRESH_SECRET),
+      YOUTUBE_API_KEY: Boolean(process.env.YOUTUBE_API_KEY),
+    },
+    checks: {
+      database: includeDatabase ? 'pending' : 'skipped',
+    },
+  };
+
+  if (includeDatabase) {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      health.checks.database = 'ok';
+    } catch (error) {
+      logger.error('Health database check failed', { requestId, error });
+      health.ok = false;
+      health.checks.database = 'failed';
+      const databaseError = serializeError(error) as {
+        name?: unknown;
+        message?: unknown;
+        code?: unknown;
+      };
+
+      return res.status(500).json(
+        createErrorResponse(
+          500,
+          'Backend health check failed. Check Vercel Function logs with this requestId.',
+          JSON.stringify({
+            requestId,
+            database: {
+              name: databaseError?.name,
+              message: databaseError?.message,
+              code: databaseError?.code,
+            },
+          })
+        )
+      );
+    }
+  }
+
+  return res.json(
+    createSuccessResponse(200, 'SoundWave backend health OK', health)
+  );
 });
 
 // Routes
@@ -46,8 +166,51 @@ app.use('/api/history', historyRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/reviews', reviewRoutes);
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.use((req: Request, res: Response) => {
+  const requestId = (req as Request & { requestId?: string }).requestId;
+
+  logger.warn('Route not found', {
+    requestId,
+    method: req.method,
+    path: req.originalUrl,
+  });
+
+  res.status(404).json(
+    createErrorResponse(404, 'Route not found', `Request ID: ${requestId}`)
+  );
 });
+
+app.use((error: unknown, req: Request, res: Response, _next: NextFunction) => {
+  const requestId = (req as Request & { requestId?: string }).requestId;
+  const statusCode =
+    typeof (error as { status?: unknown }).status === 'number'
+      ? (error as { status: number }).status
+      : 500;
+
+  logger.error('Unhandled request error', {
+    requestId,
+    method: req.method,
+    path: req.originalUrl,
+    error,
+  });
+
+  res.status(statusCode).json(
+    createErrorResponse(
+      statusCode,
+      statusCode >= 500
+        ? 'Internal server error. Check Vercel Function logs with this requestId.'
+        : 'Request failed.',
+      `Request ID: ${requestId}`
+    )
+  );
+});
+
+if (process.env.VERCEL !== '1') {
+  app.listen(port, () => {
+    logger.info('Server is running', { port });
+  });
+} else {
+  logger.info('Server initialized for Vercel serverless runtime');
+}
 
 export default app;

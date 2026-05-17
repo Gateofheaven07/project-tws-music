@@ -6,6 +6,7 @@
     "dev": "nodemon src/app.ts",
     "build": "prisma generate --schema=src/prisma/schema.prisma && tsc",
     "start": "node dist/app.js",
+    "logs:vercel": "npx vercel@latest logs project-tws-music-backend.vercel.app",
     "prisma:generate": "prisma generate --schema=src/prisma/schema.prisma",
     "prisma:push": "prisma db push --schema=src/prisma/schema.prisma",
     "prisma:studio": "prisma studio --schema=src/prisma/schema.prisma"

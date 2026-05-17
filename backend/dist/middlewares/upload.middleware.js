@@ -6,17 +6,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadAvatarMiddleware = void 0;
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
-// Tentukan folder tujuan penyimpanan avatar
-const AVATAR_UPLOAD_DIR = path_1.default.join(process.cwd(), 'uploads', 'avatar');
-// Buat foldernya kalau belum ada saat server pertama kali jalan
-if (!fs_1.default.existsSync(AVATAR_UPLOAD_DIR)) {
-    fs_1.default.mkdirSync(AVATAR_UPLOAD_DIR, { recursive: true });
-}
+const upload_paths_1 = require("../lib/upload-paths");
 // Konfigurasi cara file disimpan ke disk
 const storage = multer_1.default.diskStorage({
     destination: (_req, _file, cb) => {
-        cb(null, AVATAR_UPLOAD_DIR);
+        try {
+            (0, upload_paths_1.ensureUploadDirs)();
+            cb(null, upload_paths_1.avatarUploadDir);
+        }
+        catch (error) {
+            cb(error, upload_paths_1.avatarUploadDir);
+        }
     },
     filename: (req, file, cb) => {
         // Format nama file: userId-timestamp.ext, biar unik dan nggak bentrok

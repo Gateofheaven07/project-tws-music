@@ -1,20 +1,17 @@
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
 import { Request } from 'express';
-
-// Tentukan folder tujuan penyimpanan avatar
-const AVATAR_UPLOAD_DIR = path.join(process.cwd(), 'uploads', 'avatar');
-
-// Buat foldernya kalau belum ada saat server pertama kali jalan
-if (!fs.existsSync(AVATAR_UPLOAD_DIR)) {
-  fs.mkdirSync(AVATAR_UPLOAD_DIR, { recursive: true });
-}
+import { avatarUploadDir, ensureUploadDirs } from '../lib/upload-paths';
 
 // Konfigurasi cara file disimpan ke disk
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
-    cb(null, AVATAR_UPLOAD_DIR);
+    try {
+      ensureUploadDirs();
+      cb(null, avatarUploadDir);
+    } catch (error) {
+      cb(error as Error, avatarUploadDir);
+    }
   },
   filename: (req, file, cb) => {
     // Format nama file: userId-timestamp.ext, biar unik dan nggak bentrok

@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProfileHistory = exports.updateAvatar = exports.updatePassword = exports.updateUsername = exports.getProfile = void 0;
-const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const prisma_1 = require("../lib/prisma");
 const password_1 = require("../lib/auth/password");
+const upload_paths_1 = require("../lib/upload-paths");
 const constants_1 = require("../utils/constants");
 const response_1 = require("../utils/response");
 // Helper untuk dapetin base URL server (buat bikin URL avatar yang lengkap)
@@ -159,7 +159,7 @@ const updateAvatar = async (req, res) => {
             // Cek apakah avatar lama adalah file lokal (bukan URL eksternal)
             if (oldAvatarUrl.includes('/uploads/avatar/')) {
                 const filename = oldAvatarUrl.split('/uploads/avatar/')[1];
-                const oldFilePath = path_1.default.join(process.cwd(), 'uploads', 'avatar', filename);
+                const oldFilePath = (0, upload_paths_1.resolveAvatarPath)(filename);
                 if (fs_1.default.existsSync(oldFilePath)) {
                     fs_1.default.unlinkSync(oldFilePath);
                 }

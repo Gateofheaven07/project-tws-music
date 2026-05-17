@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import path from 'path';
 import fs from 'fs';
 import { prisma } from '../lib/prisma';
 import { hashPassword, verifyPassword } from '../lib/auth/password';
+import { resolveAvatarPath } from '../lib/upload-paths';
 import { HTTP_STATUS } from '../utils/constants';
 import { createSuccessResponse, createErrorResponse } from '../utils/response';
 
@@ -218,7 +218,7 @@ export const updateAvatar = async (req: Request, res: Response) => {
       // Cek apakah avatar lama adalah file lokal (bukan URL eksternal)
       if (oldAvatarUrl.includes('/uploads/avatar/')) {
         const filename = oldAvatarUrl.split('/uploads/avatar/')[1];
-        const oldFilePath = path.join(process.cwd(), 'uploads', 'avatar', filename);
+        const oldFilePath = resolveAvatarPath(filename);
         if (fs.existsSync(oldFilePath)) {
           fs.unlinkSync(oldFilePath);
         }
