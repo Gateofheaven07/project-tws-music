@@ -45,9 +45,9 @@ export default function RegisterPage() {
     router.push('/login');
   };
 
-  // Fungsi pura-pura buat handle pendaftaran lewat Google
   const handleGoogleRegister = () => {
-    alert('Fitur daftar dengan akun Google akan segera hadir!');
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    window.location.href = `${apiBaseUrl}/auth/google`;
   };
 
   return (

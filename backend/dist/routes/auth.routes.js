@@ -40,6 +40,8 @@ const router = (0, express_1.Router)();
 // Route buat daftar dan login (nggak butuh auth)
 router.post('/register', authController.register);
 router.post('/login', authController.login);
+router.get('/google', authController.googleAuth);
+router.get('/google/callback', authController.googleCallback);
 // Route yang butuh login
 router.get('/me', auth_middleware_1.authMiddleware, authController.getMe);
 router.post('/logout', auth_middleware_1.authMiddleware, authController.logout);

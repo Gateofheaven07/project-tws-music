@@ -107,6 +107,9 @@ const updatePassword = async (req, res) => {
         if (!user) {
             return res.status(constants_1.HTTP_STATUS.NOT_FOUND).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.NOT_FOUND, 'User tidak ditemukan.'));
         }
+        if (!user.password) {
+            return res.status(constants_1.HTTP_STATUS.BAD_REQUEST).json((0, response_1.createErrorResponse)(constants_1.HTTP_STATUS.BAD_REQUEST, 'Akun Google belum punya password lokal. Silakan atur password dari menu yang sesuai.'));
+        }
         // Verifikasi password lama
         const isPasswordValid = await (0, password_1.verifyPassword)(currentPassword, user.password);
         if (!isPasswordValid) {

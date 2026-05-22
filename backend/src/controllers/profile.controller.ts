@@ -153,6 +153,15 @@ export const updatePassword = async (req: Request, res: Response) => {
       );
     }
 
+    if (!user.password) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json(
+        createErrorResponse(
+          HTTP_STATUS.BAD_REQUEST,
+          'Akun Google belum punya password lokal. Silakan atur password dari menu yang sesuai.'
+        )
+      );
+    }
+
     // Verifikasi password lama
     const isPasswordValid = await verifyPassword(currentPassword, user.password);
 
