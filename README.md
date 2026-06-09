@@ -15,6 +15,7 @@ SoundWave adalah platform streaming musik fullstack yang terinspirasi dari Spoti
 ## 🛠️ Stack Teknologi
 
 ### Monorepo Structure
+
 Proyek ini menggunakan struktur monorepo agar pengembangan frontend dan backend bisa dilakukan secara bersamaan dengan mudah.
 
 - **Frontend**: Next.js 15, TypeScript, Tailwind CSS, Lucide React, Zustand (State Management), TanStack Query (Data Fetching).
@@ -45,11 +46,14 @@ project-tws/
 ## 🏁 Cara Menjalankan
 
 ### 1. Persiapan Database & API
+
 - Siapkan database PostgreSQL (disarankan pake Neon.tech).
 - Dapatkan `YOUTUBE_API_KEY` dari Google Cloud Console.
 
 ### 2. Setup Environment Variables
+
 Buat file `.env` di folder `backend/`:
+
 ```env
 DATABASE_URL="postgresql://..."
 JWT_SECRET="rahasia_banget"
@@ -57,11 +61,13 @@ YOUTUBE_API_KEY="AIza..."
 ```
 
 Buat file `.env` di folder `frontend/`:
+
 ```env
 NEXT_PUBLIC_API_URL="http://localhost:5000/api"
 ```
 
 ### 3. Install & Jalankan
+
 Jalankan perintah ini di root directory:
 
 ```bash
@@ -75,9 +81,9 @@ npm run dev
 Frontend akan jalan di `http://localhost:3000` dan Backend di `http://localhost:5000`.
 
 ## 📝 Catatan Implementasi
+
 - Kode ini menggunakan **Indonesian Comments** agar lebih mudah dipahami oleh pengembang lokal.
 - Menggunakan **YouTube Iframe API** yang disembunyikan untuk menangani playback audio saja, sehingga tampilan tetap bersih.
 - Data fetching di frontend diproteksi oleh **Axios Interceptors** yang otomatis menyisipkan token JWT.
 
 ---
-Dibuat dengan ❤️ oleh Antigravity.
