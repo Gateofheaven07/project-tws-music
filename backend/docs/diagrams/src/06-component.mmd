@@ -1,0 +1,29 @@
+flowchart LR
+    subgraph App[Backend Modules]
+        AUTH[Auth Module]
+        MUSIC[Music Module]
+        PLAYLIST[Playlist Module]
+        FAV[Favorites Module]
+        HIST[History Module]
+        PROFILE[Profile Module]
+        REVIEW[Review Module]
+        ADMIN[Admin Module]
+    end
+
+    DB[(PostgreSQL)]
+    EXT[External Music APIs]
+    OAUTH[Google OAuth]
+
+    AUTH --> DB
+    AUTH --> OAUTH
+    MUSIC --> EXT
+    PLAYLIST --> DB
+    FAV --> DB
+    HIST --> DB
+    PROFILE --> DB
+    REVIEW --> DB
+    ADMIN --> DB
+
+    ADMIN -.RBAC.-> AUTH
+    PLAYLIST -.uses.-> MUSIC
+    FAV -.uses.-> MUSIC

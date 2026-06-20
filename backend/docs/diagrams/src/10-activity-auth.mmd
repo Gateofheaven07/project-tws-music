@@ -1,0 +1,19 @@
+flowchart TD
+    START([Mulai]) --> CHOICE{Metode Daftar?}
+    CHOICE -->|Email/Password| FORM[Isi form register]
+    CHOICE -->|Google| GOAUTH[Redirect Google OAuth]
+
+    FORM --> VALIDATE{Validasi Zod & email/username unik?}
+    VALIDATE -->|Tidak| ERR[Tampilkan error] --> FORM
+    VALIDATE -->|Ya| HASH[Hash password bcrypt]
+    HASH --> CREATE[Buat User role=USER]
+
+    GOAUTH --> CALLBACK[Callback Google]
+    CALLBACK --> EXIST{User googleId ada?}
+    EXIST -->|Ya| LOADUSER[Ambil user]
+    EXIST -->|Tidak| CREATEG[Buat User authProvider=google]
+    CREATEG --> LOADUSER
+
+    CREATE --> JWT[Generate JWT]
+    LOADUSER --> JWT
+    JWT --> DONE([Selesai - User login])

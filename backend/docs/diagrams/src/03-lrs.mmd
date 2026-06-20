@@ -1,0 +1,21 @@
+flowchart TB
+    USER["<b>users</b><br/>───────────────<br/>id (PK)<br/>email (UK)<br/>username (UK)<br/>password<br/>googleId (UK)<br/>authProvider<br/>role<br/>avatar<br/>createdAt<br/>updatedAt"]
+
+    SONG["<b>songs</b><br/>───────────────<br/>id (PK)<br/>title<br/>artist<br/>album<br/>duration<br/>deezerUrl (UK)<br/>youtubeUrl (UK)<br/>thumbnail<br/>genre<br/>releaseDate"]
+
+    PLAYLIST["<b>playlists</b><br/>───────────────<br/>id (PK)<br/>userId (FK)<br/>name<br/>description<br/>isPublic<br/>thumbnail<br/>createdAt"]
+
+    PSONG["<b>playlist_songs</b><br/>───────────────<br/>id (PK)<br/>playlistId (FK)<br/>musicId<br/>title<br/>artist<br/>cover<br/>duration<br/>videoId<br/>UK(playlistId,musicId)"]
+
+    LIKED["<b>liked_songs</b><br/>───────────────<br/>id (PK)<br/>userId (FK)<br/>musicId<br/>title<br/>artist<br/>cover<br/>duration<br/>videoId<br/>genre<br/>UK(userId,musicId)"]
+
+    HISTORY["<b>play_history</b><br/>───────────────<br/>id (PK)<br/>userId (FK)<br/>songId (FK)<br/>playedAt"]
+
+    REVIEW["<b>app_reviews</b><br/>───────────────<br/>id (PK)<br/>userId (FK, UK)<br/>rating<br/>review<br/>adminReply<br/>repliedAt<br/>createdAt"]
+
+    PLAYLIST -->|userId| USER
+    PSONG -->|playlistId| PLAYLIST
+    LIKED -->|userId| USER
+    HISTORY -->|userId| USER
+    HISTORY -->|songId| SONG
+    REVIEW -->|userId| USER

@@ -1,0 +1,36 @@
+flowchart TB
+    subgraph CLIENT["Client Layer"]
+        WEB[Web App / SPA]
+    end
+
+    subgraph API["Application Layer - Express.js (Vercel)"]
+        direction TB
+        ROUTES[Routes / API Endpoints]
+        subgraph MW[Middlewares]
+            AUTHMW[JWT Auth]
+            ADMINMW[Admin RBAC]
+            UPLOAD[Multer Upload]
+        end
+        CTRL[Controllers]
+        SVC[Services / Business Logic]
+        LIB[Lib: JWT, bcrypt, Zod, Logger]
+    end
+
+    subgraph DATA["Data Layer"]
+        PRISMA[Prisma ORM]
+        DB[(PostgreSQL)]
+    end
+
+    subgraph EXT["External Services"]
+        DEEZER[Deezer API]
+        YT[YouTube API]
+        GOOGLE[Google OAuth]
+    end
+
+    WEB -->|HTTPS / REST + JWT| ROUTES
+    ROUTES --> MW --> CTRL --> SVC
+    SVC --> LIB
+    SVC --> PRISMA --> DB
+    SVC -->|cari & metadata lagu| DEEZER
+    SVC -->|stream id| YT
+    CTRL -->|OAuth flow| GOOGLE

@@ -1,0 +1,8 @@
+flowchart LR
+    USER([User]) -->|kredensial, request musik| SYS((Sistem SoundWave))
+    ADMIN([Admin]) -->|kelola user & review| SYS
+    SYS -->|hasil pencarian, playlist, token| USER
+    SYS -->|statistik & laporan| ADMIN
+    MUSICAPI([Deezer / YouTube]) -->|metadata & stream| SYS
+    SYS -->|query pencarian| MUSICAPI
+    GOOGLE([Google OAuth]) -->|profil OAuth| SYS

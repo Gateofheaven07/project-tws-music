@@ -1,0 +1,89 @@
+erDiagram
+    USER ||--o{ PLAYLIST : "membuat"
+    USER ||--o{ LIKED_SONG : "menyukai"
+    USER ||--o{ PLAY_HISTORY : "memutar"
+    USER ||--o| APP_REVIEW : "menulis"
+    PLAYLIST ||--o{ PLAYLIST_SONG : "berisi"
+    SONG ||--o{ PLAY_HISTORY : "tercatat di"
+
+    USER {
+        string id PK "cuid"
+        string email UK
+        string username UK
+        string password "nullable"
+        string googleId UK "nullable"
+        string authProvider "default local"
+        enum   role "USER ADMIN SUPER_ADMIN"
+        string avatar "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    SONG {
+        string id PK "cuid"
+        string title
+        string artist
+        string album "nullable"
+        int    duration "detik"
+        string deezerUrl UK "nullable"
+        string youtubeUrl UK "nullable"
+        string thumbnail "nullable"
+        string genre "nullable"
+        datetime releaseDate "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    PLAYLIST {
+        string id PK "cuid"
+        string userId FK
+        string name
+        string description "nullable"
+        boolean isPublic "default false"
+        string thumbnail "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    PLAYLIST_SONG {
+        string id PK "cuid"
+        string playlistId FK
+        string musicId
+        string title
+        string artist
+        string cover
+        int    duration
+        string videoId "nullable"
+        datetime addedAt
+    }
+
+    LIKED_SONG {
+        string id PK "cuid"
+        string userId FK
+        string musicId
+        string title
+        string artist
+        string cover
+        int    duration
+        string videoId "nullable"
+        string genre "nullable"
+        datetime createdAt
+    }
+
+    PLAY_HISTORY {
+        string id PK "cuid"
+        string userId FK
+        string songId FK
+        datetime playedAt
+    }
+
+    APP_REVIEW {
+        string id PK "cuid"
+        string userId FK,UK
+        int    rating
+        string review
+        string adminReply "nullable"
+        datetime repliedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }

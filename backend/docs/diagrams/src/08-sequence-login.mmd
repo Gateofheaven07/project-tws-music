@@ -1,0 +1,21 @@
+sequenceDiagram
+    actor U as User
+    participant R as Routes
+    participant C as AuthController
+    participant S as AuthService
+    participant DB as Prisma/PostgreSQL
+
+    U->>R: POST /api/auth/login {email, password}
+    R->>C: login()
+    C->>S: validateCredentials(email, password)
+    S->>DB: findUnique(email)
+    DB-->>S: user record
+    S->>S: bcrypt.compare(password)
+    alt Password valid
+        S->>S: generateJWT(user)
+        S-->>C: { token, user }
+        C-->>U: 200 OK { token, user }
+    else Password invalid
+        S-->>C: error
+        C-->>U: 401 Unauthorized
+    end

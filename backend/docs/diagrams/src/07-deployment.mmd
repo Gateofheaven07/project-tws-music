@@ -1,0 +1,24 @@
+flowchart TB
+    subgraph USERNODE["Client Device"]
+        BROWSER[Web Browser]
+    end
+
+    subgraph VERCEL["Vercel (Serverless)"]
+        NODE[Node.js Runtime - Express API]
+    end
+
+    subgraph DBHOST["Managed PostgreSQL"]
+        PG[(PostgreSQL Database)]
+    end
+
+    subgraph CLOUD["Third-Party Cloud"]
+        DEEZER[Deezer API]
+        YT[YouTube]
+        GAUTH[Google OAuth 2.0]
+    end
+
+    BROWSER -->|HTTPS 443| NODE
+    NODE -->|TCP 5432 / SSL| PG
+    NODE -->|HTTPS| DEEZER
+    NODE -->|HTTPS| YT
+    NODE -->|HTTPS| GAUTH

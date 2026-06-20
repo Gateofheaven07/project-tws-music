@@ -1,0 +1,27 @@
+flowchart TB
+    USER([User])
+    ADMIN([Admin])
+
+    P1((1.0 Autentikasi))
+    P2((2.0 Manajemen Musik))
+    P3((3.0 Playlist & Favorit))
+    P4((4.0 Riwayat & Rekomendasi))
+    P5((5.0 Review))
+    P6((6.0 Admin & Analitik))
+
+    D1[(users)]
+    D2[(playlists / playlist_songs)]
+    D3[(liked_songs)]
+    D4[(play_history / songs)]
+    D5[(app_reviews)]
+
+    USER --> P1 --> D1
+    USER --> P2
+    USER --> P3 --> D2
+    P3 --> D3
+    USER --> P4 --> D4
+    USER --> P5 --> D5
+    ADMIN --> P6
+    P6 --> D1
+    P6 --> D5
+    P6 --> D4

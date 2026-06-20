@@ -1,0 +1,21 @@
+sequenceDiagram
+    actor U as User
+    participant MW as JWT Middleware
+    participant C as PlaylistController
+    participant S as PlaylistService
+    participant DB as PostgreSQL
+
+    U->>MW: POST /api/playlists/:id/songs {musicId}
+    MW->>MW: verify JWT
+    MW->>C: addSong()
+    C->>S: addSongToPlaylist(playlistId, song)
+    S->>DB: cek ownership playlist
+    DB-->>S: playlist
+    S->>DB: create PlaylistSong (unique playlistId+musicId)
+    alt Lagu belum ada
+        DB-->>S: created
+        S-->>U: 201 Created
+    else Lagu sudah ada
+        DB-->>S: unique violation
+        S-->>U: 409 Conflict
+    end

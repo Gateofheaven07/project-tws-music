@@ -1,0 +1,47 @@
+flowchart LR
+    Guest([Guest])
+    User([User])
+    Admin([Admin])
+    SuperAdmin([Super Admin])
+
+    User -. inherits .-> Guest
+    Admin -. inherits .-> User
+    SuperAdmin -. inherits .-> Admin
+
+    subgraph PUBLIC[" Akses Publik "]
+        UC1((Register))
+        UC2((Login))
+        UC3((Login via Google))
+        UC4((Cari Musik))
+        UC5((Lihat Trending))
+        UC6((Lihat Genre))
+        UC7((Lihat Review Publik))
+    end
+
+    subgraph USERZONE[" Fitur User Terautentikasi "]
+        UC8((Kelola Profil))
+        UC9((Kelola Playlist))
+        UC10((Like / Unlike Lagu))
+        UC11((Riwayat Putar))
+        UC12((Rekomendasi Musik))
+        UC13((Stream Lagu))
+        UC14((Kirim / Ubah Review))
+    end
+
+    subgraph ADMINZONE[" Fitur Admin "]
+        UC15((Lihat Dashboard & Statistik))
+        UC16((Kelola User))
+        UC17((Moderasi Review))
+        UC18((Lihat Analitik))
+    end
+
+    subgraph SUPERZONE[" Fitur Super Admin "]
+        UC19((Ubah Role User))
+        UC20((Kelola Akun Admin))
+        UC21((Cek System Health))
+    end
+
+    Guest --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7
+    User --> UC8 & UC9 & UC10 & UC11 & UC12 & UC13 & UC14
+    Admin --> UC15 & UC16 & UC17 & UC18
+    SuperAdmin --> UC19 & UC20 & UC21

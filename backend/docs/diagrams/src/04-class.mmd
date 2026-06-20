@@ -1,0 +1,65 @@
+classDiagram
+    class User {
+        +String id
+        +String email
+        +String username
+        +String password
+        +String googleId
+        +Role role
+        +String avatar
+        +playlists() Playlist[]
+        +likedSongs() LikedSong[]
+        +playHistory() PlayHistory[]
+    }
+    class Playlist {
+        +String id
+        +String userId
+        +String name
+        +Boolean isPublic
+        +songs() PlaylistSong[]
+    }
+    class PlaylistSong {
+        +String id
+        +String playlistId
+        +String musicId
+        +Int duration
+    }
+    class LikedSong {
+        +String id
+        +String userId
+        +String musicId
+        +String genre
+    }
+    class Song {
+        +String id
+        +String title
+        +String artist
+        +Int duration
+    }
+    class PlayHistory {
+        +String id
+        +String userId
+        +String songId
+        +DateTime playedAt
+    }
+    class AppReview {
+        +String id
+        +String userId
+        +Int rating
+        +String review
+        +String adminReply
+    }
+    class Role {
+        <<enumeration>>
+        USER
+        ADMIN
+        SUPER_ADMIN
+    }
+
+    User "1" --> "*" Playlist
+    User "1" --> "*" LikedSong
+    User "1" --> "*" PlayHistory
+    User "1" --> "0..1" AppReview
+    User --> Role
+    Playlist "1" --> "*" PlaylistSong
+    Song "1" --> "*" PlayHistory
