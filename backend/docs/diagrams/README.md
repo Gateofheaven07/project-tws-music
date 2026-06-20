@@ -16,6 +16,8 @@ Folder ini berisi **gambar diagram resolusi tinggi (PNG, scale 3x, background pu
 | 10 | Activity — Registrasi & Auth | [png/10-activity-auth.png](png/10-activity-auth.png) |
 | 11 | DFD — Context (Level 0) | [png/11-dfd-context.png](png/11-dfd-context.png) |
 | 12 | DFD — Level 1 | [png/12-dfd-level1.png](png/12-dfd-level1.png) |
+| 13 | Arsitektur Full-Stack (FE · BE · API · DB) | [png/13-arsitektur-fullstack.png](png/13-arsitektur-fullstack.png) |
+| 14 | Sequence End-to-End (alur pemakaian web lengkap) | [png/14-sequence-end-to-end.png](png/14-sequence-end-to-end.png) |
 
 ## Struktur Folder
 - `src/` — file sumber `.mmd` (Mermaid) yang dapat diedit.

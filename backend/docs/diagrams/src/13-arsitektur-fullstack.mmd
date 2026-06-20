@@ -1,0 +1,54 @@
+flowchart TB
+    subgraph CLIENT["FRONTEND - Next.js 16 / React 19 (Vercel)"]
+        direction TB
+        PAGES["App Router Pages<br/>landing, auth, discover,<br/>playlists, favorites, profile, admin"]
+        STORES["State - Zustand<br/>authStore, playerStore, musicStore"]
+        QUERY["Data Layer<br/>TanStack Query + SWR"]
+        UI["UI - Radix UI + Tailwind + Framer Motion"]
+        YTPLAYER["YouTube Iframe Player<br/>(headless audio)"]
+        APICLIENT["Axios Instance lib/api.ts<br/>+ Bearer token interceptor"]
+    end
+
+    subgraph BACKEND["BACKEND - Express.js + TypeScript (Vercel)"]
+        direction TB
+        ROUTES["REST API Routes - /api/*"]
+        MW["Middlewares<br/>JWT Auth, Admin RBAC, Multer"]
+        CTRL["Controllers"]
+        SVC["Services - Business Logic"]
+        LIB["Lib: JWT, bcrypt, Zod, Logger"]
+        PRISMA["Prisma ORM"]
+    end
+
+    DB[("PostgreSQL<br/>(Managed)")]
+
+    subgraph EXT["EXTERNAL SERVICES"]
+        DEEZER["Deezer API<br/>(search & metadata)"]
+        YT["YouTube API<br/>(stream id)"]
+        GOOGLE["Google OAuth 2.0"]
+    end
+
+    PAGES --> STORES
+    PAGES --> QUERY
+    PAGES --> UI
+    STORES --> YTPLAYER
+    QUERY --> APICLIENT
+    STORES --> APICLIENT
+
+    APICLIENT -->|"HTTPS REST + JWT"| ROUTES
+    YTPLAYER -->|"embed videoId"| YT
+
+    ROUTES --> MW --> CTRL --> SVC
+    SVC --> LIB
+    SVC --> PRISMA --> DB
+    SVC -->|"cari lagu"| DEEZER
+    SVC -->|"resolve stream"| YT
+    CTRL -->|"OAuth flow"| GOOGLE
+
+    classDef fe fill:#dbeafe,stroke:#3b82f6,color:#1e3a8a
+    classDef be fill:#dcfce7,stroke:#22c55e,color:#14532d
+    classDef ext fill:#fef9c3,stroke:#eab308,color:#713f12
+    classDef db fill:#fae8ff,stroke:#a855f7,color:#581c87
+    class PAGES,STORES,QUERY,UI,YTPLAYER,APICLIENT fe
+    class ROUTES,MW,CTRL,SVC,LIB,PRISMA be
+    class DEEZER,YT,GOOGLE ext
+    class DB db

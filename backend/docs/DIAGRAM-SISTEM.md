@@ -3,7 +3,7 @@
 Dokumen ini berisi seluruh diagram perancangan sistem aplikasi **SoundWave** (music streaming platform).
 Seluruh diagram ditulis menggunakan sintaks **Mermaid** sehingga dapat dirender langsung di GitHub, VS Code (ekstensi Markdown Preview Mermaid), maupun editor Markdown lain yang mendukung Mermaid.
 
-**Tech Stack:** Express.js · TypeScript · Prisma ORM · PostgreSQL · JWT · Google OAuth · Vercel
+**Tech Stack:** Next.js 16 / React 19 (Frontend) · Express.js · TypeScript · Prisma ORM · PostgreSQL · JWT · Google OAuth · Deezer/YouTube API · Vercel
 
 ---
 
@@ -18,6 +18,8 @@ Seluruh diagram ditulis menggunakan sintaks **Mermaid** sehingga dapat dirender 
 8. [Sequence Diagram](#8-sequence-diagram)
 9. [Activity Diagram](#9-activity-diagram)
 10. [Data Flow Diagram (DFD)](#10-data-flow-diagram-dfd)
+11. [Arsitektur Full-Stack (FE · BE · API · DB)](#11-arsitektur-full-stack-fe--be--api--db)
+12. [Sequence Diagram End-to-End (Alur Pemakaian Web Lengkap)](#12-sequence-diagram-end-to-end-alur-pemakaian-web-lengkap)
 
 ---
 
@@ -569,4 +571,174 @@ flowchart TB
 
 ---
 
-> **Cara render:** buka file ini di VS Code dengan ekstensi *Markdown Preview Mermaid Support*, atau langsung di GitHub. Untuk mengekspor ke gambar, gunakan [Mermaid Live Editor](https://mermaid.live) dengan menyalin tiap blok ```mermaid```.
+## 11. Arsitektur Full-Stack (FE · BE · API · DB)
+
+Diagram arsitektur teknologi nyata yang digunakan: **Frontend** (Next.js/React), **Backend** (Express REST API), **Database** (PostgreSQL via Prisma), serta **layanan eksternal** (Deezer, YouTube, Google OAuth). Warna menandai tiap layer.
+
+```mermaid
+flowchart TB
+    subgraph CLIENT["FRONTEND - Next.js 16 / React 19 (Vercel)"]
+        direction TB
+        PAGES["App Router Pages<br/>landing, auth, discover,<br/>playlists, favorites, profile, admin"]
+        STORES["State - Zustand<br/>authStore, playerStore, musicStore"]
+        QUERY["Data Layer<br/>TanStack Query + SWR"]
+        UI["UI - Radix UI + Tailwind + Framer Motion"]
+        YTPLAYER["YouTube Iframe Player<br/>(headless audio)"]
+        APICLIENT["Axios Instance lib/api.ts<br/>+ Bearer token interceptor"]
+    end
+
+    subgraph BACKEND["BACKEND - Express.js + TypeScript (Vercel)"]
+        direction TB
+        ROUTES["REST API Routes - /api/*"]
+        MW["Middlewares<br/>JWT Auth, Admin RBAC, Multer"]
+        CTRL["Controllers"]
+        SVC["Services - Business Logic"]
+        LIB["Lib: JWT, bcrypt, Zod, Logger"]
+        PRISMA["Prisma ORM"]
+    end
+
+    DB[("PostgreSQL<br/>(Managed)")]
+
+    subgraph EXT["EXTERNAL SERVICES"]
+        DEEZER["Deezer API<br/>(search & metadata)"]
+        YT["YouTube API<br/>(stream id)"]
+        GOOGLE["Google OAuth 2.0"]
+    end
+
+    PAGES --> STORES
+    PAGES --> QUERY
+    PAGES --> UI
+    STORES --> YTPLAYER
+    QUERY --> APICLIENT
+    STORES --> APICLIENT
+
+    APICLIENT -->|"HTTPS REST + JWT"| ROUTES
+    YTPLAYER -->|"embed videoId"| YT
+
+    ROUTES --> MW --> CTRL --> SVC
+    SVC --> LIB
+    SVC --> PRISMA --> DB
+    SVC -->|"cari lagu"| DEEZER
+    SVC -->|"resolve stream"| YT
+    CTRL -->|"OAuth flow"| GOOGLE
+
+    classDef fe fill:#dbeafe,stroke:#3b82f6,color:#1e3a8a
+    classDef be fill:#dcfce7,stroke:#22c55e,color:#14532d
+    classDef ext fill:#fef9c3,stroke:#eab308,color:#713f12
+    classDef db fill:#fae8ff,stroke:#a855f7,color:#581c87
+    class PAGES,STORES,QUERY,UI,YTPLAYER,APICLIENT fe
+    class ROUTES,MW,CTRL,SVC,LIB,PRISMA be
+    class DEEZER,YT,GOOGLE ext
+    class DB db
+```
+
+| Layer | Teknologi | Tanggung Jawab |
+|-------|-----------|----------------|
+| **Frontend (FE)** | Next.js 16, React 19, Zustand, TanStack Query, Radix UI, Tailwind | UI, state management, pemutar audio (YouTube iframe), pemanggilan API |
+| **API / Backend (BE)** | Express.js, TypeScript, JWT, Zod | REST endpoint, autentikasi, RBAC, validasi, business logic |
+| **Data** | Prisma ORM + PostgreSQL | Persistensi user, playlist, favorit, riwayat, review |
+| **External** | Deezer, YouTube, Google OAuth | Metadata lagu, streaming audio, login pihak ketiga |
+
+---
+
+## 12. Sequence Diagram End-to-End (Alur Pemakaian Web Lengkap)
+
+Alur lengkap seorang **User** menggunakan web dari awal (buka situs) hingga akhir (logout): autentikasi → cari musik → putar lagu → like & playlist → rekomendasi → review → logout.
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant FE as Frontend (Next.js)
+    participant ST as Zustand Store
+    participant API as Backend API (Express)
+    participant DB as PostgreSQL
+    participant DZ as Deezer API
+    participant YT as YouTube
+    participant GO as Google OAuth
+
+    Note over U,FE: 1. Membuka Aplikasi
+    U->>FE: Buka situs (landing page)
+    FE-->>U: Tampilkan landing page (publik)
+
+    Note over U,GO: 2. Autentikasi
+    alt Login Email/Password
+        U->>FE: Isi form login & submit
+        FE->>API: POST /api/auth/login {email, password}
+        API->>DB: findUnique(email)
+        DB-->>API: user record
+        API->>API: bcrypt.compare + generateJWT
+        API-->>FE: { token, user }
+    else Login dengan Google
+        U->>FE: Klik "Login with Google"
+        FE->>API: GET /api/auth/google
+        API->>GO: Redirect OAuth consent
+        GO-->>API: callback (profil google)
+        API->>DB: upsert user (googleId)
+        DB-->>API: user
+        API-->>FE: { token, user }
+    end
+    FE->>ST: simpan token & user (persist localStorage)
+    FE-->>U: Redirect ke Home / Dashboard
+
+    Note over U,DZ: 3. Mencari & Menjelajah Musik
+    U->>FE: Ketik kata kunci di search
+    FE->>API: GET /api/music/search?q=...
+    API->>DZ: cari lagu
+    DZ-->>API: daftar lagu + metadata
+    API-->>FE: hasil pencarian
+    FE-->>U: Tampilkan daftar lagu
+
+    Note over U,YT: 4. Memutar Lagu
+    U->>FE: Klik lagu untuk diputar
+    FE->>ST: set currentSong
+    alt videoId belum ada
+        FE->>API: GET /api/music/stream-id (JWT)
+        API->>YT: resolve stream by artist+title
+        YT-->>API: videoId
+        API->>DB: create PlayHistory(userId, songId)
+        API-->>FE: { videoId }
+    end
+    FE->>YT: player.loadVideoById(videoId)
+    YT-->>U: Audio diputar (player bar)
+
+    Note over U,DB: 5. Like / Tambah ke Playlist
+    U->>FE: Klik tombol Like
+    FE->>API: POST /api/liked-songs {musicId} (JWT)
+    API->>DB: create LikedSong (unique userId+musicId)
+    DB-->>API: created
+    API-->>FE: 201 Created
+    U->>FE: Tambah lagu ke playlist
+    FE->>API: POST /api/playlists/:id/songs (JWT)
+    API->>DB: create PlaylistSong
+    DB-->>API: created
+    API-->>FE: 201 Created
+    FE-->>U: Notifikasi sukses (toast)
+
+    Note over U,DB: 6. Rekomendasi & Riwayat
+    U->>FE: Buka halaman Discover
+    FE->>API: GET /api/music/recommendations (JWT)
+    API->>DB: ambil genre favorit user
+    DB-->>API: genre
+    API->>DZ: cari lagu berdasarkan genre
+    DZ-->>API: rekomendasi
+    API-->>FE: daftar rekomendasi
+    FE-->>U: Tampilkan rekomendasi
+
+    Note over U,DB: 7. Memberi Review
+    U->>FE: Isi rating & review aplikasi
+    FE->>API: PUT /api/reviews/me {rating, review} (JWT)
+    API->>DB: upsert AppReview (userId unik)
+    DB-->>API: saved
+    API-->>FE: 200 OK
+
+    Note over U,FE: 8. Logout
+    U->>FE: Klik Logout
+    FE->>API: POST /api/auth/logout (JWT)
+    API-->>FE: 200 OK
+    FE->>ST: hapus token & user
+    FE-->>U: Kembali ke landing page
+```
+
+---
+
+> **Cara render:** buka file ini di VS Code dengan ekstensi *Markdown Preview Mermaid Support*, atau langsung di GitHub. Untuk mengekspor ke gambar, gunakan [Mermaid Live Editor](https://mermaid.live) dengan menyalin tiap blok ```mermaid```. Versi gambar PNG siap-pakai tersedia di folder [diagrams/png/](diagrams/png/).
