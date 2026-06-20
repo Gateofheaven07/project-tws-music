@@ -53,7 +53,7 @@ export const Sidebar = ({ className, onNavigate }: SidebarProps) => {
       </Link>
 
       {/* Navigasi utama */}
-      <nav className="flex min-h-0 flex-1 flex-col gap-1">
+      <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] pb-4">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -103,6 +103,18 @@ export const Sidebar = ({ className, onNavigate }: SidebarProps) => {
           </span>
           BUAT DAFTAR PUTAR
         </Link>
+
+        {/* Tombol ke Admin Panel (Hanya buat admin/super_admin) */}
+        {user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') && (
+          <Link
+            href="/admin"
+            onClick={onNavigate}
+            className="mt-2 flex min-h-11 w-full items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-left text-[12px] font-bold uppercase tracking-[1px] text-primary shadow-sm transition-colors hover:bg-primary/20 hover:text-white"
+          >
+            <span className="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+            ADMIN PANEL
+          </Link>
+        )}
       </nav>
 
       {/* Bagian bawah: info user + tombol logout */}

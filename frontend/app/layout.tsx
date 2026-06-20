@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import QueryProvider from '@/providers/QueryProvider'
 import { LayoutContent } from '@/components/LayoutContent'
+import { Toaster } from 'sonner'
 
 const hankenGrotesk = Hanken_Grotesk({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -40,6 +41,7 @@ export default function RootLayout({
         <QueryProvider>
           <LayoutContent>{children}</LayoutContent>
         </QueryProvider>
+        <Toaster theme="dark" position="bottom-right" richColors />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

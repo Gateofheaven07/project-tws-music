@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Loader, MessageSquare, Quote, Star } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import api, { getApiErrorMessage } from '@/lib/api';
 
@@ -17,6 +18,8 @@ type AppReview = {
   id: string;
   rating: number;
   review: string;
+  adminReply?: string | null;
+  repliedAt?: string | null;
   user: ReviewUser;
   createdAt: string;
   updatedAt: string;
@@ -72,6 +75,18 @@ export default function ReviewsPage() {
       setMyReview(review);
       setSelectedRating(review?.rating || 5);
       setReviewText(review?.review || '');
+
+      // Notifikasi kalau admin baru saja membalas ulasan kamu.
+      if (review?.adminReply && review.repliedAt) {
+        const seenKey = `soundwave:seen-reply:${user.id}`;
+        const lastSeen = localStorage.getItem(seenKey);
+        if (lastSeen !== review.repliedAt) {
+          toast.success('Admin membalas ulasan kamu!', {
+            description: review.adminReply,
+          });
+          localStorage.setItem(seenKey, review.repliedAt);
+        }
+      }
     } catch (error) {
       setMyReview(null);
       setReviewError(getApiErrorMessage(error, 'Ulasan kamu belum bisa dimuat.'));
@@ -296,6 +311,17 @@ export default function ReviewsPage() {
                       <p className="text-sm leading-6 text-[#E7E7E7]">
                         &ldquo;{item.review}&rdquo;
                       </p>
+                      {item.adminReply ? (
+                        <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                          <div className="flex items-center gap-2">
+                            <MessageSquare className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                            <span className="text-[11px] font-bold uppercase tracking-[1.2px] text-primary">
+                              Balasan Soundwave
+                            </span>
+                          </div>
+                          <p className="mt-1.5 text-sm leading-6 text-[#CFCFCF]">{item.adminReply}</p>
+                        </div>
+                      ) : null}
                     </div>
                     <div className="mt-6 border-t border-white/10 pt-4">
                       <div className="flex flex-wrap items-center gap-2">

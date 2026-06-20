@@ -7,6 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Role enum untuk RBAC (Role-Based Access Control)
+enum Role {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
 // User model untuk authentication
 model User {
   id        String   @id @default(cuid())
@@ -15,6 +22,7 @@ model User {
   password  String?
   googleId  String?  @unique
   authProvider String @default("local")
+  role         Role   @default(USER)
   avatar    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -127,6 +135,8 @@ model AppReview {
   userId    String   @unique
   rating    Int
   review    String
+  adminReply String?
+  repliedAt  DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

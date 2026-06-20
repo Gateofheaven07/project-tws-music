@@ -5,6 +5,9 @@ export interface ApiResponse<T = any> {
   meta?: {
     query?: string;
     total?: number;
+    page?: number;
+    limit?: number;
+    totalPages?: number;
     provider?: {
       metadata: string;
       playback: string;

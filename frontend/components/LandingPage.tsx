@@ -16,6 +16,8 @@ type AppReview = {
   id: string;
   rating: number;
   review: string;
+  adminReply?: string | null;
+  repliedAt?: string | null;
   user: ReviewUser;
   createdAt: string;
   updatedAt: string;
@@ -236,6 +238,17 @@ export function LandingPage() {
                       <p className="text-base leading-7 text-[#E7E7E7]">
                         &ldquo;{item.review}&rdquo;
                       </p>
+                      {item.adminReply ? (
+                        <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+                          <div className="flex items-center gap-2">
+                            <MessageSquare className="h-4 w-4 text-primary" aria-hidden="true" />
+                            <span className="text-xs font-bold uppercase tracking-[1.2px] text-primary">
+                              Balasan Soundwave
+                            </span>
+                          </div>
+                          <p className="mt-2 text-sm leading-6 text-[#CFCFCF]">{item.adminReply}</p>
+                        </div>
+                      ) : null}
                     </div>
                     <div className="mt-8 border-t border-white/10 pt-4">
                       <div className="flex flex-wrap items-center gap-2">

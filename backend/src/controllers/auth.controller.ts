@@ -53,11 +53,12 @@ const clearGoogleStateCookie = (res: Response) => {
   });
 };
 
-const createTokenResponse = (user: { id: string; email: string; username: string; avatar: string | null }) => {
+const createTokenResponse = (user: { id: string; email: string; username: string; avatar: string | null; role: string }) => {
   const tokenPayload = {
     userId: user.id,
     email: user.email,
     username: user.username,
+    role: user.role,
   };
 
   return {
@@ -66,6 +67,7 @@ const createTokenResponse = (user: { id: string; email: string; username: string
       email: user.email,
       username: user.username,
       avatar: normalizeAvatar(user.avatar),
+      role: user.role,
     },
     tokens: {
       accessToken: createAccessToken(tokenPayload),
@@ -368,12 +370,14 @@ export const login = async (req: Request, res: Response) => {
       userId: user.id,
       email: user.email,
       username: user.username,
+      role: user.role,
     });
 
     const refreshToken = createRefreshToken({
       userId: user.id,
       email: user.email,
       username: user.username,
+      role: user.role,
     });
 
     return res.status(HTTP_STATUS.OK).json(
@@ -383,6 +387,7 @@ export const login = async (req: Request, res: Response) => {
           email: user.email,
           username: user.username,
           avatar: normalizeAvatar(user.avatar),
+          role: user.role,
         },
         tokens: {
           accessToken,
@@ -422,6 +427,7 @@ export const getMe = async (req: Request, res: Response) => {
         email: true,
         username: true,
         avatar: true,
+        role: true,
         createdAt: true,
       },
     });
@@ -437,6 +443,7 @@ export const getMe = async (req: Request, res: Response) => {
         user: {
           ...user,
           avatar: normalizeAvatar(user.avatar),
+          role: user.role,
         },
       })
     );

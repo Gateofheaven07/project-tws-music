@@ -9,7 +9,8 @@
     "logs:vercel": "npx vercel@latest logs project-tws-music-backend.vercel.app",
     "prisma:generate": "prisma generate --schema=src/prisma/schema.prisma",
     "prisma:push": "prisma db push --schema=src/prisma/schema.prisma",
-    "prisma:studio": "prisma studio --schema=src/prisma/schema.prisma"
+    "prisma:studio": "prisma studio --schema=src/prisma/schema.prisma",
+    "prisma:seed": "npx ts-node src/prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",

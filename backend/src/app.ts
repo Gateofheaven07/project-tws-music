@@ -15,6 +15,7 @@ import favoriteRoutes from './routes/favorite.routes';
 import historyRoutes from './routes/history.routes';
 import profileRoutes from './routes/profile.routes';
 import reviewRoutes from './routes/review.routes';
+import adminRoutes from './routes/admin.routes';
 
 process.on('uncaughtException', (error) => {
   logger.error('Uncaught exception', { error });
@@ -158,6 +159,7 @@ app.use('/api/liked-songs', favoriteRoutes);
 app.use('/api/history', historyRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use((req: Request, res: Response) => {
   const requestId = (req as Request & { requestId?: string }).requestId;

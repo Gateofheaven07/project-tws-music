@@ -13,10 +13,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState('');
 
-  // Kalo user udah login, langsung arahkan ke beranda aplikasi.
+  // Kalo user udah login, langsung arahkan ke beranda aplikasi atau admin panel
   useEffect(() => {
     if (user) {
-      router.push('/');
+      if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     }
   }, [user, router]);
 
@@ -34,13 +38,18 @@ export default function LoginPage() {
     if (!result.success) {
       setFormError(result.error || 'Login failed');
     } else {
-      router.push('/');
+      if (result.user?.role === 'ADMIN' || result.user?.role === 'SUPER_ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     }
   };
 
-  // Fungsi pura-pura buat handle login pakai Google
+  // Arahkan ke endpoint OAuth Google di backend (full-page redirect)
   const handleGoogleLogin = () => {
-    alert('Fitur masuk dengan akun Google akan segera hadir!');
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    window.location.href = `${apiBaseUrl}/auth/google`;
   };
 
   return (
